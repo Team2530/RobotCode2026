@@ -1,9 +1,6 @@
 # This gitignore has been specially created by the WPILib team.
 # If you remove items from this file, intellisense might break.
 
-.DS_Store
-BuildConstants.java
-
 ### C++ ###
 # Prerequisites
 *.d
@@ -188,3 +185,9 @@ compile_commands.json
 
 # Eclipse generated file for annotation processors
 .factorypath
+
+# Mac File
+.DS_Store
+
+# Generated Build Constants file
+src/main/java/frc/robot/BuildConstants.java
