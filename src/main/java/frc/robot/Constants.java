@@ -217,6 +217,11 @@ public final class Constants {
             put(i, TAG_LAYOUT.getTagPose(i + 1).get().toPose2d());
         }
       }};
-
+  }
+  public static final class TurretConstants {
+    // TODO: UPDATE BASED ON REAL ROBOT
+    public static final int FlyWheelID = 20;
+    public static final double FlyWheelSpeed = 0.3;
+    public static final double FlyWheelDiameterMeters = Units.inchesToMeters(4);
   }
 }
