@@ -5,7 +5,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.Constants;
 
-public class Intake extends SubsystemBase {//Cloned From MT (NOT FINALIZED)
+public class Intake extends SubsystemBase {// Cloned From MT (NOT FINALIZED)
 
     
 
