@@ -14,32 +14,41 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkMax;
 import frc.robot.Robot;
 import frc.robot.Constants;
 
-public class LauncherSubsystem extends SubsystemBase {
+public class TurretSubsystem extends SubsystemBase {
     private static final int LauncherID = Constants.TurretConstants.FlyWheelID;
+    private static final int TurretID = Constants.TurretConstants.TurretID;
     private static final double LauncherSpeed = Constants.TurretConstants.FlyWheelSpeed;
 
-    private final SparkFlex m_Motor;
-    
+    // Motor types may need to change, for now they are set to Spark Maxes for Neo 2s.
+    private final SparkMax m_LauncherMotor;
+    private final SparkMax m_TurretMotor;
 
   /** Creates a new ExampleSubsystem. */  
-  public LauncherSubsystem() {
-    m_Motor = new SparkFlex(LauncherID, MotorType.kBrushless);
+  public TurretSubsystem() {
+    m_LauncherMotor = new SparkMax(LauncherID, MotorType.kBrushless);
+    m_TurretMotor = new SparkMax(Constants.TurretConstants.TurretID, MotorType.kBrushless);
   }
 
-void setCoastMode() {
-  SparkMaxConfig config = new SparkMaxConfig();
-  config.idleMode(IdleMode.kCoast);
+  void setCoastMode() {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(IdleMode.kCoast);
+  }
+
+  public void runLauncher() {
+    m_LauncherMotor.set(LauncherSpeed);
+  }
+      
+  public void stopLauncher() {
+    m_LauncherMotor.set(0.0);
+  }
+
+  public void runTurret(double angle) {
+    m_TurretMotor.set(angle);
+    // NOT DONE | DO NOT RUN OR THING GO BOOM
+  }
 }
 
-public void runLauncher() {
-  m_Motor.set(LauncherSpeed);
-}
-    
-public void stopLauncher() {
-  m_Motor.set(0.0);
-}
-
-}
