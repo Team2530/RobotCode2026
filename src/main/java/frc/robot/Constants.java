@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.security.PublicKey;
 import java.util.HashMap;
 
 import com.pathplanner.lib.config.ModuleConfig;
@@ -132,6 +133,9 @@ public final class Constants {
     public static final boolean BL_MOTOR_REVERSED = true;
     public static final boolean BL_STEERING_MOTOR_REVERSED = true;
   }
+  // Motor Config (YOU HAVE BEEN WARNED)
+  public static final int INTAKE_MOTOR = 4;//TODO: 4 = ID, CHANGE THIS, MOST LIKLY WRONG
+  public static final double INTAKE_SPEED = 0.6;
 
   public static class DriveConstants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
@@ -217,6 +221,20 @@ public final class Constants {
             put(i, TAG_LAYOUT.getTagPose(i + 1).get().toPose2d());
         }
       }};
+
+  }
+  //Motor groups
+
+  // Intake motors
+  public static final class Intake {
+
+  }
+  // Drive motors
+  public static final class Drive {
+
+  }
+  // Turret motors
+  public static final class Turret{
 
   }
 }

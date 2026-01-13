@@ -11,6 +11,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -105,8 +106,9 @@ public class RobotContainer {
      * joysticks}.
      */
     private void configureBindings() {
-       
-        
+       //This is ment for operator controls
+       //OPERATOR_CONTROLLER Left bumper activates intake || TODO: MAKE THIS, neccesary
+       //OPERATOR_CONTROLLER Left X Rotates Turret Left and right, Right Y Lifts Turret up and down 
     }
 
     /**
