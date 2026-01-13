@@ -223,5 +223,8 @@ public final class Constants {
     public static final int FlyWheelID = 20;
     public static final double FlyWheelSpeed = 0.3;
     public static final double FlyWheelDiameterMeters = Units.inchesToMeters(4);
+
+    public static final int TurretID = 21;
+    public static final double TurretGearRatio = 1;
   }
 }
