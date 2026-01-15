@@ -1,27 +1,24 @@
 {
     "conversionFactors": {
         "drive": {
-            "diameter": "TODO (wheel diameter in inches)",
+            "diameter": 4,
             "gearRatio": "TODO"
         },
         "angle": {
-            "gearRatio": "TODO"
+            "gearRatio": 26.09
         },
     },
     "currentLimit": {
         "drive": "TODO",
         "angle": "TODO"
     },
-    "rampRate": {
-        "drive": "TODO",
-        "angle": "TODO"
-    },
-    "friction": {
+    "friction": { // minimum voltage required to move the motors, not the 
+        // coefficient of friction.
         "drive": "TODO",
         "angle": "TODO"
     },
     "robotMass": "TODO",
-    "steerRotationalInertia": "TODO (kg / m^2)",
+    "steerRotationalInertia": "TODO, in (kg / m^2)",
     "wheelGripCoefficientOfFriction": "TODO",
     "optimalVoltage": "TODO"
 }
