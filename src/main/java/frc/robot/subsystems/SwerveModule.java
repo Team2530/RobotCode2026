@@ -74,7 +74,7 @@ public class SwerveModule {
         steerConfig.encoder
                 .positionConversionFactor(SwerveModuleConstants.STEER_ROTATION_TO_RADIANS)
                 .velocityConversionFactor(SwerveModuleConstants.STEER_RADIANS_PER_MINUTE);
-        steerMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        steerMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); // TODO: Replace depricated method 
 
         // driveMotorEncoder = driveMotor.get();
         steerMotorEncoder = steerMotor.getEncoder();
