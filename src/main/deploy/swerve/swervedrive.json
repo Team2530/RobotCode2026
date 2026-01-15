@@ -1,0 +1,13 @@
+{
+    "imu": {
+        "type": "pigeon2",
+        "id": "TODO",
+        "canbus": null
+    },
+    "modules": [
+        "frontleft.json",
+        "frontright.json",
+        "backleft.json",
+        "backright.json"
+    ]
+}

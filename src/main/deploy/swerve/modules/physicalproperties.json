@@ -1,0 +1,27 @@
+{
+    "conversionFactors": {
+        "drive": {
+            "diameter": "TODO (wheel diameter in inches)",
+            "gearRatio": "TODO"
+        },
+        "angle": {
+            "gearRatio": "TODO"
+        },
+    },
+    "currentLimit": {
+        "drive": "TODO",
+        "angle": "TODO"
+    },
+    "rampRate": {
+        "drive": "TODO",
+        "angle": "TODO"
+    },
+    "friction": {
+        "drive": "TODO",
+        "angle": "TODO"
+    },
+    "robotMass": "TODO",
+    "steerRotationalInertia": "TODO (kg / m^2)",
+    "wheelGripCoefficientOfFriction": "TODO",
+    "optimalVoltage": "TODO"
+}

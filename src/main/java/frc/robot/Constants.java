@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.io.File;
 import java.util.HashMap;
 
 import com.pathplanner.lib.config.ModuleConfig;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
@@ -45,7 +47,6 @@ public final class Constants {
     public static final double robotLengthMeters = Units.inchesToMeters(29.5);
 
     // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double TOTAL_MASS_KG = 74.088;
     public static final double MOMENT_OF_INERTIA = 6.883;
   }
 
@@ -64,76 +65,24 @@ public final class Constants {
     }
   }
 
-  public static class SwerveModuleConstants {
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double WHEEL_DIAMETER = Units.inchesToMeters(3.85); // ~4 in
-    public static final double STEERING_GEAR_RATIO = 1.d / (150d / 7d);
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    // This is for L2 modules with 16T pinions
-    public static final double DRIVE_GEAR_RATIO = (1.d / 6.75d);
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double DRIVE_ROTATION_TO_METER = DRIVE_GEAR_RATIO * Math.PI * WHEEL_DIAMETER;
-    public static final double STEER_ROTATION_TO_RADIANS = STEERING_GEAR_RATIO * Math.PI * 2d;
-    public static final double DRIVE_METERS_PER_MINUTE = DRIVE_ROTATION_TO_METER / 60d;
-    public static final double STEER_RADIANS_PER_MINUTE = STEER_ROTATION_TO_RADIANS / 60d;
-    public static final double STEER_MAX_RAD_SEC = 0.8 * STEERING_GEAR_RATIO * ((5880.f * 2.f * Math.PI) / 60.f);
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double WHEEL_FRICTION_COEFFICIENT = 1.2;
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double MODULE_KP = 0.46368;
-    public static final double MODULE_KD = 0.0050806;
-
-    // --------- Front Left Module --------- \\
-    public static final int FL_DRIVE_ID = 10;
-    public static final int FL_STEER_ID = 11;
-    public static final int FL_ABSOLUTE_ENCODER_PORT = 30;
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double FL_OFFSET_RADIANS = Units.rotationsToRadians(0);
-    public static final boolean FL_ABSOLUTE_ENCODER_REVERSED = false;
-    public static final boolean FL_MOTOR_REVERSED = true;
-    public static final boolean FL_STEERING_MOTOR_REVERSED = true;
-
-    // --------- Front Right Module --------- \\
-    public static final int FR_DRIVE_ID = 12;
-    public static final int FR_STEER_ID = 13;
-    public static final int FR_ABSOLUTE_ENCODER_PORT = 31;
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double FR_OFFSET_RADIANS = Units.rotationsToRadians(0);
-    public static final boolean FR_ABSOLUTE_ENCODER_REVERSED = false;
-    public static final boolean FR_MOTOR_REVERSED = true;
-    public static final boolean FR_STEERING_MOTOR_REVERSED = true;
-
-    // --------- Back Right Module --------- \\
-    public static final int BR_DRIVE_ID = 14;
-    public static final int BR_STEER_ID = 15;
-    public static final int BR_ABSOLUTE_ENCODER_PORT = 32;
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double BR_OFFSET_RADIANS = Units.rotationsToRadians(0);
-    public static final boolean BR_ABSOLUTE_ENCODER_REVERSED = false;
-    public static final boolean BR_MOTOR_REVERSED = true;
-    public static final boolean BR_STEERING_MOTOR_REVERSED = true;
-
-    // --------- Back Left Module --------- \\
-    public static final int BL_DRIVE_ID = 16;
-    public static final int BL_STEER_ID = 17;
-    public static final int BL_ABSOLUTE_ENCODER_PORT = 33;
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final double BL_OFFSET_RADIANS = Units.rotationsToRadians(0);
-    public static final boolean BL_ABSOLUTE_ENCODER_REVERSED = false;
-    public static final boolean BL_MOTOR_REVERSED = true;
-    public static final boolean BL_STEERING_MOTOR_REVERSED = true;
-  }
-
   public static class DriveConstants {
+    // most of the swerve setup is in src/main/deploy/swerve
+    // [see](https://docs.yagsl.com/configuring-yagsl/configuration)
+    public static final File SWERVE_CONFIG_DIRECTORY = new File(
+        Filesystem.getDeployDirectory(),
+        "swerve"
+    );
+
+    public static final class AngularCompensation {
+        // correction for heading skew when rotating
+        // (see)[https://yet-another-software-suite.github.io/YAGSL/javadocs/swervelib/SwerveDrive.html#setAngularVelocityCompensation(boolean,boolean,double)]
+        public static final boolean ENABLE_IN_TELOP = true;
+        public static final boolean ENABLE_IN_AUTO = true;
+        
+        // expected values are between -0.15 and 0.15
+        public static final double COMPENSATION_COEFFICIENT = 0.1;
+    }
+
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
     public static final double MAX_MODULE_VELOCITY = 4.2;

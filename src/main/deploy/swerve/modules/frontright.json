@@ -1,0 +1,27 @@
+{
+    "drive": {
+        "type": "sparkmax",
+        "id": "TODO",
+        "canbus": null
+    },
+    "angle": {
+        "type": "sparkmax",
+        "id": "TODO",
+        "canbus": null
+    },
+    "encoder": {
+        "type": "cancoder",
+        "id": "TODO",
+        "canbus": null
+    },
+    "inverted": {
+        "drive": false,
+        "angle": false
+    },
+    "absoluteEncoderInverted": false,
+    "absoluteEncoderOffset": 0,
+    "location": {
+        "front": "from the center in inches",
+        "left": "same thing but x direction"
+    }
+}
