@@ -21,7 +21,7 @@
     "absoluteEncoderInverted": false,
     "absoluteEncoderOffset": 0,
     "location": {
-        "front": "from the center in inches",
-        "left": "same thing but x direction"
+        "front": 12.263,
+        "left": -9.75
     }
 }
