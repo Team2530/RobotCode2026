@@ -132,7 +132,21 @@ public final class Constants {
     public static final boolean BL_MOTOR_REVERSED = true;
     public static final boolean BL_STEERING_MOTOR_REVERSED = true;
   }
-
+  /*|-----------WARNING-----------------|
+   *|edit with caution, used in all subs|
+   *|-----------------------------------|
+   *|Motor Config (YOU HAVE BEEN WARNED)|
+   *|-----------------------------------|
+   *|edits can have catastafic falure---|
+*///|-----------WARNING-----------------|
+  //---Intake Motors---\\
+  public static class IntakeMotors {
+    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed
+    public static final double INTAKE_SPEED = 0.6;
+    public static final int INTAKE_MOTOR1 = 5;
+    public static final double INTAKE_SPEED1 = 0.6;
+  }
+  
   public static class DriveConstants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
