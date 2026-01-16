@@ -226,5 +226,7 @@ public final class Constants {
 
     public static final int TurretID = 21;
     public static final double TurretGearRatio = 1;
+
+    public static final int HoodID = 22;
   }
 }
