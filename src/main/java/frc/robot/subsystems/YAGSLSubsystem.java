@@ -18,7 +18,6 @@ public class YAGSLSubsystem extends SubsystemBase {
 
     private final SwerveDrive swerveDrive;
 
-
     public YAGSLSubsystem(File swerveConfigDirectory) {
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
@@ -92,5 +91,9 @@ public class YAGSLSubsystem extends SubsystemBase {
 
     public void setMotorBrake(boolean isBraking) {
         swerveDrive.setMotorIdleMode(isBraking);
+    }
+
+    public void xStance() {
+        swerveDrive.lockPose();
     }
 }
