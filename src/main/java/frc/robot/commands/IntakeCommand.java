@@ -19,18 +19,18 @@ public class IntakeCommand extends Command {
 
      @Override
     public void end(boolean interrupted) {
-        SmartDashboard.putString("Intake Command", "Ended");
+        
     }
 
      @Override
     public void initialize() {
         subsystem.setIntakePreset(IntakePresets.INTAKE);
         SmartDashboard.putString("Intake Command", "Started");
-        end(true);
+        
 
         if (Robot.isSimulation()) {
             SmartDashboard.putBoolean("[SIM] Collected", true);
-            end(true);
+        
         }
     }
 }
