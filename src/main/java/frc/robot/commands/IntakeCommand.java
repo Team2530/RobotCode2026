@@ -20,6 +20,7 @@ public class IntakeCommand extends Command {
      @Override
     public void end(boolean interrupted) {
         subsystem.setIntakePreset(IntakePresets.IDLE);
+        SmartDashboard.putString("Intake Ended", "Ended");
     }
 
      @Override
