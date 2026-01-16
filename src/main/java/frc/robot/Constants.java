@@ -233,18 +233,4 @@ public final class Constants {
       }};
 
   }
-  //Motor groups
-
-  // Intake motors
-  public static final class Intake {
-
-  }
-  // Drive motors
-  public static final class Drive {
-
-  }
-  // Turret motors
-  public static final class Turret{
-
-  }
 }
