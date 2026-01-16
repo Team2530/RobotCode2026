@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.Constants;
-import frc.robot.commands.IntakeCommand.IntakePresets;
+import frc.robot.commands.IntakeCommand;
 
 public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINALIZED)
 
@@ -32,5 +32,9 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
     public IntakePresets getIntakePreset() {
       return this.intakePreset;
     }
+    
+    public enum IntakePresets {
+      INTAKE
+  }
 }
 

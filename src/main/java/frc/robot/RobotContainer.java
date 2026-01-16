@@ -107,8 +107,7 @@ public class RobotContainer {
      */
     private void configureBindings() {
        //This is ment for operator controls
-       //OPERATOR_CONTROLLER Left bumper activates intake || TODO: MAKE THIS, neccesary
-       //OPERATOR_CONTROLLER Left X Rotates Turret Left and right, Right Y Lifts Turret up and down 
+       
     }
 
     /**

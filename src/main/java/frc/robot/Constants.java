@@ -135,18 +135,11 @@ public final class Constants {
   }
   // Motor Config (YOU HAVE BEEN WARNED)
   //---Intake Motors---\\
-  public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: 4 = ID, CHANGE THIS, MOST LIKLY WRONG
+  public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed
   public static final double INTAKE_SPEED = 0.6;
-  //---Turret Motors---\\
-  //------Firing:
-  public static final int TURRET_LAUNCH_MOTOR = 5;//TODO: 5 = ID, CHANGE THIS, MOST LIKLY WRONG
-  public static final double TURRET_LAUNCH_SPEED = 0.6;//TODO: Change speed for real comp speed
-  //-----Rotation:
-  public static final int TURRET_ROTATION_MOTOR = 6;//TODO: 5 = ID, CHANGE THIS, MOST LIKLY WRONG
-  public static final double TURRET_ROTATION_SPEED = 0.6;
-  public static final int TURRET_ELEVATION_MOTOR =7;//TODO: 7 = ID, CHANGE THIS, MOST LIKLY WRONG
-  public static final double TURRET_ELEVATION_SPEED = 0.6;
-
+  public static final int INTAKE_MOTOR1 = 5;
+  public static final double INTAKE_SPEED1 = 0.6;
+  
   public static class DriveConstants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
