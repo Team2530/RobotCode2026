@@ -135,7 +135,7 @@ public final class Constants {
   }
   // Motor Config (YOU HAVE BEEN WARNED)
   //---Intake Motors---\\
-  public static final int INTAKE_MOTOR = 4;//TODO: 4 = ID, CHANGE THIS, MOST LIKLY WRONG
+  public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: 4 = ID, CHANGE THIS, MOST LIKLY WRONG
   public static final double INTAKE_SPEED = 0.6;
   //---Turret Motors---\\
   //------Firing:
