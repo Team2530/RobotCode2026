@@ -16,11 +16,11 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
     private IntakePresets intakePreset;
     
     public IntakeSubsystem() {
-      m_intakesubsystemMotor = new SparkFlex(Constants.INTAKESUBSYSTEM_MOTOR, MotorType.kBrushless);//TODO: Change to ACTUAL motor type
+      m_intakesubsystemMotor = new SparkFlex(Constants.IntakeMotors.INTAKESUBSYSTEM_MOTOR, MotorType.kBrushless);//TODO: Change to ACTUAL motor type
             
     }
     public void runIntake() {
-    m_intakesubsystemMotor.set(Constants.INTAKE_SPEED);
+    m_intakesubsystemMotor.set(Constants.IntakeMotors.INTAKE_SPEED);
         
     }//TODO: Update m_intakeMotor when fixed
       //After intake is touching the floor, activate the intake entry motor.
@@ -31,7 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
       boolean intakeActive = intake == IntakePresets.INTAKE;
       boolean intakeInactive = intake == IntakePresets.IDLE;
       if (IntakePresets.INTAKE == intake) {
-        m_intakesubsystemMotor.set(Constants.INTAKE_SPEED);
+        m_intakesubsystemMotor.set(Constants.IntakeMotors.INTAKE_SPEED);
         SmartDashboard.putString("Intake Subsystem", "Begin");
         
 
