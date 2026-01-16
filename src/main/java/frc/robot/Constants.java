@@ -65,7 +65,7 @@ public final class Constants {
     }
   }
 
-  public static class DriveConstants {
+  public static final class DriveConstants {
     // most of the swerve setup is in src/main/deploy/swerve
     // [see](https://docs.yagsl.com/configuring-yagsl/configuration)
     public static final File SWERVE_CONFIG_DIRECTORY = new File(
@@ -73,10 +73,23 @@ public final class Constants {
         "swerve"
     );
 
+    public static final class ControlConstants {
+        public static final double REGULAR_DRIVE_MULT = 1.0;
+        public static final double TURTLE_DRIVE_MULT = 0.25;
+
+        public static final double DRIVE_MULTIPLIER_SLEW_RATE = 0.5;
+
+        public static class Deadband {
+            public static final double x = 0.1;
+            public static final double y = x; // WARNING: can i do this?
+            public static final double z = 0.08;
+        };
+    };
+
     public static final class AngularCompensation {
         // correction for heading skew when rotating
         // (see)[https://yet-another-software-suite.github.io/YAGSL/javadocs/swervelib/SwerveDrive.html#setAngularVelocityCompensation(boolean,boolean,double)]
-        public static final boolean ENABLE_IN_TELOP = true;
+        public static final boolean ENABLE_IN_TELEOP = true;
         public static final boolean ENABLE_IN_AUTO = true;
         
         // expected values are between -0.15 and 0.15
@@ -116,9 +129,6 @@ public final class Constants {
         new Translation2d(TRACK_WIDTH / 2.0, -WHEEL_BASE / 2.0),
         new Translation2d(-TRACK_WIDTH / 2.0, WHEEL_BASE / 2.0),
         new Translation2d(-TRACK_WIDTH / 2.0, -WHEEL_BASE / 2.0));
-
-    public static final double XY_SPEED_LIMIT = 1.0;
-    public static final double Z_SPEED_LIMIT = 1.0;
   }
 
   public static class CommonConstants {

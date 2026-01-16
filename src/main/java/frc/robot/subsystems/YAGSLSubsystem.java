@@ -2,14 +2,14 @@ package frc.robot.subsystems;
 
 import java.io.File;
 
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+
 import swervelib.SwerveDrive;
-import swervelib.telemetry.SwerveDrive;
-import swervelib.telemetry.SwerveDrive.TelemetryVerbosity;
+import swervelib.parser.SwerveParser;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import frc.robot.Constants.DriveConstants;
 
@@ -37,10 +37,10 @@ public class YAGSLSubsystem extends SubsystemBase {
          *                                       1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
          * swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
          */
-        swerveDrive.setAngularVelocityCompenstation(
-                DriveConstants.AngularCompenstation.ENABLE_IN_TELEOP,
-                DriveConstants.AngularCompenstation.ENABLE_IN_AUTO,
-                DriveConstants.AngularCompenstation.COMPENSATION_COEFFICIENT
+        swerveDrive.setAngularVelocityCompensation(
+                DriveConstants.AngularCompensation.ENABLE_IN_TELEOP,
+                DriveConstants.AngularCompensation.ENABLE_IN_AUTO,
+                DriveConstants.AngularCompensation.COMPENSATION_COEFFICIENT
         );
 
     };
