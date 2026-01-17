@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.Constants;
@@ -26,13 +28,24 @@ public class ClimberSubsystem extends SubsystemBase {
         boolean climbActive = climb == ClimbPresets.CLIMBING;
         boolean climbInactive = climb == ClimbPresets.IDLE;
         if (ClimbPresets.CLIMBING == climb) {
+
           m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
           SmartDashboard.putString("Climbing Subsystem", "Begin");
-          sleep(Constants.Sleep.first); //TODO: find a way to make timer
+
+          new WaitCommand(Constants.Sleep.first); //TODO: find a way to make timer, DONE
+
           m_climbsubsystemMotor.set(0);
           //wait for button press. if auto, wait some time.
+          if (inAuto) {
+            new WaitCommand(Constants.Sleep.first);
+          }
+          else {
+            //Button press
+          }
           m_climbsubsystemMotor.set(-Constants.ClimbMotors.CLIMB_SPEED);
-          //wait some time.
+
+          new WaitCommand(Constants.Sleep.last); 
+
           SmartDashboard.putString("Climbing Subsystem", "Finished");
           
   
