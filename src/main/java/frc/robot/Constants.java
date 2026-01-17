@@ -158,8 +158,8 @@ public final class Constants {
    //---------Speed Def---------\\
   //time = seconds sdoing nothing\\
   public static class Sleep {
-    public static final double first = 0.3; //TODO: time ajustment. (Time is Seconds)
-    public static final double last = 0.1; 
+    public static final double first = 3; //TODO: time ajustment. (Time is Seconds)
+    public static final double last = 1; 
   }
 
   
