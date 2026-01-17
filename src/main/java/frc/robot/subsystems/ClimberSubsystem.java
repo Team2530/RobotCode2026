@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -36,7 +37,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
           m_climbsubsystemMotor.set(0);
           //wait for button press. if auto, wait some time.
-          if (inAuto) {
+          if (DriverStation.isAutonomousEnabled()) {
             new WaitCommand(Constants.Sleep.first);
           }
           else {
