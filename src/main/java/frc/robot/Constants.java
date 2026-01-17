@@ -132,6 +132,9 @@ public final class Constants {
     public static final boolean BL_MOTOR_REVERSED = true;
     public static final boolean BL_STEERING_MOTOR_REVERSED = true;
   }
+
+
+
   /*|-----------WARNING-----------------|
    *|edit with caution, used in all subs|
    *|-----------------------------------|
@@ -146,6 +149,14 @@ public final class Constants {
     public static final int INTAKE_MOTOR1 = 5;
     public static final double INTAKE_SPEED1 = 0.6;
   }
+  //----Climb Motors---\\
+  public static class ClimbMotors {
+    public static final int CLIMBSUBSYSTEM_MOTOR = 6;//TODO: IDs and speeds need to be changed
+    public static final double CLIMB_SPEED = 0.6;
+  }
+
+
+
   
   public static class DriveConstants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
