@@ -26,8 +26,14 @@ public class ClimberSubsystem extends SubsystemBase {
         boolean climbActive = climb == ClimbPresets.CLIMBING;
         boolean climbInactive = climb == ClimbPresets.IDLE;
         if (ClimbPresets.CLIMBING == climb) {
-          m_climbsubsystemMotor.set(Constants.IntakeMotors.INTAKE_SPEED);
+          m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
           SmartDashboard.putString("Climbing Subsystem", "Begin");
+          //wait some time.
+          m_climbsubsystemMotor.set(0);
+          //wait for button press. if auto, wait some time.
+          m_climbsubsystemMotor.set(-Constants.ClimbMotors.CLIMB_SPEED);
+          //wait some time.
+          SmartDashboard.putString("Climbing Subsystem", "Finished");
           
   
           if (Robot.isSimulation()) {
@@ -35,7 +41,7 @@ public class ClimberSubsystem extends SubsystemBase {
           
           }
         }
-        if (ClimbPresets.IDLE == climb) {
+        if (SmartDashboard.putString("Climbing Subsystem", "Finished")) {
           m_climbsubsystemMotor.set(0);
           SmartDashboard.putString("Climbing Subsystem", "Ended");
           
