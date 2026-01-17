@@ -155,7 +155,11 @@ public final class Constants {
     public static final double CLIMB_SPEED = 0.6;
   }
 
-
+  //----Speed Def----\\
+  public static class Sleep {
+    public static final double first = 0.3; //TODO: time ajustment
+    public static final double last = 0.1; 
+  }
 
   
   public static class DriveConstants {
