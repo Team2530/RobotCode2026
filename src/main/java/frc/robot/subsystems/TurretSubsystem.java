@@ -27,13 +27,17 @@ public class TurretSubsystem extends SubsystemBase {
     private static final int HoodID = Constants.TurretConstants.HoodID;
     private static final double LauncherSpeed = Constants.TurretConstants.FlyWheelSpeed;
     private static final double TurretGearRatio = Constants.TurretConstants.TurretGearRatio;
-    private static final double Height = Constants.TurretConstants.ShooterHeight;
+    private static final double Height = Constants.TurretConstants.ShooterHeight - Constants.TurretConstants.GoalHeight;
+    private static final double LimitL = Constants.TurretConstants.TurretLimitLow;
+    private static final double LimitR = Constants.TurretConstants.TurretLimitHigh;
 
     // Get Distance and Robot Odometry. Needs to be updated for On The Fly calculations.
+
     //private static final double Distance = Limelight.getTargetDistance();
     //private static final double RobotSpeed = SwerveSubsystem.getVelocity().norm();
 
     // Motor types may need to change, for now they are set to Spark Flexes for Neo Vortex.
+
     private final SparkMax m_LauncherMotor;
     private final SparkMax m_TurretMotor;
     private final SparkMax m_HoodMotor;
@@ -42,7 +46,6 @@ public class TurretSubsystem extends SubsystemBase {
     private final RelativeEncoder e_TurretEncoder;
     private final RelativeEncoder e_HoodEncoder;
 
-  /** Creates a new ExampleSubsystem. */  
   public TurretSubsystem() {
     m_LauncherMotor = new SparkMax(LauncherID, MotorType.kBrushless);
     m_TurretMotor = new SparkMax(TurretID, MotorType.kBrushless);
@@ -75,33 +78,33 @@ public class TurretSubsystem extends SubsystemBase {
     m_LauncherMotor.set(0.0);
   }
 
-  public double getTurretAngle() {
+  private double getTurretAngle() {
     double angle = e_TurretEncoder.getPosition() * (360.0 / TurretGearRatio);
     return (angle % 360 + 360) % 360;
   }
 
-  public double getHoodAngle() {
+  private double getHoodAngle() {
     double angle = e_HoodEncoder.getPosition() * (360.0 / TurretGearRatio);
     return (angle % 360 + 360) % 360;
   }
 
-  public double distance() {
-    double theta = getHoodAngle();
-    double velocity = getLauncherRPM() * (2 * Math.PI) / 60; // Convert RPM to m/s
-    double a = -4.9, b = Math.tan(theta), c = velocity * velocity * Height * Math.cos(theta * theta);
-    double determinent = b * b - 4 * a * c;
-    double root1 = (-b + Math.sqrt(determinent)) / (2 * a);
-    return root1;
+  private double getshootSpeed() {
+    double distance = 0;// Distance to Closest Part of the Goal
+    double thetaAngles = getHoodAngle(); // Hood Angle in Degrees
+    double thetaRadians = Math.toRadians(thetaAngles);
+    double g = 9.81; // Gravity in m/s^2
+    double h_dif = Math.abs(Height); // ABS(Goal Height - Shooter Height)
+
+    double exitVelocity = Math.sqrt((g * distance * distance) / ((2 * Math.cos(thetaRadians) * Math.cos(thetaRadians)) * (distance * Math.tan(thetaRadians) - h_dif)));
+    return exitVelocity;
   }
 
   public void angleTurret(double angle) {
-    while (getTurretAngle() < angle) {
-      m_TurretMotor.set(0.01);
+    if(angle < LimitL || angle > LimitR) {
+          m_TurretMotor.set(0.0);
+    } else {
+      m_TurretMotor.set(angle);
     }
-    while (getTurretAngle() > angle) {
-      m_TurretMotor.set(-0.01);
-    }
-    m_TurretMotor.set(0.0);
   }
 }
 

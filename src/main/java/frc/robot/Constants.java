@@ -226,7 +226,17 @@ public final class Constants {
 
     public static final int TurretID = 21;
     public static final double TurretGearRatio = 1;
+    public static final double TurretLimitLow = 270;
+    public static final double TurretLimitHigh = 90;
 
     public static final int HoodID = 22;
+
+    public static final double ShooterHeight = Units.inchesToMeters(20); // UPDATE THIS | Height of Shooter from Ground in Inches
+    public static final double GoalHeight = Units.inchesToMeters(72); //Height of Hub Funnel
   }
-}
+
+  public static final class IndexerConstants {
+    // TODO: UPDATE BASED ON REAL ROBOT
+    public static final int IndexerID = 23;
+    public static final double IndexerSpeed = 0.67;
+  }
