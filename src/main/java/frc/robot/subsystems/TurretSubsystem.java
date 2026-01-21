@@ -36,7 +36,7 @@ public class TurretSubsystem extends SubsystemBase {
     //private static final double Distance = Limelight.getTargetDistance();
     //private static final double RobotSpeed = SwerveSubsystem.getVelocity().norm();
 
-    // Motor types may need to change, for now they are set to Spark Flexes for Neo Vortex.
+    // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
 
     private final SparkMax m_LauncherMotor;
     private final SparkMax m_TurretMotor;
@@ -47,6 +47,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final RelativeEncoder e_HoodEncoder;
 
   public TurretSubsystem() {
+    // Initialize Motors and Encoders
     m_LauncherMotor = new SparkMax(LauncherID, MotorType.kBrushless);
     m_TurretMotor = new SparkMax(TurretID, MotorType.kBrushless);
     m_HoodMotor = new SparkMax(HoodID, MotorType.kBrushless);
@@ -54,7 +55,7 @@ public class TurretSubsystem extends SubsystemBase {
     e_LauncherEncoder = m_LauncherMotor.getEncoder();
     e_LauncherEncoder.setPosition(0);
     e_TurretEncoder = m_TurretMotor.getEncoder();
-    e_TurretEncoder.setPosition(0);
+    e_TurretEncoder.setPosition(0.5);
     e_HoodEncoder = m_HoodMotor.getEncoder();
     e_HoodEncoder.setPosition(0);
 
@@ -66,29 +67,31 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
 
-  public double getLauncherRPM() {
-    return e_LauncherEncoder.getVelocity();
-  }
-
-  public void runLauncher() {
-    m_LauncherMotor.set(LauncherSpeed);
-  }
-      
-  public void stopLauncher() {
-    m_LauncherMotor.set(0.0);
+  private double NormalizeAngle(double a) {
+      a %= 360;
+      if (a < 0) a += 360; // Turn any angle into [0, 360)
+      return a;
   }
 
   private double getTurretAngle() {
     double angle = e_TurretEncoder.getPosition() * (360.0 / TurretGearRatio);
-    return (angle % 360 + 360) % 360;
+    return NormalizeAngle(angle);
   }
 
   private double getHoodAngle() {
     double angle = e_HoodEncoder.getPosition() * (360.0 / TurretGearRatio);
-    return (angle % 360 + 360) % 360;
+    return NormalizeAngle(angle);
   }
 
-  private double getshootSpeed() {
+  private double targetHoodAngle() {
+    // Placeholder for actual calculation based on distance to target
+    double distance = 0; // Distance to Closest Part of the Goal
+    double angle = 0; // Calculate hood angle based on distance
+    return angle;
+  }
+
+  private double targetShootSpeed() {
+    // Calculate Required Exit Velocity based on Distance and Hood Angle
     double distance = 0;// Distance to Closest Part of the Goal
     double thetaAngles = getHoodAngle(); // Hood Angle in Degrees
     double thetaRadians = Math.toRadians(thetaAngles);
@@ -99,11 +102,20 @@ public class TurretSubsystem extends SubsystemBase {
     return exitVelocity;
   }
 
-  public void angleTurret(double angle) {
-    if(angle < LimitL || angle > LimitR) {
-          m_TurretMotor.set(0.0);
-    } else {
-      m_TurretMotor.set(angle);
+  public void runLauncher() {
+    m_LauncherMotor.set(LauncherSpeed);
+  }
+      
+  public void stopLauncher() {
+    m_LauncherMotor.set(0.0);
+  }
+
+  public void angleTurret(double targetAngle) {
+    double TurretSpeed = 0.1;
+    double Angle0 = getTurretAngle();
+    
+    if (targetAngle < LimitL) {
+      //targetAngle = LimitL;
     }
   }
 }
