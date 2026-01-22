@@ -2,11 +2,14 @@ package frc.robot.subsystems;
 
 import java.io.File;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 import swervelib.SwerveDrive;
+import swervelib.SwerveDriveTest;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -41,7 +44,6 @@ public class YAGSLSubsystem extends SubsystemBase {
                 DriveConstants.AngularCompensation.ENABLE_IN_AUTO,
                 DriveConstants.AngularCompensation.COMPENSATION_COEFFICIENT
         );
-
     };
 
     @Override
@@ -95,5 +97,33 @@ public class YAGSLSubsystem extends SubsystemBase {
 
     public void xStance() {
         swerveDrive.lockPose();
+    }
+
+    public Command sysIdDriveCommand() {
+        return SwerveDriveTest.generateSysIdCommand(
+                SwerveDriveTest.setDriveSysIdRoutine(
+                    new SysIdRoutine.Config(), 
+                    this,
+                    swerveDrive, 
+                    12.0, 
+                    true
+                ),
+                10.0, // delay between each section of the command
+                5.0, // how long to run each quasistatic section
+                2.0 // how long to run each dynamic section
+        );
+    }
+
+    public Command sysIdAngleCommand() {
+        return SwerveDriveTest.generateSysIdCommand(
+                SwerveDriveTest.setAngleSysIdRoutine(
+                    new SysIdRoutine.Config(), 
+                    this,
+                    swerveDrive
+                ),
+                10.0, 
+                5.0, 
+                2.0 
+        );
     }
 }
