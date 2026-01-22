@@ -18,7 +18,7 @@ public class ClimberCommand extends Command {
 
     public ClimberCommand(ClimberSubsystem subsystem1) {
         this.subsystem1 = subsystem1;
-        addRequirements();
+        addRequirements(subsystem1);
     }
 
      @Override
