@@ -15,6 +15,7 @@ import frc.robot.subsystems.ClimberSubsystem.ClimbPresets;
 public class ClimberCommand extends Command {
     private final ClimberSubsystem subsystem1;
     private final ClimberCommand command1;
+    private final ClimberSubsystem ClimbPresets;
 
     private final SparkFlex m_climbsubsystemMotor;
     private ClimbPresets climbPreset;
