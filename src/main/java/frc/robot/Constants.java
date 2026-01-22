@@ -111,6 +111,11 @@ public final class Constants {
         public static final double COMPENSATION_COEFFICIENT = 0.1;
     }
 
+    public static final class SwerveModules {
+        // in inches
+        public static final double WHEEL_DIAMETER = 4;
+    }
+
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
     public static final double MAX_MODULE_VELOCITY = 4.2;
