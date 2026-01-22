@@ -65,6 +65,21 @@ public final class Constants {
     }
   }
 
+  /*|-----------WARNING-----------------|
+   *|edit with caution, used in all subs|
+   *|-----------------------------------|
+   *|Motor Config (YOU HAVE BEEN WARNED)|
+   *|-----------------------------------|
+   *|edits can have catastafic falure---|
+*///|-----------WARNING-----------------|
+  //---Intake Motors---\\
+  public static class IntakeMotors {
+    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed
+    public static final double INTAKE_SPEED = 0.6;
+    public static final int INTAKE_MOTOR1 = 5;
+    public static final double INTAKE_SPEED1 = 0.6;
+  }
+
   public static final class DriveConstants {
     // most of the swerve setup is in src/main/deploy/swerve
     // [see](https://docs.yagsl.com/configuring-yagsl/configuration)
