@@ -4,9 +4,12 @@
 
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import java.util.ArrayList;
 
-import com.studica.frc.AHRS;
+import com.ctre.phoenix6.hardware.Pigeon2;
+// import com.studica.frc.AHRS;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -16,6 +19,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Limelight;
 
+/**
+ * The LimelightContainer class manages multiple Limelight cameras and their
+ * odometry estimation.
+ */
 public class LimelightContainer {
   static int SIMCOUNTER = 0;
   static int RLCOUNTER = 0;
@@ -26,8 +33,9 @@ public class LimelightContainer {
     for (Limelight limelight : limelights) {
       LimelightContainer.limelights.add(limelight);
       LimelightHelpers.SetIMUMode(limelight.getName(), 0);
+
+      limelight.setEnabled(true);
     }
-    enableLimelights(true);
 
   }
 
@@ -48,102 +56,105 @@ public class LimelightContainer {
         doRejectUpdate = true;
       }
       if (!doRejectUpdate) {
-        SmartDashboard.putString("Simulated Pos", mt2.pose.toString() + SIMCOUNTER);
+        limelight.pushPoseToShuffleboard(limelight.getName() + " MT2Pose", mt2.pose);
+        SmartDashboard.putString(limelight.getName() + " Pose: ", mt2.pose.toString() + SIMCOUNTER);
         SIMCOUNTER++;
       }
     }
   }
-
-  public void estimateMT1OdometryPrelim(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx,
-      SwerveModulePosition[] swerveModulePositions) {
+  /** 
+   * For every limelight in the container, estimate odometry using MegaTag2 & Push to Shuffleboard
+   */
+  public void estimateMT2Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, Pigeon2 pigeon2) {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
-
-      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
-
-      if (mt1 == null) {
-        continue;
-      }
-
-      if (mt1.tagCount == 0) {
-        doRejectUpdate = true;
-      }
-
-      if (Math.abs(navx.getRate()) > 720) {
-        doRejectUpdate = true;
-      }
-
-      if (!doRejectUpdate) {
-        odometry.resetPosition(mt1.pose.getRotation(), swerveModulePositions, mt1.pose);
-        SmartDashboard.putString("Pos MT1 prelim: ", mt1.pose.toString() + " " + RLCountermt1);
-      }
-
-      RLCountermt1++;
-    }
-  }
-
-  public void estimateMT1Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx) {
-    for (Limelight limelight : limelights) {
-      boolean doRejectUpdate = false;
-
-      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
-
-      if (mt1 == null) {
-        continue;
-      }
-
-      if (mt1.tagCount == 0) {
-        doRejectUpdate = true;
-      }
-
-      if (mt1.avgTagDist < Units.feetToMeters(10))
-        doRejectUpdate = true;
-
-      if (Math.abs(navx.getRate()) > 720) {
-        doRejectUpdate = true;
-      }
-
-      if ((Math.abs(mt1.pose.getX() - odometry.getEstimatedPosition().getX()) > 1.5)
-          || (Math.abs(mt1.pose.getY() - odometry.getEstimatedPosition().getY()) > 1.5)) {
-
-        doRejectUpdate = true;
-
-      }
-
-      if (!doRejectUpdate) {
-        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(3, 3, 9999));
-        odometry.addVisionMeasurement(
-            mt1.pose,
-            mt1.timestampSeconds);
-
-        SmartDashboard.putString("Pos MT1: ", mt1.pose.toString() + " " + RLCountermt1);
-        limelight.pushPoseToShuffleboard(limelight.getName() + "mt1", mt1.pose);
-
-      }
-
-      RLCountermt1++;
-    }
-  }
-
-  public void estimateMT2Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx) {
-    for (Limelight limelight : limelights) {
-      boolean doRejectUpdate = false;
-      LimelightHelpers.SetRobotOrientation(limelight.getName(), navx.getAngle(), 0, 0, 0, 0, 0);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
+      LimelightHelpers.SetRobotOrientation(limelight.getName(), pigeon2.getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2Estimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
 
       // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      if (Math.abs(navx.getRate()) > 720) {
-        doRejectUpdate = true;
-      }
+      // if (Math.abs(pigeon2.getAngularVelocityXWorld().getValue()) > 720) {
+      //   doRejectUpdate = true;
+      // }
 
-      if (mt2.tagCount == 0) {
+      if (mt2Estimation.tagCount == 0) {
         doRejectUpdate = true;
       }
       if (!doRejectUpdate) {
-        limelight.pushPoseToShuffleboard(limelight.getName() + "mt2", mt2.pose);
+        limelight.pushPoseToShuffleboard(limelight.getName() + " MT2Pose", mt2Estimation.pose);
         odometry.setVisionMeasurementStdDevs(VecBuilder.fill(3, 3, 9999999));
-        odometry.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
+        odometry.addVisionMeasurement(mt2Estimation.pose, mt2Estimation.timestampSeconds);
       }
     }
   }
+
+  // public void estimateMT1OdometryPrelim(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx,
+  //     SwerveModulePosition[] swerveModulePositions) {
+  //   for (Limelight limelight : limelights) {
+  //     boolean doRejectUpdate = false;
+
+  //     LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
+
+  //     if (mt1 == null) {
+  //       continue;
+  //     }
+
+  //     if (mt1.tagCount == 0) {
+  //       doRejectUpdate = true;
+  //     }
+
+  //     if (Math.abs(navx.getRate()) > 720) {
+  //       doRejectUpdate = true;
+  //     }
+
+  //     if (!doRejectUpdate) {
+  //       odometry.resetPosition(mt1.pose.getRotation(), swerveModulePositions, mt1.pose);
+  //       SmartDashboard.putString("Pos MT1 prelim: ", mt1.pose.toString() + " " + RLCountermt1);
+  //     }
+
+  //     RLCountermt1++;
+  //   }
+  // }
+
+  // public void estimateMT1Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx) {
+  //   for (Limelight limelight : limelights) {
+  //     boolean doRejectUpdate = false;
+
+  //     LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
+
+  //     if (mt1 == null) {
+  //       continue;
+  //     }
+
+  //     if (mt1.tagCount == 0) {
+  //       doRejectUpdate = true;
+  //     }
+
+  //     if (mt1.avgTagDist < Units.feetToMeters(10))
+  //       doRejectUpdate = true;
+
+  //     if (Math.abs(navx.getRate()) > 720) {
+  //       doRejectUpdate = true;
+  //     }
+
+  //     if ((Math.abs(mt1.pose.getX() - odometry.getEstimatedPosition().getX()) > 1.5)
+  //         || (Math.abs(mt1.pose.getY() - odometry.getEstimatedPosition().getY()) > 1.5)) {
+
+  //       doRejectUpdate = true;
+
+  //     }
+
+  //     if (!doRejectUpdate) {
+  //       odometry.setVisionMeasurementStdDevs(VecBuilder.fill(3, 3, 9999));
+  //       odometry.addVisionMeasurement(
+  //           mt1.pose,
+  //           mt1.timestampSeconds);
+
+  //       SmartDashboard.putString("Pos MT1: ", mt1.pose.toString() + " " + RLCountermt1);
+  //       limelight.pushPoseToShuffleboard(limelight.getName() + "mt1", mt1.pose);
+
+  //     }
+
+  //     RLCountermt1++;
+  //   }
+  // }
 }

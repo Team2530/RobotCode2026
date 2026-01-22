@@ -17,9 +17,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Limelight.*;
+import frc.robot.util.LimelightContainer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -34,18 +38,15 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class RobotContainer {
 
     // TODO: ADD Limelights
-    // private static final Limelight LL_name = new Limelight(LimelightType.LL4, "limelight-name", true, true);
+    private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "BR", true, true);
 
-    // TODO: initalize Limelight container
+    //TODO: initalize Limelight container
+    @Logged
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BR);
     // @Logged
-    // public static final LimelightContainer LLContainer = new LimelightContainer(LL_name1, LL_name2, LL_name3);
-
+    public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged
-    public final CommandXboxController driverXbox = new CommandXboxController(
-            ControllerConstants.DRIVER_CONTROLLER_PORT);
-    // @Logged
-    public final CommandXboxController operatorXbox = new CommandXboxController(
-            ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
     private final SendableChooser<Command> autoChooser;
 
