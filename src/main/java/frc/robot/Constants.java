@@ -140,7 +140,7 @@ public final class Constants {
    *|-----------------------------------|
    *|Motor Config (YOU HAVE BEEN WARNED)|
    *|-----------------------------------|
-   *|edits can have catastafic falure---|
+   *|edits can have catastafic falures--|
 *///|-----------WARNING-----------------|
   //---Intake Motors---\\
   public static class IntakeMotors {
@@ -156,7 +156,7 @@ public final class Constants {
   }
 
    //---------Speed Def---------\\
-  //time = seconds sdoing nothing\\
+  //time = seconds  doing nothing\\
   public static class Sleep {
     public static final double first = 3; //TODO: time ajustment. (Time is Seconds)
     public static final double last = 1; 
