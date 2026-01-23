@@ -26,9 +26,9 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.Constants.DriveConstants;
 
 
-public class YAGSLSubsystem extends SubsystemBase {
+public class SwerveSubsystem extends SubsystemBase {
 
-    private SwerveDrive swerveDrive;
+    private final SwerveDrive swerveDrive;
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
@@ -44,7 +44,7 @@ public class YAGSLSubsystem extends SubsystemBase {
         }
     }
 
-    public YAGSLSubsystem(File swerveConfigDirectory) {
+    public SwerveSubsystem(File swerveConfigDirectory) {
         gearChooser = new SendableChooser<>();
 
         gearChooser.addOption(

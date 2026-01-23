@@ -6,21 +6,21 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 
-import frc.robot.subsystems.YAGSLSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.ControlConstants;
 
-public class YAGSLCommand extends Command {
+public class DriveCommand extends Command {
 
-    private final YAGSLSubsystem subsystem;
+    private final SwerveSubsystem subsystem;
     private final XboxController driverXbox;
 
     private SlewRateLimiter driveMultiplierSlewLimiter = new SlewRateLimiter(
             ControlConstants.DRIVE_MULTIPLIER_SLEW_RATE
     );
 
-    public YAGSLCommand(
-        YAGSLSubsystem subsystem,
+    public DriveCommand(
+        SwerveSubsystem subsystem,
         XboxController driverXbox
     ) {
         this.subsystem = subsystem;
