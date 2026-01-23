@@ -15,10 +15,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.subsystems.IntakeSubsystem.IntakePresets;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 /**
@@ -88,9 +91,14 @@ public class RobotContainer {
         });
     }
 
-    
+    private IntakePresets selectedIntakePreset = IntakePresets.IDLE;
+    private IntakePresets lockedIntake = IntakePresets.IDLE;
 
 
+    private void IntakePreset(IntakePresets preset) {
+        selectedIntakePreset = preset;
+        SmartDashboard.putString("Locked Fuel Preset", preset.toString());
+    }
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
      * created via the
@@ -107,7 +115,13 @@ public class RobotContainer {
      */
     private void configureBindings() {
        //This is ment for operator controls
-       
+
+       //
+       operatorXbox.y().onTrue(new InstantCommand(() -> {
+          selectedIntakePreset = IntakePresets.INTAKE;
+        }));
+
+
     }
 
     /**
