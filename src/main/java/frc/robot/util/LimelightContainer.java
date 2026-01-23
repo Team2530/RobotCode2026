@@ -49,6 +49,7 @@ public class LimelightContainer {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
+      
       if (mt2 == null) { // in case not all limelights are connected
         continue;
       }

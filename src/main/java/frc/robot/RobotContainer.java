@@ -38,10 +38,10 @@ import frc.robot.util.LimelightContainer;
 public class RobotContainer {
 
     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "FR", true, true);
+    private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "BL", true, true);
     private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "BR", true, true);
 
-    @Logged
-    public static final LimelightContainer LLContainer = new LimelightContainer(LL_FR, LL_BR);
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_FR, LL_BL, LL_BR);
     // @Logged
     public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged
