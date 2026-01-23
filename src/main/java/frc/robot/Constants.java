@@ -46,8 +46,9 @@ public final class Constants {
     public static final double robotWidthMeters = Units.inchesToMeters(29.5);
     public static final double robotLengthMeters = Units.inchesToMeters(29.5);
 
-    // TODO: UPDATE BASED ON REAL ROBOT
     public static final double MOMENT_OF_INERTIA = 6.883;
+
+    public static final double TOTAL_MASS_KG = 1.0;
   }
 
   public static final class FieldConstants {
@@ -112,8 +113,14 @@ public final class Constants {
     }
 
     public static final class SwerveModules {
+        // TODO: i've moved the swerve configuration to the `deploy/swerve` 
+        // directory, but i'm thinking now that I should change it back
+        // to the constants file with how much I have to duplicate the
+        // values.
+        
         // in inches
         public static final double WHEEL_DIAMETER = 4;
+        public static final double WHEEL_FRICTION_COEFFICIENT = 1.19;
     }
 
     // TODO: Make sure that this is correct - this is from the SDS website but needs
@@ -170,9 +177,9 @@ public final class Constants {
         RobotConstants.TOTAL_MASS_KG,
         RobotConstants.MOMENT_OF_INERTIA,
         new ModuleConfig(
-            SwerveModuleConstants.WHEEL_DIAMETER / 2,
+            DriveConstants.SwerveModules.WHEEL_DIAMETER / 2,
             DriveConstants.MAX_MODULE_VELOCITY,
-            SwerveModuleConstants.WHEEL_FRICTION_COEFFICIENT,
+            DriveConstants.SwerveModules.WHEEL_FRICTION_COEFFICIENT,
             DCMotor.getKrakenX60(1),
             DriveConstants.MAX_MODULE_CURRENT,
             1),

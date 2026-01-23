@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.AllianceFlipUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -50,7 +51,9 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     @Logged
-    public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+    public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem(
+            Constants.DriveConstants.SWERVE_CONFIG_DIRECTORY
+    );
 
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
@@ -82,7 +85,14 @@ public class RobotContainer {
             public void accept(Command t) {
                 if (t instanceof PathPlannerAuto) {
                     PathPlannerAuto auto = (PathPlannerAuto) t;
-                    swerveDriveSubsystem.setAutoStartingPose(auto.getStartingPose());
+                    swerveDriveSubsystem
+                        .getField()
+                        .getObject("autoStart")
+                        .setPose(
+                            AllianceFlipUtil.apply(
+                                auto.getStartingPose()
+                            )
+                        );
                 }
             }
         });
@@ -116,7 +126,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        swerveDriveSubsystem.setGyroToEstimate();
         return autoChooser.getSelected();
     }
 

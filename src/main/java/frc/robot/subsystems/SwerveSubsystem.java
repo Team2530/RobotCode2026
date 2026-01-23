@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.io.File;
 
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -186,10 +187,14 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setDriveMotorConversionFactor(
             SwerveMath.calculateMetersPerRotation(
                 Units.inchesToMeters(
-                    Constants.DriveConstants.SwerveModule.WHEEL_DIAMETER
+                    DriveConstants.SwerveModules.WHEEL_DIAMETER
                 ),
                 gearing.gearRatio
             )
         );  
+    }
+
+    public Field2d getField() {
+        return swerveDrive.field;
     }
 }
