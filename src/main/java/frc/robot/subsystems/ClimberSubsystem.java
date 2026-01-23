@@ -22,8 +22,7 @@ public class ClimberSubsystem extends SubsystemBase {
       }
     public void setClimbPreset(ClimbPresets climb) {
           this.climbPreset = climb;
-      boolean climbActive = climb == ClimbPresets.CLIMBING;
-      boolean climbInactive = climb == ClimbPresets.IDLE;
+      
       if (ClimbPresets.CLIMBING == climb) {
 
         m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
