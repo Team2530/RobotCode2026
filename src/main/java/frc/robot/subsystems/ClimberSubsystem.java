@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -20,33 +21,33 @@ public class ClimberSubsystem extends SubsystemBase {
           m_climbsubsystemMotor = new SparkFlex(Constants.ClimbMotors.CLIMBSUBSYSTEM_MOTOR, MotorType.kBrushless);//TODO: Change to ACTUAL motor type
                 
       }
+    // -- Warning: Irreverable when climbing -- \\
     public void setClimbPreset(ClimbPresets climb) {
           this.climbPreset = climb;
       
-      if (ClimbPresets.CLIMBING == climb) {
+      if (ClimbPresets.CLIMBINGUP == climb) {
 
         m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
         SmartDashboard.putString("Climbing Subsystem", "Begin");
 
-        new WaitCommand(Constants.Sleep.first);
-        
-        m_climbsubsystemMotor.set(0);
-        //wait for button press. if auto, wait some time.
-        if (DriverStation.isAutonomousEnabled()) {
-          new WaitCommand(Constants.Sleep.first);
+        if (ClimbPresets.CLIMBINGDOWN == climb) {
+          m_climbsubsystemMotor.set(0);
+          if (DriverStation.isAutonomousEnabled()==false) {
+            //Button press
+          }
+          m_climbsubsystemMotor.set(-Constants.ClimbMotors.CLIMB_SPEED);
+          SmartDashboard.putString("Climbing Command", "Lowering to finish Climb");
+          if (ClimbPresets.CLIMBINGUPF == climb) {
+            m_climbsubsystemMotor.set(0);
+          }
         }
-        else {
-          //Button press
-        }
-        m_climbsubsystemMotor.set(-Constants.ClimbMotors.CLIMB_SPEED);
-
-        new WaitCommand(Constants.Sleep.last); 
+         
 
         SmartDashboard.putString("Climbing Command", "Finished");
         
 
         if (Robot.isSimulation()) {
-            SmartDashboard.putBoolean("[SIM] Climbing", true);
+            SmartDashboard.putBoolean("[SIM] Climbing", false);
         
         }
       }

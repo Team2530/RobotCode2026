@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkFlex;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -29,8 +30,14 @@ public class ClimberCommand extends Command {
 
      @Override
     public void initialize() {
-        subsystem1.setClimbPreset(ClimbPresets.CLIMBING);
-        SmartDashboard.putString("Climb Command", "Started");
+        subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP);
+        SmartDashboard.putString("Climb Command", "Started Part 1 Climb");
+        new WaitCommand(Constants.Sleep.up);
+        SmartDashboard.putString("Climb Command", "Finished Part 1 Climb");
+        subsystem1.setClimbPreset(ClimbPresets.CLIMBINGDOWN);
+        new WaitCommand(Constants.Sleep.finishUP);
+        SmartDashboard.putString("Climb Command", "Finished Climb");
+        
         
 
         if (Robot.isSimulation()) {
@@ -43,7 +50,9 @@ public class ClimberCommand extends Command {
     }
       
     public enum ClimbPresets {
-    CLIMBING,
+        CLIMBINGUP,
+        CLIMBINGUPF,
+        CLIMBINGDOWN,
         IDLE,
     }
 }
