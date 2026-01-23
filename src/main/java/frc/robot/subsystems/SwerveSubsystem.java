@@ -179,8 +179,8 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
 
         // TODO: Check if this is correctly implemented
-        if (DriverStation.isTeleop()) {
-            RobotContainer.LLContainer.estimateMT2Odometry(odometry, lastChassisSpeeds, pigeon);
+        if (Robot.isSimulation()) {
+            LimelightContainer.estimateSimOdometry();
         } else {
             RobotContainer.LLContainer.estimateMT2Odometry(odometry, lastChassisSpeeds, pigeon);
         }
