@@ -44,8 +44,6 @@ public class Robot extends TimedRobot {
   @Logged
   private RobotContainer m_robotContainer;
 
-  public static SendableChooser<String> autoChooser = new SendableChooser<>();
-
   double lastLoopTime = Timer.getFPGATimestamp();
   @Logged
   double loopTime = 0.02;
@@ -87,8 +85,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-
-    SmartDashboard.putData(autoChooser);
 
     // Put git/code version metadata on networktables
     NetworkTable versionTable = NetworkTableInstance.getDefault().getTable("Version");
