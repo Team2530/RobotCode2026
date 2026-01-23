@@ -29,8 +29,8 @@ public class ClimberSubsystem extends SubsystemBase {
         m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
         SmartDashboard.putString("Climbing Subsystem", "Begin");
 
-        new WaitCommand(Constants.Sleep.first); //TODO: find a way to make timer, DONE
-
+        new WaitCommand(Constants.Sleep.first);
+        
         m_climbsubsystemMotor.set(0);
         //wait for button press. if auto, wait some time.
         if (DriverStation.isAutonomousEnabled()) {
