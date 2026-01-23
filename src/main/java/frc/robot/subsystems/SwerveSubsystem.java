@@ -46,6 +46,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public SwerveSubsystem(File swerveConfigDirectory) {
+        // register gearshifter with smartdashboard
         gearChooser = new SendableChooser<>();
 
         gearChooser.addOption(
@@ -68,7 +69,18 @@ public class SwerveSubsystem extends SubsystemBase {
             gearChooser
         );
 
+        // register sysId commands with smartdashboard
+        SmartDashboard.putData(
+            "SysId Drive Motors",
+            sysIdDriveCommand()
+        );  
+        SmartDashboard.putData(
+            "SysId Angle Motors",
+            sysIdAngleCommand()
+        );
 
+
+        // instantiate yagsl library classes
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
         try {
@@ -93,13 +105,11 @@ public class SwerveSubsystem extends SubsystemBase {
                 DriveConstants.AngularCompensation.ENABLE_IN_AUTO,
                 DriveConstants.AngularCompensation.COMPENSATION_COEFFICIENT
         );
-
-        /* TODO: things the example code had - i need to research these options
-         *  
-         *   swerveDrive.setModuleEncoderAutoSynchronize(false, 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
-         * 
-         */
-
+        // Enable if you want to resynchronize your absolute encoders and motor 
+        // encoders periodically when they are not moving.
+        //
+        // idk this seems find
+        swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
     };
 
     @Override
