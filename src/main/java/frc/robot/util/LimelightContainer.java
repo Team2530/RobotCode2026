@@ -73,9 +73,9 @@ public class LimelightContainer {
       LimelightHelpers.PoseEstimate mt2Estimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
 
       // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      // if (Math.abs(pigeon2.getAngularVelocityXWorld().getValue()) > 720) {
-      //   doRejectUpdate = true;
-      // }
+      if (Math.abs(pigeon2.getAngularVelocityZWorld().getValueAsDouble()) > 720) {
+        doRejectUpdate = true;
+      }
 
       if (mt2Estimation.tagCount == 0) {
         doRejectUpdate = true;
