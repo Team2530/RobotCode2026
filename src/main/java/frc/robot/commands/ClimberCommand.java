@@ -8,12 +8,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.RobotContainer;
 
 public class ClimberCommand extends Command {
     private final ClimberSubsystem subsystem1;
+    
 
     private ClimbPresets climbPreset;
 
@@ -30,7 +33,7 @@ public class ClimberCommand extends Command {
 
      @Override
     public void initialize() {
-        subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP);
+        subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP); //TODO: Sequence command group this
         SmartDashboard.putString("Climb Command", "Started Part 1 Climb");
         new WaitCommand(Constants.Sleep.up);
         SmartDashboard.putString("Climb Command", "Finished Part 1 Climb");
@@ -43,6 +46,10 @@ public class ClimberCommand extends Command {
         if (Robot.isSimulation()) {
             SmartDashboard.putBoolean("[SIM] Climbed", true);
         
+        }
+        //private static final RobotContainer.CommandXboxController.driverXbox driverXbox; TODO: Import he XBox controller
+        if (driverXbox.dpadup = true) {
+
         }
     }
     public ClimbPresets getClimbPreset() {

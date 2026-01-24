@@ -29,7 +29,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
         m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
         SmartDashboard.putString("Climbing Subsystem", "Begin");
-
+        
         if (ClimbPresets.CLIMBINGDOWN == climb) {
           m_climbsubsystemMotor.set(0);
           if (DriverStation.isAutonomousEnabled()==false) {
@@ -58,6 +58,10 @@ public class ClimberSubsystem extends SubsystemBase {
             SmartDashboard.putBoolean("[SIM] Climbing", false);
         
         }
+      }
+      if (ClimbPresets.CLIMBINGDOWN == climb) {
+        m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
+        
       }
     }
 
