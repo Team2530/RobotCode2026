@@ -6,9 +6,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -74,7 +75,7 @@ public class SwerveModule {
         steerConfig.encoder
                 .positionConversionFactor(SwerveModuleConstants.STEER_ROTATION_TO_RADIANS)
                 .velocityConversionFactor(SwerveModuleConstants.STEER_RADIANS_PER_MINUTE);
-        steerMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); // TODO: Replace depricated method 
+        steerMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // driveMotorEncoder = driveMotor.get();
         steerMotorEncoder = steerMotor.getEncoder();

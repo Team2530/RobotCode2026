@@ -4,8 +4,6 @@
 
 package frc.robot.util;
 
-import static edu.wpi.first.units.Units.Degrees;
-
 import java.util.ArrayList;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -76,7 +74,6 @@ public class LimelightContainer {
       if (Math.abs(pigeon2.getAngularVelocityZWorld().getValueAsDouble()) > 720) {
         doRejectUpdate = true;
       }
-
       if (mt2Estimation.tagCount == 0) {
         doRejectUpdate = true;
       }
