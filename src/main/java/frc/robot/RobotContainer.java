@@ -40,73 +40,82 @@ public class RobotContainer {
     // @Logged
     // public static final LimelightContainer LLContainer = new LimelightContainer(LL_name1, LL_name2, LL_name3);
 
-    // @Logged
-    public final CommandXboxController driverXbox = new CommandXboxController(
-            ControllerConstants.DRIVER_CONTROLLER_PORT);
-    // @Logged
-    public final CommandXboxController operatorXbox = new CommandXboxController(
-            ControllerConstants.OPERATOR_CONTROLLER_PORT);
-
-    private final SendableChooser<Command> autoChooser;
-
-    @Logged
-    public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-
-    // private final LimeLightSubsystem limeLightSubsystem = new
-    // LimeLightSubsystem();
-    @Logged
-    private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
-
-    /*
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        // Configure the trigger bindings
-        configureBindings();
-
-        DataLogManager.logNetworkTables(true);
-        DataLogManager.start();
-
-        
-
-        swerveDriveSubsystem.setDefaultCommand(normalDrive);
-
-        // NamedCommands.registerCommand(null, getAutonomousCommand());
-
-        swerveDriveSubsystem.configurePathplanner();
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-
-        autoChooser.onChange(new Consumer<Command>() {
-            @Override
-            public void accept(Command t) {
-                if (t instanceof PathPlannerAuto) {
-                    PathPlannerAuto auto = (PathPlannerAuto) t;
-                    swerveDriveSubsystem.setAutoStartingPose(auto.getStartingPose());
+        // @Logged
+        public final static CommandXboxController driverXbox = new CommandXboxController(
+                        ControllerConstants.DRIVER_CONTROLLER_PORT);
+                // @Logged
+                public final CommandXboxController operatorXbox = new CommandXboxController(
+                        ControllerConstants.OPERATOR_CONTROLLER_PORT);
+            
+                private final SendableChooser<Command> autoChooser;
+            
+                @Logged
+                public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+            
+                // private final LimeLightSubsystem limeLightSubsystem = new
+                // LimeLightSubsystem();
+                @Logged
+                private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
+            
+                /*
+                 * The container for the robot. Contains subsystems, OI devices, and commands.
+                 */
+                public RobotContainer() {
+                    // Configure the trigger bindings
+                    configureBindings();
+            
+                    DataLogManager.logNetworkTables(true);
+                    DataLogManager.start();
+            
+                    
+            
+                    swerveDriveSubsystem.setDefaultCommand(normalDrive);
+            
+                    // NamedCommands.registerCommand(null, getAutonomousCommand());
+            
+                    swerveDriveSubsystem.configurePathplanner();
+                    autoChooser = AutoBuilder.buildAutoChooser();
+                    SmartDashboard.putData("Auto Chooser", autoChooser);
+            
+                    autoChooser.onChange(new Consumer<Command>() {
+                        @Override
+                        public void accept(Command t) {
+                            if (t instanceof PathPlannerAuto) {
+                                PathPlannerAuto auto = (PathPlannerAuto) t;
+                                swerveDriveSubsystem.setAutoStartingPose(auto.getStartingPose());
+                            }
+                        }
+                    });
                 }
-            }
-        });
-    }
-
+            
+                
+            
+            
+        /**
+         * Use this method to define your trigger->command mappings. Triggers can be
+         * created via the
+         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+         * an arbitrary
+         * predicate, or via the named factories in {@link
+         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+         * {@link
+         * CommandXboxController
+         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+         * PS4} controllers or
+         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+         * joysticks}.
+         */
+        boolean isXstance;
     
-
-
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-     * {@link
-     * CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
-    private void configureBindings() {
-       //This is ment for operator controls
+         private void configureBindings() {
+        driverXbox.x().whileTrue(DriveCommand, isXstance);
+            if (isXstance) {
+                // fire shooter
+            };
+       /*(
+        new setXstance(m_Carousel, true)
+      );
+    */
        
     }
 
