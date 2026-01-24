@@ -1,7 +1,8 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
+// **UPDATES FOR 2025: !!Megatag 1 should updated to megatag 2!! where applicable, as mega tag 2 is more accurate.
+//mega tag 1 functions are good for more genral less accurate positioning estimates, mega tag 2 functions are better for more precise positioning. EX. scoring.**
 package frc.robot.util;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class LimelightContainer {
       limelight.setEnabled(enable);
     }
   }
+
 
   public static void estimateSimOdometry() {
     for (Limelight limelight : limelights) {
@@ -97,7 +99,7 @@ public class LimelightContainer {
   public void estimateMT1Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx) {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
-
+      //update these to Mega tag 2? its highly likely we will only use mega tag 2 going forward as it is more accurate.
       LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
 
       if (mt1 == null) {
