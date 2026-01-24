@@ -15,6 +15,11 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Limelight;
+import frc.robot.util.LimelightHelpers;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.geometry.Pose2d;
+//will most likely need to import other things as we go along, some are currently unused, keep them for now.
 
 public class LimelightContainer {
   static int SIMCOUNTER = 0;
@@ -24,13 +29,14 @@ public class LimelightContainer {
 
   public LimelightContainer(Limelight... limelights) {
     // This is were we add valid tag ids.
-    // int[] validTagIDs = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-    //  25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48 }; 
-    // most likely we will not use all of these, but just in case we do, they are here. Remove as needed. 
+    int[] validTagIDs = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48 }; 
+    // it is very likely that we will not use all of these, but just in case we do, they are here. Remove as needed. 
     // Each tag id should be commented here to show what object it is in corralation to the field.
 
     for (Limelight limelight : limelights) {
       LimelightContainer.limelights.add(limelight);
+      LimelightHelpers.SetFiducialIDFiltersOverride(limelight.getName(), validTagIDs); //makes sure the helper only considers the specified valid tag IDs.
       LimelightHelpers.SetIMUMode(limelight.getName(), 0);
     }
     enableLimelights(true);
