@@ -19,6 +19,8 @@ import frc.robot.util.LimelightHelpers;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
+import com.ctre.phoenix6.hardware.Pigeon2;
+
 //will most likely need to import other things as we go along, some are currently unused, keep them for now.
 
 public class LimelightContainer {
@@ -67,7 +69,7 @@ public class LimelightContainer {
     }
   }
 
-  public void estimateMT1OdometryPrelim(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx,
+  public void estimateMT1OdometryPrelim(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS Pigion2,
       SwerveModulePosition[] swerveModulePositions) {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
@@ -82,7 +84,7 @@ public class LimelightContainer {
         doRejectUpdate = true;
       }
 
-      if (Math.abs(navx.getRate()) > 720) {
+      if (Math.abs(Pigion2.getRate()) > 720) {
         doRejectUpdate = true;
       }
 
@@ -95,7 +97,7 @@ public class LimelightContainer {
     }
   }
 
-  public void estimateMT1Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx) {
+  public void estimateMT1Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS Pigion2) {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
       
@@ -112,7 +114,7 @@ public class LimelightContainer {
       if (mt1.avgTagDist < Units.feetToMeters(10))
         doRejectUpdate = true;
 
-      if (Math.abs(navx.getRate()) > 720) {
+      if (Math.abs(Pigion2.getRate()) > 720) {
         doRejectUpdate = true;
       }
 
@@ -138,14 +140,14 @@ public class LimelightContainer {
     }
   }
 
-  public void estimateMT2Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS navx) {
+  public void estimateMT2Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS Pigion2) {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
-      LimelightHelpers.SetRobotOrientation(limelight.getName(), navx.getAngle(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(limelight.getName(), Pigion2.getAngle(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
 
       // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      if (Math.abs(navx.getRate()) > 720) {
+      if (Math.abs(Pigion2.getRate()) > 720) {
         doRejectUpdate = true;
       }
 
