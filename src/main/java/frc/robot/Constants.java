@@ -238,5 +238,9 @@ public final class Constants {
   public static final class IndexerConstants {
     // TODO: UPDATE BASED ON REAL ROBOT
     public static final int IndexerID = 23;
-    public static final double IndexerSpeed = 0.67;
+    public static final double IndexerSpeed = 0.60;
+
+    public static final int LoaderID = 24;
+    public static final double LoaderSpeed = 0.60;
   }
+}

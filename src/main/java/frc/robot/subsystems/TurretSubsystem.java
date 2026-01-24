@@ -86,19 +86,22 @@ public class TurretSubsystem extends SubsystemBase {
   private double targetHoodAngle() {
     // Placeholder for actual calculation based on distance to target
     double distance = 0; // Distance to Closest Part of the Goal
-    double angle = 0; // Calculate hood angle based on distance
+    double h_dif = Math.abs(Height); // ABS(Goal Height - Shooter Height)
+    double bias = 0; // Placeholder  Bias
+    double angle = Math.atan(1/(h_dif / (2 * distance))) + bias; // Calculate the prefered angle.
     return angle;
   }
 
   private double targetShootSpeed() {
     // Calculate Required Exit Velocity based on Distance and Hood Angle
     double distance = 0;// Distance to Closest Part of the Goal
-    double thetaAngles = getHoodAngle(); // Hood Angle in Degrees
+    double thetaAngles = targetHoodAngle(); // Hood Angle in Degrees
     double thetaRadians = Math.toRadians(thetaAngles);
     double g = 9.81; // Gravity in m/s^2
     double h_dif = Math.abs(Height); // ABS(Goal Height - Shooter Height)
+    double bias = 2.5;
 
-    double exitVelocity = Math.sqrt((g * distance * distance) / ((2 * Math.cos(thetaRadians) * Math.cos(thetaRadians)) * (distance * Math.tan(thetaRadians) - h_dif)));
+    double exitVelocity = (Math.sqrt((g * distance * distance) / ((2 * Math.cos(thetaRadians) * Math.cos(thetaRadians)) * (distance * Math.tan(thetaRadians) - h_dif)))) + 2.5;
     return exitVelocity;
   }
 
