@@ -6,7 +6,7 @@ package frc.robot.util;
 
 import java.util.ArrayList;
 
-import com.studica.frc.AHRS;
+// import com.studica.frc.AHRS;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Limelight;
 import frc.robot.util.LimelightHelpers;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -69,7 +68,7 @@ public class LimelightContainer {
     }
   }
 
-  public void estimateMT1OdometryPrelim(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS Pigion2,
+  public void estimateMT1OdometryPrelim(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, Pigeon2 pigeon,
       SwerveModulePosition[] swerveModulePositions) {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
@@ -84,7 +83,7 @@ public class LimelightContainer {
         doRejectUpdate = true;
       }
 
-      if (Math.abs(Pigion2.getRate()) > 720) {
+      if (doRotationRejection(pigeon, 720)) {
         doRejectUpdate = true;
       }
 
@@ -97,7 +96,7 @@ public class LimelightContainer {
     }
   }
 
-  public void estimateMT1Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS Pigion2) {
+  public void estimateMT1Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, Pigeon2 pigeon) {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
       
@@ -111,10 +110,10 @@ public class LimelightContainer {
         doRejectUpdate = true;
       }
 
-      if (mt1.avgTagDist < Units.feetToMeters(10))
+      if (mt1.avgTagDist < Units.feetToMeters(2)) // origanally 10ft, for testing set to 2ft.
         doRejectUpdate = true;
 
-      if (Math.abs(Pigion2.getRate()) > 720) {
+      if (doRotationRejection(pigeon, 720)) {
         doRejectUpdate = true;
       }
 
@@ -126,10 +125,9 @@ public class LimelightContainer {
       }
 
       if (!doRejectUpdate) {
-        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(3, 3, 9999));
-        odometry.addVisionMeasurement(
-            mt1.pose,
-            mt1.timestampSeconds);
+        // Use realistic vision measurement standard deviations (meters, meters, radians)
+        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(0.15, 0.15, Units.degreesToRadians(5.0)));
+        odometry.addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
 
         SmartDashboard.putString("Pos MT1: ", mt1.pose.toString() + " " + RLCountermt1);
         limelight.pushPoseToShuffleboard(limelight.getName() + "mt1", mt1.pose);
@@ -140,14 +138,14 @@ public class LimelightContainer {
     }
   }
 
-  public void estimateMT2Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, AHRS Pigion2) {
+  public void estimateMT2Odometry(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, Pigeon2 pigeon2) {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
-      LimelightHelpers.SetRobotOrientation(limelight.getName(), Pigion2.getAngle(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(limelight.getName(), pigeon2.getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
 
       // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      if (Math.abs(Pigion2.getRate()) > 720) {
+      if (doRotationRejection(pigeon2, 720)) {
         doRejectUpdate = true;
       }
 
@@ -156,9 +154,12 @@ public class LimelightContainer {
       }
       if (!doRejectUpdate) {
         limelight.pushPoseToShuffleboard(limelight.getName() + "mt2", mt2.pose);
-        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(3, 3, 9999999));
+        odometry.setVisionMeasurementStdDevs(VecBuilder.fill(0.15, 0.15, Units.degreesToRadians(5.0)));
         odometry.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
       }
     }
+  }
+  private boolean doRotationRejection(Pigeon2 pigeon, int dps) {
+    return Math.abs(pigeon.getAngularVelocityZWorld().getValueAsDouble()) > dps;
   }
 }
