@@ -1,7 +1,7 @@
 {
     "imu": {
         "type": "pigeon2",
-        "id": "TODO",
+        "id": 0,
         "canbus": null
     },
     "modules": [
