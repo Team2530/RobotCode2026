@@ -38,14 +38,15 @@ import frc.robot.subsystems.Limelight;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s)
-     private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
-     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
-     private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
-     private static final Limelight LL_BF = new Limelight(LimelightType.LL4, "limelight-bf", true, true);
+    private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
+    private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
+    private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
+    private static final Limelight LL_BF = new Limelight(LimelightType.LL4, "limelight-bf", true, true);
 
-     //initalizing limelight container (Group)
-     public static final LimelightContainer LLContainer = new LimelightContainer(LL_BF, LL_BL, LL_BR, LL_FR);
-
+    //initalizing limelight container (Group)
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BF, LL_BL, LL_BR, LL_FR);
+    // @Logged
+    public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged
     public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
