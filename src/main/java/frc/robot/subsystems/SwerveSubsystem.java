@@ -174,7 +174,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         // Vision-based odometry updates via LimelightContainer
         try {
-            RobotContainer.LLContainer.estimateMT1Odometry(odometry, getChassisSpeeds(), pigeon);
+            RobotContainer.LLContainer.estimateMT1OdometryPrelim(odometry, getChassisSpeeds(), pigeon, getModulePositions());
         } catch (Exception e) {
             // Don't let limelight errors crash periodic; surface the message for debugging
             SmartDashboard.putString("LL Error", e.toString());
