@@ -91,14 +91,7 @@ public class RobotContainer {
         });
     }
 
-    private IntakePresets selectedIntakePreset = IntakePresets.IDLE;
-    private IntakePresets lockedIntake = IntakePresets.IDLE;
-
-
-    private void IntakePreset(IntakePresets preset) {
-        selectedIntakePreset = preset;
-        SmartDashboard.putString("Locked Fuel Preset", preset.toString());
-    }
+   
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
      * created via the
@@ -117,9 +110,7 @@ public class RobotContainer {
        //This is ment for operator controls
 
        //
-       operatorXbox.y().onTrue(new InstantCommand(() -> {
-          selectedIntakePreset = IntakePresets.INTAKE;
-        }));
+       
 
 
     }
