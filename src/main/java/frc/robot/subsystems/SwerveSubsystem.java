@@ -39,10 +39,9 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.Robot;
-
 import frc.robot.RobotContainer;
-import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LimelightContainer;
+import frc.robot.util.AllianceFlipUtil;
 
 @Logged
 /**
@@ -178,11 +177,13 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        // TODO: Check if this is correctly implemented
-        if (Robot.isSimulation()) {
-            LimelightContainer.estimateSimOdometry();
-        } else {
-            RobotContainer.LLContainer.estimateMT2Odometry(odometry, lastChassisSpeeds, pigeon);
+
+        // Vision-based odometry updates via LimelightContainer
+        try {
+            RobotContainer.LLContainer.estimateMT1OdometryPrelim(odometry, getChassisSpeeds(), pigeon, getModulePositions());
+        } catch (Exception e) {
+            // Don't let limelight errors crash periodic; surface the message for debugging
+            SmartDashboard.putString("LL Error", e.toString());
         }
 
         odometry.update(getGyroRotation2d(), getModulePositions());
