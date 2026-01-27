@@ -49,7 +49,7 @@ public class Limelight extends SubsystemBase {
         this.isEnabled = isEnabled;
         this.cropEnabled = cropEnabled;
 
-        publisher =  NetworkTableInstance.getDefault().getStructTopic(name, Pose2d.struct).publish();
+        publisher = NetworkTableInstance.getDefault().getStructTopic(name+" Pose2d", Pose2d.struct).publish();
 
         LimelightHelpers.SetIMUMode(name, 1);
     }
