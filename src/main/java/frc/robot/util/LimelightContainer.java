@@ -14,16 +14,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Limelight;
-import frc.robot.util.LimelightHelpers;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.math.geometry.Pose2d;
-import com.ctre.phoenix6.hardware.Pigeon2;
-
-//will most likely need to import other things as we go along, some are currently unused, keep them for now.
 
 /**
- * The LimelightContainer class manages multiple Limelight cameras and their
- * odometry estimation.
+ * The LimelightContainer class manages multiple Limelight cameras and their odometry estimation.
  */
 public class LimelightContainer {
   static int SIMCOUNTER = 0;
@@ -48,13 +41,12 @@ public class LimelightContainer {
 
   }
 
+  /** Enable or disable all limelights. */
   public void enableLimelights(boolean enable) {
     for (Limelight limelight : limelights) {
       limelight.setEnabled(enable);
     }
   }
-  
-
 
   public static void estimateSimOdometry() {
     for (Limelight limelight : limelights) {

@@ -16,15 +16,13 @@ import frc.robot.util.LimelightHelpers.RawFiducial;
 public class Limelight extends SubsystemBase {
     public enum LimelightType {
         // LL1 doesn't have specs listed, so these could be incorrect
-        LL1(54, 41),
-        LL2(62.5, 48.9),
-        LL2Plus(62.5, 48.9),
+        LL1(54, 41), LL2(62.5, 48.9), LL2Plus(62.5, 48.9),
         LL3(62.5, 48.9),
         LL3G(82, 56.2),
         LL4(82, 56.2);
 
-        private double HFOV;
-        private double VFOV;
+        private final double HFOV;
+        private final double VFOV;
 
         private LimelightType(double HFOV, double VFOV) {
             this.HFOV = HFOV;
@@ -154,59 +152,27 @@ public class Limelight extends SubsystemBase {
             }
         }
     }
-
-    public void setIMUMode(int mode) {
-        LimelightHelpers.SetIMUMode(name, mode);
-    }
-
+    
     public void restoreCrop() {
         LimelightHelpers.setCropWindow(name, -1, 1, -1, 1);
     }
 
-    
-    public void setEnabled(boolean enabled) {
-        this.isEnabled = enabled;
+    public void setIMUMode(int mode) {LimelightHelpers.SetIMUMode(name, mode);}
+
+    public void setEnabled(boolean enabled) {this.isEnabled = enabled;}
+    public void setCropEnabled(boolean enabled) {this.cropEnabled = enabled;}
+    public boolean isEnabled() {return isEnabled;}
+    public boolean isCropEnabled() {return cropEnabled;}
+
+    public double getLastFrameTime(){return lastFrame;}
+    public void setLastFrame(double lastFrameTime){lastFrame = lastFrameTime;}
+
+    public double getVFOV() {return limelightType.VFOV;}
+    public double getHFOV() {return limelightType.HFOV;}
+
+    /** Set the publisher's pose. */
+    public void pushPoseToShuffleboard(String name, Pose2d pose) {
+        publisher.set(pose);
     }
-
-    public void setCropEnabled(boolean enabled) {
-        this.cropEnabled = enabled;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public boolean isCropEnabled() {
-        return cropEnabled;
-    }
-
-    public double getLastFrameTime(){
-        return lastFrame;
-    }
-
-    public void setLastFrame(double lastFrameTime){
-        lastFrame = lastFrameTime;
-    }
-
-    public double getVFOV() {
-        return limelightType.VFOV;
-    }
-
-    public double getHFOV() {
-        return limelightType.HFOV;
-    }
-
-    public LimelightType getLimelightType() {
-        return limelightType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-
-  public void pushPoseToShuffleboard(String name, Pose2d pose) {
-    publisher.set(pose);
-  }
 
 }
