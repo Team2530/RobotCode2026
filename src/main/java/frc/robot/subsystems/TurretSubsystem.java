@@ -107,10 +107,20 @@ public class TurretSubsystem extends SubsystemBase {
 
   public void runLauncher() {
     m_LauncherMotor.set(LauncherSpeed);
+
+    if (Robot.isSimulation()) {
+      SmartDashboard.putBoolean("[SIM] Shooting", true);
+        
+    }
   }
       
   public void stopLauncher() {
     m_LauncherMotor.set(0.0);
+
+    if (Robot.isSimulation()) {
+      SmartDashboard.putBoolean("[SIM] Shooting", false);
+        
+    }
   }
 
   public void angleTurret(double targetAngle) {
