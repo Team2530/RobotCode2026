@@ -41,15 +41,15 @@ public class DriveCommand extends Command {
         // rotation
         double x = MathUtil.applyDeadband(
             driverXbox.getLeftY(),
-            ControlConstants.Deadband.x
+            ControlConstants.Deadband.X
         );
         double y = MathUtil.applyDeadband(
             driverXbox.getLeftX(),
-            ControlConstants.Deadband.y
+            ControlConstants.Deadband.Y
         );
         double z = MathUtil.applyDeadband(
             driverXbox.getRightX(),
-            ControlConstants.Deadband.z
+            ControlConstants.Deadband.Z
         );
         
         // trigger-base slow / fast mode
