@@ -322,7 +322,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.drive(
             translation,
             rotation,
-            false,
+            true,
             false
         );
     }
@@ -339,7 +339,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.drive(
             translation,
             rotation,
-            true,
+            false,
             false
         );
     }
