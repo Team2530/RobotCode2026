@@ -104,7 +104,7 @@ public final class Constants {
         public static final double REGULAR_DRIVE_MULT = 1.0;
         public static final double TURTLE_DRIVE_MULT = 0.25;
 
-        public static final double DRIVE_MULTIPLIER_SLEW_RATE = 0.5;
+        public static final double DRIVE_MULTIPLIER_SLEW_RATE = 4.0;
 
         public static class Deadband {
             public static final double X = 0.1;
@@ -133,7 +133,7 @@ public final class Constants {
         // TODO: tune all
 
         public static final class Drive {
-            public static final double P = 0.002;
+            public static final double P = 5;
             public static final double I = 0;
             public static final double D = 0;
             public static final double F = 0;
@@ -142,7 +142,7 @@ public final class Constants {
 
         // for the steer motors on the modules
         public static final class Angle {
-            public static final double P = 0.01;
+            public static final double P = 100;
             public static final double I = 0;
             public static final double D = 0;
             public static final double F = 0;
@@ -181,7 +181,7 @@ public final class Constants {
         public static final int STEER_CURRENT_LIMIT = 70;
         // the minimum number of seconds it takes the motor to go from 0 to full 
         // throttle
-        public static final double DRIVE_RAMP_RATE = 0;
+        public static final double DRIVE_RAMP_RATE = 0.05;
         public static final double STEER_RAMP_RATE = 0;
         // the minimum voltage it takes for the given motor to move
         // TODO: get real values
