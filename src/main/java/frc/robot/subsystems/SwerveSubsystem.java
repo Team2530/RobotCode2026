@@ -160,7 +160,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     new CANCoderSwerve(
                         DriveConstants.SwerveModules.CanIDs.FL_CANCODER
                     ), 
-                    DriveConstants.SwerveModules.Offsets.FL_ANGLE,
+                    Units.rotationsToDegrees(
+                        DriveConstants.SwerveModules.Offsets.FL_ANGLE
+                    ),
                     DriveConstants.SwerveModules.Offsets.FL_X,
                     DriveConstants.SwerveModules.Offsets.FL_Y,
                     anglePID, 
@@ -189,7 +191,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     new CANCoderSwerve(
                         DriveConstants.SwerveModules.CanIDs.FR_CANCODER
                     ), 
-                    DriveConstants.SwerveModules.Offsets.FR_ANGLE,
+                    Units.rotationsToDegrees(
+                        DriveConstants.SwerveModules.Offsets.FR_ANGLE
+                    ),
                     DriveConstants.SwerveModules.Offsets.FR_X,
                     DriveConstants.SwerveModules.Offsets.FR_Y,
                     anglePID, 
@@ -216,7 +220,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     new CANCoderSwerve(
                         DriveConstants.SwerveModules.CanIDs.BL_CANCODER
                     ), 
-                    DriveConstants.SwerveModules.Offsets.BL_ANGLE,
+                    Units.rotationsToDegrees(
+                        DriveConstants.SwerveModules.Offsets.BL_ANGLE
+                    ),
                     DriveConstants.SwerveModules.Offsets.BL_X,
                     DriveConstants.SwerveModules.Offsets.BL_Y,
                     anglePID, 
@@ -243,7 +249,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     new CANCoderSwerve(
                         DriveConstants.SwerveModules.CanIDs.BR_CANCODER
                     ), 
-                    DriveConstants.SwerveModules.Offsets.BR_ANGLE,
+                    Units.rotationsToDegrees(
+                        DriveConstants.SwerveModules.Offsets.BR_ANGLE
+                    ),
                     DriveConstants.SwerveModules.Offsets.BR_X,
                     DriveConstants.SwerveModules.Offsets.BR_Y,
                     anglePID, 
