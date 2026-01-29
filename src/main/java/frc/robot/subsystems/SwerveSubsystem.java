@@ -56,7 +56,7 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    public SwerveSubsystem(File swerveConfigDirectory) {
+    public SwerveSubsystem() {
         // register gearshifter with smartdashboard
         gearChooser = new SendableChooser<>();
 
