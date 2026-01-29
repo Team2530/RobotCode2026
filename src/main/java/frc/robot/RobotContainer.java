@@ -15,10 +15,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 /**
@@ -39,6 +42,10 @@ public class RobotContainer {
     // TODO: initalize Limelight container
     // @Logged
     // public static final LimelightContainer LLContainer = new LimelightContainer(LL_name1, LL_name2, LL_name3);
+    
+    
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+
 
     // @Logged
     public final CommandXboxController driverXbox = new CommandXboxController(
@@ -88,9 +95,7 @@ public class RobotContainer {
         });
     }
 
-    
-
-
+   
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
      * created via the
@@ -108,6 +113,8 @@ public class RobotContainer {
     private void configureBindings() {
        //This is ment for operator controls
        
+       operatorXbox.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem));
+
     }
 
     /**
