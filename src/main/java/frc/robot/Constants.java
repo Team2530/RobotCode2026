@@ -249,6 +249,30 @@ public final class Constants {
             put(i, TAG_LAYOUT.getTagPose(i + 1).get().toPose2d());
         }
       }};
+  }
+  public static final class TurretConstants {
+    // TODO: UPDATE BASED ON REAL ROBOT
+    public static final int FlyWheelID = 20;
+    public static final double FlyWheelSpeed = 0.3;
+    public static final double FlyWheelDiameterMeters = Units.inchesToMeters(4);
 
+    public static final int TurretID = 21;
+    public static final double TurretGearRatio = 1;
+    public static final double TurretLimitLow = 270;
+    public static final double TurretLimitHigh = 90;
+
+    public static final int HoodID = 22;
+
+    public static final double ShooterHeight = Units.inchesToMeters(20); // UPDATE THIS | Height of Shooter from Ground in Inches
+    public static final double GoalHeight = Units.inchesToMeters(72); //Height of Hub Funnel
+  }
+
+  public static final class IndexerConstants {
+    // TODO: UPDATE BASED ON REAL ROBOT
+    public static final int IndexerID = 23;
+    public static final double IndexerSpeed = 0.60;
+
+    public static final int LoaderID = 24;
+    public static final double LoaderSpeed = 0.60;
   }
 }
