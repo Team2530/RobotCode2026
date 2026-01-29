@@ -166,6 +166,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     anglePID, 
                     drivePID, 
                     physicalCharacteristics, 
+                    DriveConstants.SwerveModules.Offsets.FL_ENCODER_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.FL_DRIVE_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.FL_ANGLE_INVERTED, 
                     "PORT_BOW", 
                     // Cosine compensation should not be used for simulations 
                     // since it causes discrepancies not seen in real life.
@@ -192,6 +195,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     anglePID, 
                     drivePID, 
                     physicalCharacteristics, 
+                    DriveConstants.SwerveModules.Offsets.FR_ENCODER_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.FR_DRIVE_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.FR_ANGLE_INVERTED,
                     "STARBOARD_BOW", 
                     !RobotBase.isSimulation()
                 ),
@@ -216,6 +222,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     anglePID, 
                     drivePID, 
                     physicalCharacteristics, 
+                    DriveConstants.SwerveModules.Offsets.BL_ENCODER_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.BL_DRIVE_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.BL_ANGLE_INVERTED,
                     "PORT_QUARTER", 
                     !RobotBase.isSimulation()
                 ),
@@ -240,6 +249,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     anglePID, 
                     drivePID, 
                     physicalCharacteristics, 
+                    DriveConstants.SwerveModules.Offsets.BR_ENCODER_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.BR_DRIVE_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.BR_ANGLE_INVERTED,
                     "STARBOARD_QUARTER", 
                     !RobotBase.isSimulation()
                 )

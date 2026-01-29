@@ -218,14 +218,23 @@ public final class Constants {
             public static final double FL_Y = 12.263;
             // as in absolute encoder offset
             public static final double FL_ANGLE = 0; // TODO: update
+            public static final boolean FL_ENCODER_INVERTED = false;
+            public static final boolean FL_DRIVE_INVERTED = false;
+            public static final boolean FL_ANGLE_INVERTED = false;
 
             public static final double FR_X = -9.75;
             public static final double FR_Y = 12.263;
             public static final double FR_ANGLE = 0; // TODO: update
+            public static final boolean FR_ENCODER_INVERTED = false;
+            public static final boolean FR_DRIVE_INVERTED = false;
+            public static final boolean FR_ANGLE_INVERTED = false;
 
             public static final double BL_X = 9.75;
             public static final double BL_Y = -12.263;
             public static final double BL_ANGLE = 0; // TODO: update
+            public static final boolean BL_ENCODER_INVERTED = false;
+            public static final boolean BL_DRIVE_INVERTED = false;
+            public static final boolean BL_ANGLE_INVERTED = false;
 
             public static final double BR_X = -9.75;
             public static final double BR_Y = -12.263;
