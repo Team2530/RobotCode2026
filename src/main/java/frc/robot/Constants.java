@@ -239,6 +239,9 @@ public final class Constants {
             public static final double BR_X = -9.75;
             public static final double BR_Y = -12.263;
             public static final double BR_ANGLE = 0; // TODO: update
+            public static final boolean BR_ENCODER_INVERTED = false;
+            public static final boolean BR_DRIVE_INVERTED = false;
+            public static final boolean BR_ANGLE_INVERTED = false;
         };
     }
 
