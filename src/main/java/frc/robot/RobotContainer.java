@@ -23,7 +23,6 @@ import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
-import frc.robot.util.LimelightHelpers;
 import frc.robot.subsystems.Limelight;
 
 /**
@@ -37,7 +36,7 @@ import frc.robot.subsystems.Limelight;
  */
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
-    // These are initating the individual Limlight(s)
+    // These are initating the individual Limlight(s). The name should match the limelight internal names.
     private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
     private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);

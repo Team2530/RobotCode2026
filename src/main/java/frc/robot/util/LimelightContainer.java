@@ -52,7 +52,6 @@ public class LimelightContainer {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
-      
       if (mt2 == null) { // in case not all limelights are connected
         continue;
       }
@@ -97,24 +96,18 @@ public class LimelightContainer {
 
       LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
 
-      if (mt1 == null) {
-        continue;
-      }
-
+      if (mt1 == null) {continue;}
       if (mt1.tagCount == 0) {
         doRejectUpdate = true;
       }
-
       if (doRotationRejection(pigeon, 720)) {
         doRejectUpdate = true;
       }
-
       if (!doRejectUpdate) {
         odometry.resetPosition(mt1.pose.getRotation(), swerveModulePositions, mt1.pose);
         SmartDashboard.putString("Pos MT1 prelim: ", mt1.pose.toString() + " " + RLCountermt1);
         limelight.pushPoseToShuffleboard(limelight.getName() + " mt1", mt1.pose);
       }
-
       RLCountermt1++;
     }
   }
@@ -124,27 +117,22 @@ public class LimelightContainer {
       boolean doRejectUpdate = false;
       
       LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
-
       if (mt1 == null) {
         continue;
       }
-
       if (mt1.tagCount == 0) {
         doRejectUpdate = true;
       }
-
-      if (mt1.avgTagDist < Units.feetToMeters(2)) // origanally 10ft, for testing set to 2ft.
+      if (mt1.avgTagDist < Units.feetToMeters(2)) { // origanally 10ft, for testing set to 2ft.
         doRejectUpdate = true;
-
+      }
       if (doRotationRejection(pigeon,720)) {
         doRejectUpdate = true;
       }
-
+      // Limelight position too far from odometry position
       if ((Math.abs(mt1.pose.getX() - odometry.getEstimatedPosition().getX()) > 1.5)
           || (Math.abs(mt1.pose.getY() - odometry.getEstimatedPosition().getY()) > 1.5)) {
-
         doRejectUpdate = true;
-
       }
 
       if (!doRejectUpdate) {
@@ -154,9 +142,7 @@ public class LimelightContainer {
 
         SmartDashboard.putString("Pos MT1: ", mt1.pose.toString() + " " + RLCountermt1);
         limelight.pushPoseToShuffleboard(limelight.getName() + " mt1", mt1.pose);
-
       }
-
       RLCountermt1++;
     }
   }
