@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.subsystems.IntakeSubsystem.IntakePresets;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -113,12 +112,9 @@ public class RobotContainer {
      */
     private void configureBindings() {
        //This is ment for operator controls
+        
 
-       operatorXbox.a().onTrue(new InstantCommand(() -> {
-            new IntakeCommand(intakeSubsystem);
-        }));
-       
-
+       operatorXbox.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem));
 
     }
 
