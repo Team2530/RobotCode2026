@@ -252,29 +252,6 @@ public final class Constants {
     public static final boolean LOG_TO_NETWORKTABLES = true;
   }
 
-  public static final class PathPlannerConstants {
-
-    // TODO: UPDATE BASED ON REAL ROBOT
-    public static final PIDConstants TRANSLATION_PID = new PIDConstants(15.0, 0, 0.005);
-    public static final PIDConstants ROTATION_PID = new PIDConstants(9.0, 0, 0.03); // was 10 and 9
-
-    public static final PPHolonomicDriveController HOLONOMIC_FOLLOWER_CONTROLLER = new PPHolonomicDriveController(
-        TRANSLATION_PID,
-        ROTATION_PID);
-
-    public static final RobotConfig ROBOT_CONFIG = new RobotConfig(
-        RobotConstants.TOTAL_MASS_KG,
-        RobotConstants.MOMENT_OF_INERTIA,
-        new ModuleConfig(
-            DriveConstants.SwerveModules.WHEEL_DIAMETER / 2,
-            DriveConstants.MAX_MODULE_VELOCITY,
-            DriveConstants.SwerveModules.WHEEL_FRICTION_COEFFICIENT,
-            DCMotor.getKrakenX60(1),
-            DriveConstants.MAX_MODULE_CURRENT,
-            1),
-        DriveConstants.KINEMATICS.getModules());
-  }
-
   public static final class PoseConstants {
 
     public static final double kPositionStdDevX = 0.1;
