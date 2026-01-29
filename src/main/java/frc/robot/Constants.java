@@ -84,7 +84,7 @@ public final class Constants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
     public static final double MAX_ROBOT_VELOCITY = 4.2;
-    public static final double MAX_ROBOT_RAD_VELOCITY = 12.0;
+    public static final double MAX_ROBOT_RAD_VELOCITY = 6.0;
 
 
     // (((((65kg×1(m/s^2))/4)×(4in/2))/6.75)/(0.0194Nm/A))×(0.033ohm)
@@ -232,12 +232,12 @@ public final class Constants {
             public static final double BL_Y = -12.263;
             public static final double BL_ANGLE = 0.003906;
             public static final boolean BL_ENCODER_INVERTED = false;
-            public static final boolean BL_DRIVE_INVERTED = false;
+            public static final boolean BL_DRIVE_INVERTED = true;
             public static final boolean BL_ANGLE_INVERTED = true;
 
             public static final double BR_X = -9.75;
             public static final double BR_Y = -12.263;
-            public static final double BR_ANGLE = 0.575928;
+            public static final double BR_ANGLE = 0.075928;
             public static final boolean BR_ENCODER_INVERTED = false;
             public static final boolean BR_DRIVE_INVERTED = false;
             public static final boolean BR_ANGLE_INVERTED = true;
