@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.urcl.URCL;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -135,6 +137,8 @@ public class Robot extends TimedRobot {
 
   }
 
+
+ 
   /**
    * This autonomous runs the autonomous command selected by your
    * {@link RobotContainer} class.
