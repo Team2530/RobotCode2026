@@ -112,8 +112,7 @@ public class RobotContainer {
      */
     private void configureBindings() {
        //This is ment for operator controls
-        
-
+       
        operatorXbox.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem));
 
     }
