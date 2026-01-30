@@ -58,6 +58,15 @@ public class ClimberCommand extends Command {
         
         }
             new WaitUntilCommand(driveXbox.a());
+            subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP);
+            SmartDashboard.putString("Climb Command", "Started Part 1 Going Down");
+            new WaitCommand(Constants.Sleep.down);
+            SmartDashboard.putString("Climb Command", "Started Part 2 Going Down, Please Reverse to clear the bar!!!!!!!!!!!");
+            subsystem1.setClimbPreset(ClimbPresets.CLIMBINGDOWN);
+            new WaitCommand(Constants.Sleep.finishDN);
+            subsystem1.setClimbPreset(ClimbPresets.IDLE);
+            SmartDashboard.putString("Climb Command", "Comgrats, you successfully unclimbed from the bar!");
+
     }
     
     public ClimbPresets getClimbPreset() {
