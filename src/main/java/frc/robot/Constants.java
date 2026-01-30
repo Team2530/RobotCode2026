@@ -42,11 +42,12 @@ public final class Constants {
   }
 
   public static class RobotConstants {
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double robotWidthMeters = Units.inchesToMeters(29.5);
     public static final double robotLengthMeters = Units.inchesToMeters(29.5);
 
-    public static final double TOTAL_MASS_KG = 1.0;
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
+    public static final double TOTAL_MASS_KG = 74.088;
     public static final double MOMENT_OF_INERTIA = 6.883;
   }
 
@@ -74,7 +75,7 @@ public final class Constants {
 *///|-----------WARNING-----------------|
   //---Intake Motors---\\
   public static class IntakeMotors {
-    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed
+    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed. DONE: FALSE
     public static final double INTAKE_SPEED = 0.6;
     public static final int INTAKE_MOTOR1 = 5;
     public static final double INTAKE_SPEED1 = 0.6;
@@ -91,12 +92,12 @@ public final class Constants {
     public static final double GLOBAL_kA = 0.135; // V/(m/ss)
 
     
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double TRACK_WIDTH = Units.inchesToMeters(19.675);
     public static final double WHEEL_BASE = Units.inchesToMeters(19.675);
     public static final double FULL_ROBOT_WIDTH = Units.inchesToMeters(37.50);
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final PIDConstants TRANSLATION_ASSIST = new PIDConstants(8, 0, 0.01);
     public static final PIDConstants ROTATION_ASSIST = new PIDConstants(7.0, 0, 0.02);
 
@@ -251,6 +252,32 @@ public final class Constants {
     public static final boolean LOG_TO_NETWORKTABLES = true;
   }
 
+<<<<<<< HEAD
+=======
+  public static final class PathPlannerConstants {
+
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
+    public static final PIDConstants TRANSLATION_PID = new PIDConstants(15.0, 0, 0.005);
+    public static final PIDConstants ROTATION_PID = new PIDConstants(9.0, 0, 0.03); // was 10 and 9
+
+    public static final PPHolonomicDriveController HOLONOMIC_FOLLOWER_CONTROLLER = new PPHolonomicDriveController(
+        TRANSLATION_PID,
+        ROTATION_PID);
+
+    public static final RobotConfig ROBOT_CONFIG = new RobotConfig(
+        RobotConstants.TOTAL_MASS_KG,
+        RobotConstants.MOMENT_OF_INERTIA,
+        new ModuleConfig(
+            SwerveModuleConstants.WHEEL_DIAMETER / 2,
+            DriveConstants.MAX_MODULE_VELOCITY,
+            SwerveModuleConstants.WHEEL_FRICTION_COEFFICIENT,
+            DCMotor.getKrakenX60(1),
+            DriveConstants.MAX_MODULE_CURRENT,
+            1),
+        DriveConstants.KINEMATICS.getModules());
+  }
+
+>>>>>>> main
   public static final class PoseConstants {
 
     public static final double kPositionStdDevX = 0.1;

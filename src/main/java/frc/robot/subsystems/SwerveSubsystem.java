@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.io.File;
-
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,7 +25,6 @@ import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveModuleConfiguration;
 import swervelib.parser.SwerveModulePhysicalCharacteristics;
-import swervelib.parser.SwerveParser;
 import swervelib.parser.json.modules.AngleConversionFactorsJson;
 import swervelib.parser.json.modules.ConversionFactorsJson;
 import swervelib.parser.json.modules.DriveConversionFactorsJson;
@@ -36,7 +33,6 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
-
 
 public class SwerveSubsystem extends SubsystemBase {
 
