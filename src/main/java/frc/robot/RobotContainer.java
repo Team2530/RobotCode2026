@@ -108,13 +108,10 @@ public class RobotContainer {
         boolean isXstance;
     
          private void configureBindings() {
-            driverXbox.x().whileTrue(normalDrive, isXstance);
+            driverXbox.x().whileTrue(normalDrive);
             if (isXstance) {
                 // fire shooter
             };
-            else{
-
-            }
        /*(
         new setXstance(m_Carousel, true)
       );

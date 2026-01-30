@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommand;
 import frc.robot.Constants;
@@ -19,8 +20,6 @@ import frc.robot.RobotContainer;
 
 public class ClimberCommand extends Command {
     private final ClimberSubsystem subsystem1;
-    // private XboxController = driverXbox; TODO: Not working, find a better solution
-    // this.driverXbox = xbox;
     
 
     private ClimbPresets climbPreset;
@@ -58,9 +57,7 @@ public class ClimberCommand extends Command {
             SmartDashboard.putBoolean("[SIM] Climbed", true);
         
         }
-        if (!driverXbox.getAButton()) {
-
-        }
+            new WaitUntilCommand(driveXbox.getStartButton);
     }
     
     public ClimbPresets getClimbPreset() {
@@ -73,4 +70,8 @@ public class ClimberCommand extends Command {
         CLIMBINGDOWN,
         IDLE,
     }
+    public CommandXboxController getDriverXbox() {
+        return getDriverXbox();
+    }
+    private CommandXboxController driveXbox; 
 }
