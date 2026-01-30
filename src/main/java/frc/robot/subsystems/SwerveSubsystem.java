@@ -1,371 +1,409 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.util.DriveFeedforwards;
-import com.pathplanner.lib.util.swerve.SwerveSetpoint;
-import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.PoseConstants;
-import frc.robot.Constants.SwerveModuleConstants;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
-import frc.robot.util.LimelightContainer;
-import frc.robot.util.AllianceFlipUtil;
+import edu.wpi.first.wpilibj.RobotBase;
 
-@Logged
-/**
- * The SwerveSubsystem class manages odometry with swerve and Limelights.
- * It also contains methods to control the swerve drive.
- */
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+
+import swervelib.SwerveDrive;
+import swervelib.SwerveDriveTest;
+import swervelib.encoders.CANCoderSwerve;
+import swervelib.math.SwerveMath;
+import swervelib.motors.TalonFXSwerve;
+import swervelib.imu.Pigeon2Swerve;
+import swervelib.parser.PIDFConfig;
+import swervelib.parser.SwerveControllerConfiguration;
+import swervelib.parser.SwerveDriveConfiguration;
+import swervelib.parser.SwerveModuleConfiguration;
+import swervelib.parser.SwerveModulePhysicalCharacteristics;
+import swervelib.parser.json.modules.AngleConversionFactorsJson;
+import swervelib.parser.json.modules.ConversionFactorsJson;
+import swervelib.parser.json.modules.DriveConversionFactorsJson;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.RobotConstants;
+
 public class SwerveSubsystem extends SubsystemBase {
 
-    boolean isalliancereset = false;
+    private final SwerveDrive swerveDrive;
 
-    @NotLogged
-    SwerveModule frontLeft = new SwerveModule(SwerveModuleConstants.FL_STEER_ID, SwerveModuleConstants.FL_DRIVE_ID,
-            SwerveModuleConstants.FL_ABSOLUTE_ENCODER_PORT, SwerveModuleConstants.FL_OFFSET_RADIANS,
-            SwerveModuleConstants.FL_ABSOLUTE_ENCODER_REVERSED,
-            SwerveModuleConstants.FL_MOTOR_REVERSED,
-            SwerveModuleConstants.FL_STEERING_MOTOR_REVERSED);
-    @NotLogged
-    SwerveModule frontRight = new SwerveModule(SwerveModuleConstants.FR_STEER_ID, SwerveModuleConstants.FR_DRIVE_ID,
-            SwerveModuleConstants.FR_ABSOLUTE_ENCODER_PORT, SwerveModuleConstants.FR_OFFSET_RADIANS,
-            SwerveModuleConstants.FR_ABSOLUTE_ENCODER_REVERSED,
-            SwerveModuleConstants.FR_MOTOR_REVERSED,
-            SwerveModuleConstants.FR_STEERING_MOTOR_REVERSED);
-    @NotLogged
-    SwerveModule backRight = new SwerveModule(SwerveModuleConstants.BR_STEER_ID, SwerveModuleConstants.BR_DRIVE_ID,
-            SwerveModuleConstants.BR_ABSOLUTE_ENCODER_PORT, SwerveModuleConstants.BR_OFFSET_RADIANS,
-            SwerveModuleConstants.BR_ABSOLUTE_ENCODER_REVERSED,
-            SwerveModuleConstants.BR_MOTOR_REVERSED,
-            SwerveModuleConstants.BR_STEERING_MOTOR_REVERSED);
-    @NotLogged
-    SwerveModule backLeft = new SwerveModule(SwerveModuleConstants.BL_STEER_ID, SwerveModuleConstants.BL_DRIVE_ID,
-            SwerveModuleConstants.BL_ABSOLUTE_ENCODER_PORT, SwerveModuleConstants.BL_OFFSET_RADIANS,
-            SwerveModuleConstants.BL_ABSOLUTE_ENCODER_REVERSED,
-            SwerveModuleConstants.BL_MOTOR_REVERSED,
-            SwerveModuleConstants.BL_STEERING_MOTOR_REVERSED);
+    private final SendableChooser<SwerveGearing> gearChooser;
 
-    // public final AHRS navX = new AHRS(AHRS.NavXComType.kMXP_SPI, 50);
-    private double gyroSim;
-    public final Pigeon2 pigeon = new Pigeon2(11);
-    private double pigeonOffset = 0.0;
+    enum SwerveGearing {
+        LIGHT(7.03f),
+        RIDICULUS(6.03f),
+        LUDICRUS(5.27f);
 
-    private ChassisSpeeds lastChassisSpeeds = new ChassisSpeeds();
+        public final float gearRatio;
 
-    private Field2d field = new Field2d();
-    private FieldObject2d fieldRobot = field.getRobotObject();
-
-    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Odometry Pose", Pose2d.struct).publish();
-    StructArrayPublisher<SwerveModuleState> swerveStatesPublisher = NetworkTableInstance.getDefault()
-            .getStructArrayTopic("Swerve States", SwerveModuleState.struct).publish();
-    StructArrayPublisher<SwerveModuleState> swerveTargetStatesPublisher = NetworkTableInstance.getDefault()
-            .getStructArrayTopic("Swerve Target States", SwerveModuleState.struct).publish();
-
-    public final LimelightContainer limelightContainer = new LimelightContainer();
-
-    // TODO: Properly set starting pose
-    public final SwerveDrivePoseEstimator odometry;
-
-    private final SwerveSetpointGenerator setpointGenerator;
-    private SwerveSetpoint previousSetpoint;
-
-    public SwerveSubsystem() {
-        odometry = new SwerveDrivePoseEstimator(DriveConstants.KINEMATICS,
-                getGyroRotation2d(),
-                getModulePositions(), new Pose2d(), createStateStdDevs(
-                        PoseConstants.kPositionStdDevX,
-                        PoseConstants.kPositionStdDevY,
-                        PoseConstants.kPositionStdDevTheta),
-                createVisionMeasurementStdDevs(
-                        PoseConstants.kVisionStdDevX,
-                        PoseConstants.kVisionStdDevY,
-                        PoseConstants.kVisionStdDevTheta));
-
-        // --------- Path Planner Init ---------- \\
-        RobotConfig config = Constants.PathPlannerConstants.ROBOT_CONFIG;
-        try {
-            config = RobotConfig.fromGUISettings();
-        } catch (Exception e) {
-            // Handle exception as needed
-            e.printStackTrace();
+        private SwerveGearing(float gearRatio) {
+            this.gearRatio = gearRatio;
         }
-
-        NamedCommands.registerCommand("namedCommand", new PrintCommand("Ran namedCommand"));
-
-        setpointGenerator = new SwerveSetpointGenerator(
-                config,
-                Constants.SwerveModuleConstants.STEER_MAX_RAD_SEC);
-
-        previousSetpoint = new SwerveSetpoint(getChassisSpeeds(), getModuleStates(),
-                DriveFeedforwards.zeros(config.numModules));
-
-        // navX.enableLogging(true);
     }
 
-    public void configurePathplanner() {
-        RobotConfig config = Constants.PathPlannerConstants.ROBOT_CONFIG;
+    public SwerveSubsystem() {
+        // register gearshifter with smartdashboard
+        gearChooser = new SendableChooser<>();
+
+        gearChooser.addOption(
+            SwerveGearing.LIGHT.toString(),
+            SwerveGearing.LIGHT
+        );
+        gearChooser.setDefaultOption(
+            SwerveGearing.RIDICULUS.toString(),
+            SwerveGearing.RIDICULUS
+        );
+        gearChooser.addOption(
+            SwerveGearing.LUDICRUS.toString(),
+            SwerveGearing.LUDICRUS
+        );
+
+        gearChooser.onChange(gearing -> changeGearing(gearing));
+
+        SmartDashboard.putData(
+            "Swerve Drive Gearing",
+            gearChooser
+        );
+
+        // register sysId commands with smartdashboard
+        SmartDashboard.putData(
+            "SysId Drive Motors",
+            sysIdDriveCommand()
+        );  
+        SmartDashboard.putData(
+            "SysId Angle Motors",
+            sysIdAngleCommand()
+        );
+
+
+        // instantiate yagsl library classes
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+
         try {
-            config = RobotConfig.fromGUISettings();
+            // one liner >:3
+            ConversionFactorsJson conversionFactors = 
+                new ConversionFactorsJson(){{
+                    angle = new AngleConversionFactorsJson() {{
+                        gearRatio = DriveConstants.SwerveModules.ANGLE_GEARING;
+
+                        calculate();
+                    }};
+
+                    drive = new DriveConversionFactorsJson() {{
+                        gearRatio = DriveConstants.SwerveModules.DRIVE_GEARING;
+                        diameter = DriveConstants.SwerveModules.WHEEL_DIAMETER;
+
+                        calculate();
+                    }};
+                }};
+
+            PIDFConfig drivePID = new PIDFConfig(
+                DriveConstants.PIDs.Drive.P,
+                DriveConstants.PIDs.Drive.I,
+                DriveConstants.PIDs.Drive.D,
+                DriveConstants.PIDs.Drive.F,
+                DriveConstants.PIDs.Drive.IZ
+            );
+            PIDFConfig anglePID = new PIDFConfig(
+                DriveConstants.PIDs.Angle.P,
+                DriveConstants.PIDs.Angle.I,
+                DriveConstants.PIDs.Angle.D,
+                DriveConstants.PIDs.Angle.F,
+                DriveConstants.PIDs.Angle.IZ
+            );
+
+            SwerveModulePhysicalCharacteristics physicalCharacteristics = 
+                new SwerveModulePhysicalCharacteristics(
+                        conversionFactors, 
+                        DriveConstants.SwerveModules.WHEEL_FRICTION_COEFFICIENT, 
+                        DriveConstants.SwerveModules.OPTIMAL_VOLTAGE, 
+                        DriveConstants.SwerveModules.DRIVE_CURRENT_LIMIT, 
+                        DriveConstants.SwerveModules.STEER_CURRENT_LIMIT, 
+                        DriveConstants.SwerveModules.DRIVE_RAMP_RATE,
+                        DriveConstants.SwerveModules.STEER_RAMP_RATE,
+                        DriveConstants.SwerveModules.DRIVE_FRICTION_VOLTAGE,
+                        DriveConstants.SwerveModules.STEER_FRICTION_VOLTAGE,
+                        RobotConstants.MOMENT_OF_INERTIA, 
+                        RobotConstants.TOTAL_MASS_KG
+                );
+
+            // WARNING: if these types of motors ever change, so will this 
+            // configuration
+            SwerveModuleConfiguration modules[] = {
+                new SwerveModuleConfiguration(
+                    new TalonFXSwerve(
+                        DriveConstants.SwerveModules.CanIDs.FL_DRIVE,
+                        true, 
+                        DCMotor.getKrakenX60(1)
+                    ), 
+                    new TalonFXSwerve(
+                        DriveConstants.SwerveModules.CanIDs.FL_STEER,
+                        false, 
+                        DCMotor.getKrakenX44(1)
+                    ), 
+                    conversionFactors,
+                    new CANCoderSwerve(
+                        DriveConstants.SwerveModules.CanIDs.FL_CANCODER
+                    ), 
+                    Units.rotationsToDegrees(
+                        DriveConstants.SwerveModules.Offsets.FL_ANGLE
+                    ),
+                    DriveConstants.SwerveModules.Offsets.FL_X,
+                    DriveConstants.SwerveModules.Offsets.FL_Y,
+                    anglePID, 
+                    drivePID, 
+                    physicalCharacteristics, 
+                    DriveConstants.SwerveModules.Offsets.FL_ENCODER_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.FL_DRIVE_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.FL_ANGLE_INVERTED, 
+                    "PORT_BOW", 
+                    // Cosine compensation should not be used for simulations 
+                    // since it causes discrepancies not seen in real life.
+                    !RobotBase.isSimulation()
+                ),
+                new SwerveModuleConfiguration(
+                    new TalonFXSwerve(
+                        DriveConstants.SwerveModules.CanIDs.FR_DRIVE,
+                        true, 
+                        DCMotor.getKrakenX60(1)
+                    ), 
+                    new TalonFXSwerve(
+                        DriveConstants.SwerveModules.CanIDs.FR_STEER,
+                        false, 
+                        DCMotor.getKrakenX44(1)
+                    ), 
+                    conversionFactors,
+                    new CANCoderSwerve(
+                        DriveConstants.SwerveModules.CanIDs.FR_CANCODER
+                    ), 
+                    Units.rotationsToDegrees(
+                        DriveConstants.SwerveModules.Offsets.FR_ANGLE
+                    ),
+                    DriveConstants.SwerveModules.Offsets.FR_X,
+                    DriveConstants.SwerveModules.Offsets.FR_Y,
+                    anglePID, 
+                    drivePID, 
+                    physicalCharacteristics, 
+                    DriveConstants.SwerveModules.Offsets.FR_ENCODER_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.FR_DRIVE_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.FR_ANGLE_INVERTED,
+                    "STARBOARD_BOW", 
+                    !RobotBase.isSimulation()
+                ),
+                new SwerveModuleConfiguration(
+                    new TalonFXSwerve(
+                        DriveConstants.SwerveModules.CanIDs.BL_DRIVE,
+                        true, 
+                        DCMotor.getKrakenX60(1)
+                    ), 
+                    new TalonFXSwerve(
+                        DriveConstants.SwerveModules.CanIDs.BL_STEER,
+                        false, 
+                        DCMotor.getKrakenX44(1)
+                    ), 
+                    conversionFactors,
+                    new CANCoderSwerve(
+                        DriveConstants.SwerveModules.CanIDs.BL_CANCODER
+                    ), 
+                    Units.rotationsToDegrees(
+                        DriveConstants.SwerveModules.Offsets.BL_ANGLE
+                    ),
+                    DriveConstants.SwerveModules.Offsets.BL_X,
+                    DriveConstants.SwerveModules.Offsets.BL_Y,
+                    anglePID, 
+                    drivePID, 
+                    physicalCharacteristics, 
+                    DriveConstants.SwerveModules.Offsets.BL_ENCODER_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.BL_DRIVE_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.BL_ANGLE_INVERTED,
+                    "PORT_QUARTER", 
+                    !RobotBase.isSimulation()
+                ),
+                new SwerveModuleConfiguration(
+                    new TalonFXSwerve(
+                        DriveConstants.SwerveModules.CanIDs.BR_DRIVE,
+                        true, 
+                        DCMotor.getKrakenX60(1)
+                    ), 
+                    new TalonFXSwerve(
+                        DriveConstants.SwerveModules.CanIDs.BR_STEER,
+                        false, 
+                        DCMotor.getKrakenX44(1)
+                    ), 
+                    conversionFactors,
+                    new CANCoderSwerve(
+                        DriveConstants.SwerveModules.CanIDs.BR_CANCODER
+                    ), 
+                    Units.rotationsToDegrees(
+                        DriveConstants.SwerveModules.Offsets.BR_ANGLE
+                    ),
+                    DriveConstants.SwerveModules.Offsets.BR_X,
+                    DriveConstants.SwerveModules.Offsets.BR_Y,
+                    anglePID, 
+                    drivePID, 
+                    physicalCharacteristics, 
+                    DriveConstants.SwerveModules.Offsets.BR_ENCODER_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.BR_DRIVE_INVERTED,
+                    DriveConstants.SwerveModules.Offsets.BR_ANGLE_INVERTED,
+                    "STARBOARD_QUARTER", 
+                    !RobotBase.isSimulation()
+                )
+            };
+            
+            SwerveDriveConfiguration driveConfiguration = 
+                new SwerveDriveConfiguration(
+                    modules, 
+                    new Pigeon2Swerve(DriveConstants.IMU.CANID), 
+                    DriveConstants.IMU.INVERTED,
+                    physicalCharacteristics
+            );
+
+            PIDFConfig headingPID = new PIDFConfig(
+                DriveConstants.PIDs.Heading.P,
+                DriveConstants.PIDs.Heading.I,
+                DriveConstants.PIDs.Heading.D,
+                DriveConstants.PIDs.Heading.F,
+                DriveConstants.PIDs.Heading.IZ
+            );
+
+            SwerveControllerConfiguration controllerConfiguration = 
+                new SwerveControllerConfiguration(
+                    driveConfiguration,
+                    headingPID,
+                    DriveConstants.ControlConstants.Deadband.HEADING,
+                    DriveConstants.MAX_ROBOT_VELOCITY
+            );
+
+            swerveDrive = new SwerveDrive(
+                    driveConfiguration, 
+                    controllerConfiguration,
+                    DriveConstants.MAX_ROBOT_VELOCITY, 
+                    new Pose2d() // TODO: choreo's gonna need a different pose
+            );
         } catch (Exception e) {
-            // Handle exception as needed
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+        
+        // Heading correction should only be used while controlling the robot 
+        // via angle. 
+        swerveDrive.setHeadingCorrection(false);
+        // Compensates for heading drift due to spinny fast
+        swerveDrive.setAngularVelocityCompensation(
+                DriveConstants.AngularCompensation.ENABLE_IN_TELEOP,
+                DriveConstants.AngularCompensation.ENABLE_IN_AUTO,
+                DriveConstants.AngularCompensation.COMPENSATION_COEFFICIENT
+        );
+        // Enable if you want to resynchronize your absolute encoders and motor 
+        // encoders periodically when they are not moving.
+        //
+        // idk this seems find
+        swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
+    };
 
-        AutoBuilder.configure(
-                this::getOdometryPose, // Robot pose supplier
-                this::resetOdometryAndGyro, // Method to reset odometry (will be called if your auto has a starting
-                                            // pose)
-                this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforward) -> {
-                    setChassisSpeeds(speeds);
-                    setFeedforwards(feedforward);
-                }, // Method that will drive the robot given ROBOT
-                   // RELATIVE ChassisSpeeds
-                Constants.PathPlannerConstants.HOLONOMIC_FOLLOWER_CONTROLLER,
-                // Constants.PathPlannerConstants.ROBOT_CONFIG, // The robot configuration
-                config,
-                () -> {
-                    // Boolean supplier that controls when the path will be mirrored for the red
-                    // alliance
-                    // This will flip the path being followed to the red side of the field.
-                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    @Override
+    public void periodic() {}
 
-                    var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent()) {
-                        return alliance.get() == DriverStation.Alliance.Red;
-                    }
-                    return false;
+    @Override
+    public void simulationPeriodic() {}
 
-                },
-                this // Reference to this subsystem to set requirements
+    /**
+     * drive field-oriented
+     * @param translation field-oriented translation; m / s
+     * @param rotation angular rate; rads / s
+     */
+    public void drive(Translation2d translation, double rotation) {
+        swerveDrive.drive(
+            translation,
+            rotation,
+            true,
+            false
         );
     }
 
-    @Override
-    public void periodic() {
-
-
-        // Vision-based odometry updates via LimelightContainer
-        try {
-            RobotContainer.LLContainer.estimateMT1OdometryPrelim(odometry, getChassisSpeeds(), pigeon, getModulePositions());
-        } catch (Exception e) {
-            // Don't let limelight errors crash periodic; surface the message for debugging
-            SmartDashboard.putString("LL Error", e.toString());
-        }
-
-        odometry.update(getGyroRotation2d(), getModulePositions());
-        fieldRobot.setPose(getOdometryPose());
-        posePublisher.set(getOdometryPose());
-
-        SmartDashboard.putData("Field", field);
-        swerveStatesPublisher.set(getModuleStates());
-
-        // SmartDashboard.putBoolean("NavX Connected", navX.isConnected());
-        SmartDashboard.putBoolean("Pigeon 2 Connected", pigeon.isConnected());
-        // SmartDashboard.putNumber("NavX Heading", -navX.getAngle());
-        SmartDashboard.putNumber("Pigeon 2 Heading (Yaw)", pigeon.getYaw().getValueAsDouble());
-    }
-
-    public void setFeedforwards(DriveFeedforwards ffs) {
-        double[] accs = ffs.accelerationsMPSSq();
-        frontLeft.setAcceleration(accs[0]);
-        frontRight.setAcceleration(accs[1]);
-        backLeft.setAcceleration(accs[2]);
-        backRight.setAcceleration(accs[3]);
-    }
-
-    public void zeroFeedforwards() {
-        frontLeft.setAcceleration(0.0);
-        frontRight.setAcceleration(0.0);
-        backLeft.setAcceleration(0.0);
-        backRight.setAcceleration(0.0);
-    }
-
-    public void zeroHeading() {
-        setHeading(0);
-    }
-
-    public void setHeading(double deg) {
-        if (Robot.isSimulation()) {
-            gyroSim = Units.degreesToRadians(deg);
-        }
-
-        // navX.reset();
-        // navX.setAngleAdjustment(deg);
-
-        // double error = deg - navX.getAngle();
-        // double new_adjustment = navX.getAngleAdjustment() + error;
-        // navX.setAngleAdjustment(new_adjustment);
-
-        pigeonOffset = deg - pigeon.getYaw().getValueAsDouble();
-    }
-
-    public void setGyroToEstimate() {
-        resetOdometryAndGyro(odometry.getEstimatedPosition());
-    }
-
-    public Pose2d getOdometryPose() {
-        return odometry.getEstimatedPosition();
+    /**
+     * drive robot-oriented
+     * @param translation robot-oriented translation; m / s
+     * @param rotation angular rate; rads / s
+     */
+    public void driveRobotRelative(
+        Translation2d translation, 
+        double rotation
+    ) {
+        swerveDrive.drive(
+            translation,
+            rotation,
+            false,
+            false
+        );
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometry.resetPosition(getGyroRotation2d(), getModulePositions(), pose);
+        swerveDrive.resetOdometry(pose);
+    }
+    
+    public Pose2d getPose() {
+        return swerveDrive.getPose();
     }
 
-    public void resetOdometryRotation(Rotation2d rot) {
-        odometry.resetRotation(rot);
+    public void setMotorBrake(boolean isBraking) {
+        swerveDrive.setMotorIdleMode(isBraking);
     }
 
-    public void resetOdometryAndGyro(Pose2d pose) {
-        setHeading(Units.radiansToDegrees(pose.getRotation().getRadians()
-                + (FieldConstants.getAlliance() == Alliance.Red ? Math.PI : 0.0)));
-        resetOdometry(pose);
+    public void xStance() {
+        swerveDrive.lockPose();
     }
 
-    public double getGyroHeading() {
-        // return Robot.isSimulation() ? gyroSim :
-        // Units.degreesToRadians(Math.IEEEremainder(-navX.getAngle(), 360));
-        return Robot.isSimulation() ? gyroSim
-                : Units.degreesToRadians(Math.IEEEremainder(pigeon.getYaw().getValueAsDouble() + pigeonOffset,
-                        360));
+    public Command sysIdDriveCommand() {
+        return SwerveDriveTest.generateSysIdCommand(
+                SwerveDriveTest.setDriveSysIdRoutine(
+                    new SysIdRoutine.Config(), 
+                    this,
+                    swerveDrive, 
+                    12.0, 
+                    true
+                ),
+                10.0, // delay between each section of the command
+                5.0, // how long to run each quasistatic section
+                2.0 // how long to run each dynamic section
+        );
     }
 
-    public Rotation2d getGyroRotation2d() {
-        return new Rotation2d(getGyroHeading());
+    public Command sysIdAngleCommand() {
+        return SwerveDriveTest.generateSysIdCommand(
+                SwerveDriveTest.setAngleSysIdRoutine(
+                    new SysIdRoutine.Config(), 
+                    this,
+                    swerveDrive
+                ),
+                10.0,
+                5.0, 
+                2.0 
+        );
     }
 
-    public void stopDrive() {
-        frontLeft.stop();
-        frontRight.stop();
-        backLeft.stop();
-        backRight.stop();
+    public void changeGearing(SwerveGearing gearing) {
+        swerveDrive.setDriveMotorConversionFactor(
+            SwerveMath.calculateMetersPerRotation(
+                Units.inchesToMeters(
+                    DriveConstants.SwerveModules.WHEEL_DIAMETER
+                ),
+                gearing.gearRatio
+            )
+        );  
     }
 
-    public void setModules(SwerveModuleState[] states) {
-        lastChassisSpeeds = DriveConstants.KINEMATICS.toChassisSpeeds(states);
-        // Normalize speeds so they are all obtainable
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.MAX_MODULE_VELOCITY);
-        frontLeft.setModuleState(states[0]);
-        frontRight.setModuleState(states[1]);
-        backLeft.setModuleState(states[2]);
-        backRight.setModuleState(states[3]);
-        swerveTargetStatesPublisher.set(states);
-    }
-
-    public void setChassisSpeeds(ChassisSpeeds speeds) {
-        SwerveModuleState[] states = DriveConstants.KINEMATICS.toSwerveModuleStates(speeds);
-        setModules(states);
-    }
-
-    public void setChassisSpeedsAuto(ChassisSpeeds speeds) {
-        previousSetpoint = setpointGenerator.generateSetpoint(
-                previousSetpoint,
-                speeds,
-                0.02);
-        setModules(previousSetpoint.moduleStates());
-    }
-
-    public void setXstance() {
-        frontLeft.setModuleStateRaw(new SwerveModuleState(0,
-                Rotation2d.fromDegrees(45)));
-        frontRight.setModuleStateRaw(new SwerveModuleState(0,
-                Rotation2d.fromDegrees(-45)));
-        backLeft.setModuleStateRaw(new SwerveModuleState(0,
-                Rotation2d.fromDegrees(-45)));
-        backRight.setModuleStateRaw(new SwerveModuleState(0,
-                Rotation2d.fromDegrees(45)));
-    }
-
-    public ChassisSpeeds getChassisSpeeds() {
-        ChassisSpeeds speeds = DriveConstants.KINEMATICS.toChassisSpeeds(
-                frontLeft.getModuleState(),
-                frontRight.getModuleState(),
-                backLeft.getModuleState(),
-                backRight.getModuleState());
-
-        return Robot.isSimulation() ? lastChassisSpeeds : speeds;
-    }
-
-    public SwerveModulePosition[] getModulePositions() {
-        SwerveModulePosition[] states = {
-                frontLeft.getModulePosition(),
-                frontRight.getModulePosition(),
-                backLeft.getModulePosition(),
-                backRight.getModulePosition()
-        };
-
-        return states;
-    }
-
-    public SwerveModuleState[] getModuleStates() {
-        SwerveModuleState[] states = {
-                frontLeft.getModuleState(),
-                frontRight.getModuleState(),
-                backLeft.getModuleState(),
-                backRight.getModuleState()
-        };
-
-        return states;
-    }
-
-    @Override
-    public void simulationPeriodic() {
-        frontLeft.simulate_step();
-        frontRight.simulate_step();
-        backLeft.simulate_step();
-        backRight.simulate_step();
-        gyroSim += 0.02 * lastChassisSpeeds.omegaRadiansPerSecond;
-    }
-
-    // ---------- Path Planner Methods ---------- \\
-
-    public Command loadPath(String name) {
-        return new PathPlannerAuto(name);
-    }
-
-    public Vector<N3> createStateStdDevs(double x, double y, double theta) {
-        return VecBuilder.fill(x, y, Units.degreesToRadians(theta));
-    }
-
-    public Vector<N3> createVisionMeasurementStdDevs(double x, double y, double theta) {
-        return VecBuilder.fill(x, y, Units.degreesToRadians(theta));
-    }
-
-    public void setAutoStartingPose(Pose2d pose) {
-        FieldObject2d obj = field.getObject("autoStart");
-        obj.setPose(AllianceFlipUtil.apply(pose));
+    public Field2d getField() {
+        return swerveDrive.field;
     }
 }
