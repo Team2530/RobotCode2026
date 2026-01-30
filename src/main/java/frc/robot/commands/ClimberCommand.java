@@ -57,7 +57,7 @@ public class ClimberCommand extends Command {
             SmartDashboard.putBoolean("[SIM] Climbed", true);
         
         }
-            new WaitUntilCommand(driveXbox.getStartButton);
+            new WaitUntilCommand(driveXbox.a());
     }
     
     public ClimbPresets getClimbPreset() {
