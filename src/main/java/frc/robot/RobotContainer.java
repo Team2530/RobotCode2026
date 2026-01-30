@@ -19,11 +19,15 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Limelight.LimelightType;
+import frc.robot.util.LimelightContainer;
+import frc.robot.subsystems.Limelight;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -48,12 +52,18 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
 
+    // These are initating the individual Limlight(s). The name should match the limelight internal names.
+    private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
+    private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
+    private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
+    private static final Limelight LL_BF = new Limelight(LimelightType.LL4, "limelight-bf", true, true);
+
+    //initalizing limelight container (Group)
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BF, LL_BL, LL_BR, LL_FR);
     // @Logged
-    public final CommandXboxController driverXbox = new CommandXboxController(
-            ControllerConstants.DRIVER_CONTROLLER_PORT);
+    public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged
-    public final CommandXboxController operatorXbox = new CommandXboxController(
-            ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
     private final SendableChooser<Command> autoChooser;
 
