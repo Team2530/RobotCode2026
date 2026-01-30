@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 /**
@@ -108,18 +109,18 @@ public class RobotContainer {
         boolean isXstance;
     
          private void configureBindings() {
-            driverXbox.x().whileTrue(normalDrive);
+            operatorXbox.x().whileTrue(normalDrive);
             if (isXstance) {
-                
+            
             };
-       /*(
+        /*(
         new setXstance(m_Carousel, true)
-      );
+        );
     */
        
     }
-
-    /**
+                
+                    /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
      * @return the command to run in autonomous
