@@ -147,7 +147,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
      public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
-        Pose2d pose = getOdometryPose();
+        Pose2d pose = getPose();
 
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
@@ -157,7 +157,7 @@ public class SwerveSubsystem extends SubsystemBase {
         );
 
         // Apply the generated speeds
-        driveFieldRelative(speeds);
+        setChassisSpeedsAuto(speeds);
     }
     public void configurePathplanner() {
         RobotConfig config = Constants.PathPlannerConstants.ROBOT_CONFIG;
@@ -263,6 +263,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Pose2d getOdometryPose() {
         return odometry.getEstimatedPosition();
+    }
+
+    public Pose2d getPose() {
+        Pose2d p = odometry.getEstimatedPosition();
+        return p;
     }
 
     public void resetOdometry(Pose2d pose) {
