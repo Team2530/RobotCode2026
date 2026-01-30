@@ -1,13 +1,13 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * A command that runs the intake at a set speed for collection or ejection.
  */
 public class TurretCommand extends Command {
-    private final TurretSubsystem m_LauncherSubsystem;
+    private final LauncherSubsystem m_LauncherSubsystem;
 
     /**
      * Creates a new RunIntakeCommand.
@@ -15,7 +15,7 @@ public class TurretCommand extends Command {
      * @param intakeSubsystem The subsystem this command will run on.
      * @param isReversed If true, the motor will run in reverse (eject).
      */
-    public TurretCommand(TurretSubsystem LauncherSubsystem) {
+    public TurretCommand(LauncherSubsystem LauncherSubsystem) {
         m_LauncherSubsystem = LauncherSubsystem;
         // Require the subsystem to prevent other commands from running on it concurrently
         addRequirements(LauncherSubsystem);
