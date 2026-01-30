@@ -12,25 +12,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkBase;
 
 
-public class IntakeSubsystem extends SubsystemBase {
+public class LoaderSubsystem extends SubsystemBase {
     // Constants for the Intake
-    private static final int INTAKE_MOTOR = 50;
-
-                                                 // **CHANGE THIS TO YOUR ACTUAL CAN ID**
-    private static final double INTAKE_SPEED = 70;
-   // Motor speed (0.0 to 1.0) //Please change motor speed if needed. 
+    private static final int LOADER_MOTOR = 57; // **CHANGE THIS TO YOUR ACTUAL CAN ID**
+    private static final double LOADER_SPEED = 70;  
+    
+    private static final int SPINDEX_MOTOR = 62;
+    private static final double SPINDEX_SPEED = -70;// Motor speed (0.0 to 1.0) //Please change motor speed if needed. 
 
     // Motor Controller Declaration
-    private final SparkFlex m_intakeMotor;  
-
-
+    private final SparkFlex m_loaderMotor;
+    private final SparkFlex m_spindexMotor;  
 
     /**
      * Initializes the Intake Subsystem.
      */
-    public IntakeSubsystem() {
+    public LoaderSubsystem() {
         // Instantiate the SPARK Flex. SPARK Flex is typically used with Brushless motors.
-        m_intakeMotor = new SparkFlex(INTAKE_MOTOR, MotorType.kBrushless);
+        m_loaderMotor = new SparkFlex(LOADER_MOTOR, MotorType.kBrushless);
+        m_spindexMotor = new SparkFlex(SPINDEX_MOTOR, MotorType.kBrushless);
 
 
         // --- Basic Motor Configuration (REVLib 2025 Style) ---
@@ -60,14 +60,21 @@ void setCoastMode() {
     /**
      * Runs the intake motor at the specified speed (forward).
      */
-    public void runIntake() {
-        m_intakeMotor.set(-INTAKE_SPEED);
+    public void runLoader() {
+        m_loaderMotor.set(LOADER_SPEED);
+        m_spindexMotor.set(SPINDEX_SPEED);
+
     }
 
+    public void reverseIntake() {
+        m_loaderMotor.set(0);
+        m_spindexMotor.set(0);
+    }
     /**
      * Stops the intake motor.
      */
-    public void stopIntake() {
-        m_intakeMotor.set(0.0);
+    public void stopLoader() {
+        m_loaderMotor.set(0);
+        m_spindexMotor.set(0);
     }
 }

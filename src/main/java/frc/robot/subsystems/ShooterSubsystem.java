@@ -12,26 +12,20 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkBase;
 
 
-public class IntakeSubsystem extends SubsystemBase {
+public class ShooterSubsystem extends SubsystemBase {
     // Constants for the Intake
-    private static final int INTAKE_MOTOR = 50;
-
-                                                 // **CHANGE THIS TO YOUR ACTUAL CAN ID**
-    private static final double INTAKE_SPEED = 70;
-   // Motor speed (0.0 to 1.0) //Please change motor speed if needed. 
+    private static final int SHOOTER_MOTOR = 41; // **CHANGE THIS TO YOUR ACTUAL CAN ID**
+    private static final double SHOOTER_SPEED = -0.70;    // Motor speed (0.0 to 1.0) //Please change motor speed if needed. 
 
     // Motor Controller Declaration
-    private final SparkFlex m_intakeMotor;  
-
-
+    private final SparkFlex m_shooterMotor;  
 
     /**
      * Initializes the Intake Subsystem.
      */
-    public IntakeSubsystem() {
+    public ShooterSubsystem() {
         // Instantiate the SPARK Flex. SPARK Flex is typically used with Brushless motors.
-        m_intakeMotor = new SparkFlex(INTAKE_MOTOR, MotorType.kBrushless);
-
+        m_shooterMotor = new SparkFlex(SHOOTER_MOTOR, MotorType.kBrushless);
 
         // --- Basic Motor Configuration (REVLib 2025 Style) ---
         // While REVLib 2025 uses declarative config objects, for simple open-loop control
@@ -60,14 +54,14 @@ void setCoastMode() {
     /**
      * Runs the intake motor at the specified speed (forward).
      */
-    public void runIntake() {
-        m_intakeMotor.set(-INTAKE_SPEED);
+    public void runShooter() {
+        m_shooterMotor.set(SHOOTER_SPEED);
     }
 
     /**
      * Stops the intake motor.
      */
-    public void stopIntake() {
-        m_intakeMotor.set(0.0);
+    public void stopShooter() {
+        m_shooterMotor.set(0.0);
     }
 }

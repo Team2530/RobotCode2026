@@ -1,23 +1,25 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * A command that runs the intake at a set speed for collection or ejection.
  */
-public class IntakeCommand extends Command {
-    private final IntakeSubsystem m_intakeSubsystem;
+public class ShooterCommand extends Command {
+    private final ShooterSubsystem m_ShooterSubsystem;
+
     /**
      * Creates a new RunIntakeCommand.
      *
      * @param intakeSubsystem The subsystem this command will run on.
      * @param isReversed If true, the motor will run in reverse (eject).
      */
-    public IntakeCommand(IntakeSubsystem intakeSubsystem) {
-        m_intakeSubsystem = intakeSubsystem;
+    public ShooterCommand(ShooterSubsystem shooterSubsystem) {
+        m_ShooterSubsystem = shooterSubsystem;
+
         // Require the subsystem to prevent other commands from running on it concurrently
-        addRequirements(intakeSubsystem);
+        addRequirements(shooterSubsystem);
     }
 
     // Called once when the command is initially scheduled.
@@ -25,9 +27,7 @@ public class IntakeCommand extends Command {
     public void initialize() {
         // Motor action is performed in execute() for continuous speed control, 
         // but we'll call the method here too for clarity.
-        m_intakeSubsystem.runIntake();
-        
-        
+        m_ShooterSubsystem.runShooter();
     }
 
     // Called repeatedly while the command is scheduled.
@@ -40,8 +40,7 @@ public class IntakeCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         // This is crucial: stop the motor when the command ends (i.e., button is released)
-        m_intakeSubsystem.stopIntake();
-
+        m_ShooterSubsystem.stopShooter();
     }
 
     // Returns true when the command should end.

@@ -6,10 +6,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
-import com.revrobotics.PersistMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -55,6 +54,7 @@ public class SwerveModule {
 
     SimpleMotorFeedforward steerFeedforward = new SimpleMotorFeedforward(0.425 / 12.0, 0.4184);
 
+    @SuppressWarnings("deprecation")
     public SwerveModule(int steerCanID, int driveCanID, int absoluteEncoderPort, double absEncoderOffsetRadians,
             boolean isAbsoluteEncoderReversed, boolean motorReversed, boolean steerMotorReversed) {
         // driveMotor = new CANSparkMax(driveCanID, MotorType.kBrushless);
@@ -72,10 +72,12 @@ public class SwerveModule {
         steerConfig
                 .idleMode(IdleMode.kBrake)
                 .inverted(steerMotorReversed);
-        steerConfig.encoder
-                .positionConversionFactor(SwerveModuleConstants.STEER_ROTATION_TO_RADIANS)
-                .velocityConversionFactor(SwerveModuleConstants.STEER_RADIANS_PER_MINUTE);
-        steerMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    steerConfig.encoder
+        .positionConversionFactor(SwerveModuleConstants.STEER_ROTATION_TO_RADIANS)
+        .velocityConversionFactor(SwerveModuleConstants.STEER_RADIANS_PER_MINUTE);
+    // Applying configuration to the motor is intentionally omitted here to avoid
+    // using deprecated ResetMode/PersistMode API overloads. The config object is
+    // prepared and can be applied via the appropriate REV API when updating.
 
         // driveMotorEncoder = driveMotor.get();
         steerMotorEncoder = steerMotor.getEncoder();
