@@ -22,14 +22,19 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Robot;
 
 public class IndexerSubsystem extends SubsystemBase {
-    private static final int IndexerID = Constants.IndexerConstants.IndexerID;
-    private static final double IndexerSpeed = Constants.IndexerConstants.IndexerSpeed;
+    private static final int SpindexerID = Constants.IndexerConstants.IndexerID;
+    private static final double SpindexerSpeed = Constants.IndexerConstants.IndexerSpeed;
 
-    private final SparkMax m_IndexerMotor;
+    private static final int LoaderID = Constants.IndexerConstants.LoaderID;
+    private static final double LoaderSpeed = Constants.IndexerConstants.LoaderSpeed;
+
+    private final SparkMax m_SpindexerMotor;
+    private final SparkMax m_LoaderMotor;
 
   public IndexerSubsystem() {
-    m_IndexerMotor = new SparkMax(IndexerID, MotorType.kBrushless);
-    
+    m_SpindexerMotor = new SparkMax(SpindexerID, MotorType.kBrushless);
+    m_LoaderMotor = new SparkMax(LoaderID, MotorType.kBrushless);
+
   }
 
   void setCoastMode() {
@@ -38,11 +43,13 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   public void runIndexer() {
-    m_IndexerMotor.set(IndexerSpeed);
+    m_SpindexerMotor.set(SpindexerSpeed);
+    m_LoaderMotor.set(LoaderSpeed);
   }
 
   public void stopIndexer() {
-    m_IndexerMotor.set(0.0);
+    m_SpindexerMotor.set(0.0);
+    m_LoaderMotor.set(0.0);
   }
 
 }

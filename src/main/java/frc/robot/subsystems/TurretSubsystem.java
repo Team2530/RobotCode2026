@@ -55,7 +55,7 @@ public class TurretSubsystem extends SubsystemBase {
     e_LauncherEncoder = m_LauncherMotor.getEncoder();
     e_LauncherEncoder.setPosition(0);
     e_TurretEncoder = m_TurretMotor.getEncoder();
-    e_TurretEncoder.setPosition(0.5);
+    e_TurretEncoder.setPosition(0.5); // Set default to 180. Makes turret angling easier. 
     e_HoodEncoder = m_HoodMotor.getEncoder();
     e_HoodEncoder.setPosition(0);
 
@@ -88,6 +88,7 @@ public class TurretSubsystem extends SubsystemBase {
     double distance = 0; // Distance to Closest Part of the Goal
     double h_dif = Math.abs(Height); // ABS(Goal Height - Shooter Height)
     double bias = 0; // Placeholder  Bias
+
     double angle = Math.atan(1/(h_dif / (2 * distance))) + bias; // Calculate the prefered angle.
     return angle;
   }
@@ -99,14 +100,25 @@ public class TurretSubsystem extends SubsystemBase {
     double thetaRadians = Math.toRadians(thetaAngles);
     double g = 9.81; // Gravity in m/s^2
     double h_dif = Math.abs(Height); // ABS(Goal Height - Shooter Height)
-    double bias = 2.5;
+    double bias = 2.5; // Corrects for air resistance and other factors. Needs Testing.
 
-    double exitVelocity = (Math.sqrt((g * distance * distance) / ((2 * Math.cos(thetaRadians) * Math.cos(thetaRadians)) * (distance * Math.tan(thetaRadians) - h_dif)))) + 2.5;
+    double exitVelocity = (Math.sqrt((g * distance * distance) / ((2 * Math.cos(thetaRadians) * Math.cos(thetaRadians)) * (distance * Math.tan(thetaRadians) - h_dif)))) + bias;
     return exitVelocity;
   }
 
+  private double velocityToRPM(double velocity) {
+    // Convert Exit Velocity to Wheel RPM
+    // Need to do Testing and Regression.
+    double wheelDiameter = 0.1; // Wheel Diameter in meters (Placeholder Value)
+    double wheelCircumference = Math.PI * wheelDiameter;
+    double rpm = (velocity / wheelCircumference) * 60; // Convert m/s to RPM
+    return rpm;
+
+  }
   public void runLauncher() {
-    m_LauncherMotor.set(LauncherSpeed);
+    m_LauncherMotor.set(velocityToRPM(targetShootSpeed()));
+
+
   }
       
   public void stopLauncher() {
@@ -114,12 +126,26 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   public void angleTurret(double targetAngle) {
-    double TurretSpeed = 0.1;
-    double Angle0 = getTurretAngle();
-    
-    if (targetAngle < LimitL) {
-      //targetAngle = LimitL;
+
+    double currentAngle = getTurretAngle();
+    double error = targetAngle - currentAngle;
+
+    double kP = 0.01; // Proportional gain.
+    double output = kP * error;
+
+    // Limit output to prevent overshooting
+    output = Math.max(-0.5, Math.min(0.5, output));
+
+    // Check limits
+    if ((currentAngle <= LimitL && output < 0) || (currentAngle >= LimitR && output > 0)) {
+        output = 0; // Stops movement if at limits
     }
+
+    if (Math.abs(error) < 2) { // Stops if within 2 degrees of target.
+    output = 0;
+    }
+
+    m_TurretMotor.set(output);
   }
 }
 
