@@ -99,7 +99,16 @@ public class RobotContainer {
     private Command shootTurret(){
         return new InstantCommand(() -> {
             new ParallelCommandGroup(
-               //shooter, turret, and indexer will go here
+                //shooter, turret, and indexer will go here
+            );
+        });
+    }
+
+    private Command intakeDoing(){
+        return new InstantCommand(() -> {
+            new ParallelCommandGroup(
+               new IntakeCommand(intakeSubsystem)
+                //putting down the intake will go here
             );
         });
     }
@@ -120,7 +129,7 @@ public class RobotContainer {
     private void configureBindings() {
        //This is ment for operator controls
        
-       operatorXbox.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem));
+       operatorXbox.leftTrigger().whileTrue(intakeDoing());
        operatorXbox.rightTrigger().whileTrue(shootTurret());
 
     }
