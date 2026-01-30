@@ -39,9 +39,15 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
+import frc.robot.util.LimelightContainer;
 import frc.robot.util.AllianceFlipUtil;
 
 @Logged
+/**
+ * The SwerveSubsystem class manages odometry with swerve and Limelights.
+ * It also contains methods to control the swerve drive.
+ */
 public class SwerveSubsystem extends SubsystemBase {
 
     boolean isalliancereset = false;
@@ -87,6 +93,8 @@ public class SwerveSubsystem extends SubsystemBase {
             .getStructArrayTopic("Swerve States", SwerveModuleState.struct).publish();
     StructArrayPublisher<SwerveModuleState> swerveTargetStatesPublisher = NetworkTableInstance.getDefault()
             .getStructArrayTopic("Swerve Target States", SwerveModuleState.struct).publish();
+
+    public final LimelightContainer limelightContainer = new LimelightContainer();
 
     // TODO: Properly set starting pose
     public final SwerveDrivePoseEstimator odometry;
@@ -170,13 +178,13 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
 
 
-        // TODO: Update LL Container to use for pose estimation
-
-        // if (DriverStation.isTeleop()) {
-        //     RobotContainer.LLContainer.estimateMT1Odometry(odometry, lastChassisSpeeds);
-        // } else {
-        //     RobotContainer.LLContainer.estimateMT1OdometryAuto(odometry, lastChassisSpeeds);
-        // }
+        // Vision-based odometry updates via LimelightContainer
+        try {
+            RobotContainer.LLContainer.estimateMT1OdometryPrelim(odometry, getChassisSpeeds(), pigeon, getModulePositions());
+        } catch (Exception e) {
+            // Don't let limelight errors crash periodic; surface the message for debugging
+            SmartDashboard.putString("LL Error", e.toString());
+        }
 
         odometry.update(getGyroRotation2d(), getModulePositions());
         fieldRobot.setPose(getOdometryPose());
@@ -187,9 +195,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
         // SmartDashboard.putBoolean("NavX Connected", navX.isConnected());
         SmartDashboard.putBoolean("Pigeon 2 Connected", pigeon.isConnected());
-
         // SmartDashboard.putNumber("NavX Heading", -navX.getAngle());
-        SmartDashboard.putNumber("Pigeon 2 Heading", pigeon.getYaw().getValueAsDouble());
+        SmartDashboard.putNumber("Pigeon 2 Heading (Yaw)", pigeon.getYaw().getValueAsDouble());
     }
 
     public void setFeedforwards(DriveFeedforwards ffs) {

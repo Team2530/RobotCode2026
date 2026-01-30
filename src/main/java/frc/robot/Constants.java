@@ -40,11 +40,11 @@ public final class Constants {
   }
 
   public static class RobotConstants {
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double robotWidthMeters = Units.inchesToMeters(29.5);
     public static final double robotLengthMeters = Units.inchesToMeters(29.5);
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double TOTAL_MASS_KG = 74.088;
     public static final double MOMENT_OF_INERTIA = 6.883;
   }
@@ -66,25 +66,25 @@ public final class Constants {
 
   public static class SwerveModuleConstants {
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(3.85); // ~4 in
     public static final double STEERING_GEAR_RATIO = 1.d / (150d / 7d);
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     // This is for L2 modules with 16T pinions
     public static final double DRIVE_GEAR_RATIO = (1.d / 6.75d);
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double DRIVE_ROTATION_TO_METER = DRIVE_GEAR_RATIO * Math.PI * WHEEL_DIAMETER;
     public static final double STEER_ROTATION_TO_RADIANS = STEERING_GEAR_RATIO * Math.PI * 2d;
     public static final double DRIVE_METERS_PER_MINUTE = DRIVE_ROTATION_TO_METER / 60d;
     public static final double STEER_RADIANS_PER_MINUTE = STEER_ROTATION_TO_RADIANS / 60d;
     public static final double STEER_MAX_RAD_SEC = 0.8 * STEERING_GEAR_RATIO * ((5880.f * 2.f * Math.PI) / 60.f);
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double WHEEL_FRICTION_COEFFICIENT = 1.2;
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double MODULE_KP = 0.46368;
     public static final double MODULE_KD = 0.0050806;
 
@@ -93,7 +93,7 @@ public final class Constants {
     public static final int FL_STEER_ID = 11;
     public static final int FL_ABSOLUTE_ENCODER_PORT = 30;
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double FL_OFFSET_RADIANS = Units.rotationsToRadians(0);
     public static final boolean FL_ABSOLUTE_ENCODER_REVERSED = false;
     public static final boolean FL_MOTOR_REVERSED = true;
@@ -104,7 +104,7 @@ public final class Constants {
     public static final int FR_STEER_ID = 13;
     public static final int FR_ABSOLUTE_ENCODER_PORT = 31;
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double FR_OFFSET_RADIANS = Units.rotationsToRadians(0);
     public static final boolean FR_ABSOLUTE_ENCODER_REVERSED = false;
     public static final boolean FR_MOTOR_REVERSED = true;
@@ -115,7 +115,7 @@ public final class Constants {
     public static final int BR_STEER_ID = 15;
     public static final int BR_ABSOLUTE_ENCODER_PORT = 32;
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double BR_OFFSET_RADIANS = Units.rotationsToRadians(0);
     public static final boolean BR_ABSOLUTE_ENCODER_REVERSED = false;
     public static final boolean BR_MOTOR_REVERSED = true;
@@ -126,7 +126,7 @@ public final class Constants {
     public static final int BL_STEER_ID = 17;
     public static final int BL_ABSOLUTE_ENCODER_PORT = 33;
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double BL_OFFSET_RADIANS = Units.rotationsToRadians(0);
     public static final boolean BL_ABSOLUTE_ENCODER_REVERSED = false;
     public static final boolean BL_MOTOR_REVERSED = true;
@@ -141,7 +141,7 @@ public final class Constants {
 *///|-----------WARNING-----------------|
   //---Intake Motors---\\
   public static class IntakeMotors {
-    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed
+    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed. DONE: FALSE
     public static final double INTAKE_SPEED = 0.6;
     public static final int INTAKE_MOTOR1 = 5;
     public static final double INTAKE_SPEED1 = 0.6;
@@ -160,12 +160,12 @@ public final class Constants {
     public static final double GLOBAL_kA = 0.135; // V/(m/ss)
 
     
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double TRACK_WIDTH = Units.inchesToMeters(19.675);
     public static final double WHEEL_BASE = Units.inchesToMeters(19.675);
     public static final double FULL_ROBOT_WIDTH = Units.inchesToMeters(37.50);
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final PIDConstants TRANSLATION_ASSIST = new PIDConstants(8, 0, 0.01);
     public static final PIDConstants ROTATION_ASSIST = new PIDConstants(7.0, 0, 0.02);
 
@@ -193,7 +193,7 @@ public final class Constants {
 
   public static final class PathPlannerConstants {
 
-    // TODO: UPDATE BASED ON REAL ROBOT
+    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final PIDConstants TRANSLATION_PID = new PIDConstants(15.0, 0, 0.005);
     public static final PIDConstants ROTATION_PID = new PIDConstants(9.0, 0, 0.03); // was 10 and 9
 
