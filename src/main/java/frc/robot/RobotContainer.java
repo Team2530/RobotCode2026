@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import choreo.auto.AutoChooser;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.XboxController;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
 import frc.robot.subsystems.Limelight;
@@ -49,7 +51,7 @@ public class RobotContainer {
     // @Logged
     public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
-    private final SendableChooser<Command> autoChooser;
+    private final AutoChooser autoChooser;
 
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
@@ -76,15 +78,21 @@ public class RobotContainer {
         // NamedCommands.registerCommand(null, getAutonomousCommand());
 
         swerveDriveSubsystem.configurePathplanner();
-        autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser = new AutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
-
         autoChooser.onChange(new Consumer<Command>() {
             @Override
             public void accept(Command t) {
                 if (t instanceof PathPlannerAuto) {
                     PathPlannerAuto auto = (PathPlannerAuto) t;
-                    swerveDriveSubsystem.setAutoStartingPose(auto.getStartingPose());
+                    swerveDriveSubsystem
+                        .getField()
+                        .getObject("autoStart")
+                        .setPose(
+                            AllianceFlipUtil.apply(
+                                auto.getStartingPose()
+                            )
+                        );
                 }
             }
         });
@@ -118,7 +126,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        swerveDriveSubsystem.setGyroToEstimate();
         return autoChooser.getSelected();
     }
 
