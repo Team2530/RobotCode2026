@@ -19,6 +19,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -298,16 +300,66 @@ public final class Constants {
   }
   public static final class TurretConstants {
     // TODO: UPDATE BASED ON REAL ROBOT
-    public static final int FlyWheelID = 20;
-    public static final double FlyWheelSpeed = 0.3;
-    public static final double FlyWheelDiameterMeters = Units.inchesToMeters(4);
+    public static final class Launcher {
+        // inches
+        public static final double WHEEL_DIAMETER =4;
 
-    public static final int TurretID = 21;
-    public static final double TurretGearRatio = 1;
-    public static final double TurretLimitLow = 270;
-    public static final double TurretLimitHigh = 90;
+        public static final class PID {
+            public static final double P = 1;
+            public static final double I = 0;
+            public static final double D = 0;
+        }
+    }
 
-    public static final int HoodID = 22;
+    public static final class Yaw {
+        public static final double GEAR_RATIO = 1;
+
+        // angular limits on yaw movement
+        // 180 is pointed directly out the turret side
+        public static final double ANGLE_MIN = 90;
+        public static final double ANGLE_MAX = 270;
+
+        public static final class Zeroing {
+            // amps
+            public static final double CURRENT_LIMIT = 35;
+            // time above current limit to register as hitting the hard limit
+            public static final double DEBOUNCE_TIME = 0.25;
+        }
+
+        public static final class PID {
+            public static final double P = 1;
+            public static final double I = 0;
+            public static final double D = 0;
+        }
+    }
+
+    public static final class Pitch {
+        public static final double GEAR_RATIO = 1;
+
+        // 90 would have the "face" of the turret as vertical
+        public static final double ANGLE_MIN = 90;
+        public static final double ANGLE_MAX = 270;
+
+        public static final class PID {
+            public static final double P = 1;
+            public static final double I = 0;
+            public static final double D = 0;
+        }
+    }
+
+    public static final class CanIDs {
+        public static final int LAUNCHER_MOTOR = 20;
+
+        public static final int YAW_MOTOR = 21;
+
+        public static final int PITCH_MOTOR = 22;
+        public static final int PITCH_ENCODER = 23;
+    }
+
+    public static final class Offsets {
+        public static final double YAW_ENCODER_ANGLE = 0;
+        public static final double PITCH_ENCODER_ANGLE = 0;
+    }
 
     public static final double ShooterHeight = Units.inchesToMeters(20); // UPDATE THIS | Height of Shooter from Ground in Inches
     public static final double GoalHeight = Units.inchesToMeters(72); //Height of Hub Funnel

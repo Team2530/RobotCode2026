@@ -1,179 +1,173 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.CAN;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import com.revrobotics.spark.config.SparkMaxConfig;
+
+import com.ctre.phoenix6.hardware.CANcoder;
+
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkFlexExternalEncoder;
-import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.Robot;
-import org.apache.commons.math3.fitting.leastsquares.*;
+
+import frc.robot.Constants.TurretConstants;
 
 public class TurretSubsystem extends SubsystemBase {
-    private static final int LauncherID = Constants.TurretConstants.FlyWheelID;
-    private static final int TurretID = Constants.TurretConstants.TurretID;
-    private static final int HoodID = Constants.TurretConstants.HoodID;
-    private static final double LauncherSpeed = Constants.TurretConstants.FlyWheelSpeed;
-    private static final double TurretGearRatio = Constants.TurretConstants.TurretGearRatio;
-    private static final double Height = Constants.TurretConstants.ShooterHeight - Constants.TurretConstants.GoalHeight;
-    private static final double LimitL = Constants.TurretConstants.TurretLimitLow;
-    private static final double LimitR = Constants.TurretConstants.TurretLimitHigh;
-
-    // Get Distance and Robot Odometry. Needs to be updated for On The Fly calculations.
-
-    //private static final double Distance = Limelight.getTargetDistance();
-    //private static final double RobotSpeed = SwerveSubsystem.getVelocity().norm();
-
     // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
 
     private final SparkMax m_LauncherMotor;
-    private final SparkMax m_TurretMotor;
-    private final SparkMax m_HoodMotor;
+    private final SparkMax m_YawMotor;
+    private final SparkMax m_PitchMotor;
 
     private final RelativeEncoder e_LauncherEncoder;
-    private final RelativeEncoder e_TurretEncoder;
-    private final RelativeEncoder e_HoodEncoder;
+    private final RelativeEncoder e_YawEncoder;
+    // lets just pray its a  cancoder
+    private final CANcoder e_PitchEncoder;
 
-  public TurretSubsystem() {
-    // Initialize Motors and Encoders
-    m_LauncherMotor = new SparkMax(LauncherID, MotorType.kBrushless);
-    m_TurretMotor = new SparkMax(TurretID, MotorType.kBrushless);
-    m_HoodMotor = new SparkMax(HoodID, MotorType.kBrushless);
-    
-    e_LauncherEncoder = m_LauncherMotor.getEncoder();
-    e_LauncherEncoder.setPosition(0);
-    e_TurretEncoder = m_TurretMotor.getEncoder();
-    e_TurretEncoder.setPosition(0.5); // Set default to 180. Makes turret angling easier. 
-    e_HoodEncoder = m_HoodMotor.getEncoder();
-    e_HoodEncoder.setPosition(0);
+    private double targetLauncherVelocity;
+    private double targetYaw;
+    private double targetPitch;
 
-  }
-
-  void setCoastMode() {
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kCoast);
-  }
+    private final PIDController launcherPID;
+    private final PIDController yawPID;
+    private final PIDController pitchPID;
 
 
-  private double NormalizeAngle(double a) {
-      a %= 360;
-      if (a < 0) a += 360; // Turn any angle into [0, 360)
-      return a;
-  }
+    private boolean yawIsZeroed;
+    private double yawOffset;
+    private Debouncer hardLimitDebouncer;
 
-  private double getTurretAngle() {
-    double angle = e_TurretEncoder.getPosition() * (360.0 / TurretGearRatio);
-    return NormalizeAngle(angle);
-  }
+    public TurretSubsystem() {
+        // Initialize Motors and Encoders
+        m_LauncherMotor = new SparkMax(
+            TurretConstants.CanIDs.LAUNCHER_MOTOR, 
+            MotorType.kBrushless
+        );
+        m_YawMotor = new SparkMax(
+            TurretConstants.CanIDs.YAW_MOTOR, 
+            MotorType.kBrushless
+        );
+        m_PitchMotor = new SparkMax(
+            TurretConstants.CanIDs.PITCH_MOTOR,
+            MotorType.kBrushless
+        );
 
-  private double getHoodAngle() {
-    double angle = e_HoodEncoder.getPosition() * (360.0 / TurretGearRatio);
-    return NormalizeAngle(angle);
-  }
+        e_LauncherEncoder = m_LauncherMotor.getEncoder();
+        e_YawEncoder = m_YawMotor.getEncoder();
+        e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
 
-  private double targetHoodAngle() {
-    // Placeholder for actual calculation based on distance to target
-    double distance = 0; // Distance to Closest Part of the Goal
-    double h_dif = Math.abs(Height); // ABS(Goal Height - Shooter Height)
-    double bias = 0; // Placeholder  Bias
+        launcherPID = new PIDController(
+            TurretConstants.Launcher.PID.P,
+            TurretConstants.Launcher.PID.I,
+            TurretConstants.Launcher.PID.D
+        );
+        yawPID = new PIDController(
+            TurretConstants.Yaw.PID.P,
+            TurretConstants.Yaw.PID.I,
+            TurretConstants.Yaw.PID.D
+        );
+        pitchPID = new PIDController(
+            TurretConstants.Pitch.PID.P,
+            TurretConstants.Pitch.PID.I,
+            TurretConstants.Pitch.PID.D
+        );
 
-    double angle = Math.atan(1/(h_dif / (2 * distance))) + bias; // Calculate the prefered angle.
-    return angle;
-  }
-
-  private double targetShootSpeed() {
-    // Calculate Required Exit Velocity based on Distance and Hood Angle
-    double distance = 0;// Distance to Closest Part of the Goal
-    double thetaAngles = targetHoodAngle(); // Hood Angle in Degrees
-    double thetaRadians = Math.toRadians(thetaAngles);
-    double g = 9.81; // Gravity in m/s^2
-    double h_dif = Math.abs(Height); // ABS(Goal Height - Shooter Height)
-    double bias = 2.5; // Corrects for air resistance and other factors. Needs Testing.
-
-    double exitVelocity = (Math.sqrt((g * distance * distance) / ((2 * Math.cos(thetaRadians) * Math.cos(thetaRadians)) * (distance * Math.tan(thetaRadians) - h_dif)))) + bias;
-    return exitVelocity;
-  }
-
-  private double velocityToRPM(double velocity) {
-    // Convert Exit Velocity to Wheel RPM
-    // Need to do Testing and Regression.
-    double wheelDiameter = 0.1; // Wheel Diameter in meters (Placeholder Value)
-    double wheelCircumference = Math.PI * wheelDiameter;
-    double rpm = (velocity / wheelCircumference) * 60; // Convert m/s to RPM
-    return rpm;
-
-  }
-  public void runLauncher() {
-    m_LauncherMotor.set(velocityToRPM(targetShootSpeed()));
-
-    if (Robot.isSimulation()) {
-      SmartDashboard.putBoolean("[SIM] Shooting", true);
-        
-    }
-  }
-      
-  public void stopLauncher() {
-    m_LauncherMotor.set(0.0);
-
-    if (Robot.isSimulation()) {
-      SmartDashboard.putBoolean("[SIM] Shooting", false);
-        
-    }
-  }
-
-  public void angleTurret(double targetAngle) {
-
-    double currentAngle = getTurretAngle();
-    double error = targetAngle - currentAngle;
-
-    double kP = 0.01; // Proportional gain.
-    double output = kP * error;
-
-    // Limit output to prevent overshooting
-    output = Math.max(-0.2, Math.min(0.2, output));
-
-    // Check limits
-    if ((currentAngle <= LimitL && output < 0) || (currentAngle >= LimitR && output > 0)) {
-        output = 0; // Stops movement if at limits
+        startYawZeroing();
     }
 
-    if (Math.abs(error) < 2) { // Stops if within 2 degrees of target.
-        output = 0;
+    @Override
+    public void periodic() {
+        if (yawIsZeroed) {
+            m_LauncherMotor.setVoltage(
+                launcherPID.calculate(
+                    getLauncherVelocity(), 
+                    getTargetLauncherVelocity()
+                )
+            );
+            m_YawMotor.setVoltage(
+                yawPID.calculate(
+                    getYaw(),
+                    getTargetYaw()
+                )
+            );
+            m_PitchMotor.setVoltage(
+                pitchPID.calculate(
+                    getPitch(),
+                    getTargetPitch()
+                )
+            );
+        } else {
+             if (hardLimitDebouncer.calculate(
+                m_YawMotor.getOutputCurrent() 
+                    > TurretConstants.Yaw.Zeroing.CURRENT_LIMIT
+            )) {
+                m_YawMotor.setVoltage(0);
+
+                yawIsZeroed = true;
+                yawOffset = e_YawEncoder.getPosition();
+            }
+        }
     }
 
-    m_TurretMotor.set(output);
-  }
 
-  public void angleHood(double targetAngle) {
-
-    double currentAngle = getHoodAngle();
-    double error = targetAngle - currentAngle;
-
-    double kP = 0.01; // Proportional gain.
-    double output = kP * error;
-
-    // Limit output to prevent overshooting
-    output = Math.max(-0.2, Math.min(0.2, output));
-
-    if (Math.abs(error) < 1) { // Stops if within 1 degree of target.
-        output = 0;
+    public void setYaw(double angle) {
+        // TODO: limit handling
+        targetYaw = angle;
     }
 
-    m_HoodMotor.set(output);
-  }
+    public double getYaw() {
+        return MathUtil.angleModulus(
+            Units.rotationsToRadians(
+                e_YawEncoder.getPosition() / TurretConstants.Yaw.GEAR_RATIO
+            )
+        );
+    }
+
+    public double getTargetYaw() {
+        return targetYaw;
+    }
+
+    public void setPitch(double angle) {
+        // TODO: limit handling
+        targetPitch = angle;
+    }
+
+    public double getPitch() {
+        return MathUtil.angleModulus(
+            Units.rotationsToRadians(
+                e_PitchEncoder.getPosition().getValueAsDouble() 
+                    / TurretConstants.Pitch.GEAR_RATIO
+            )
+        );
+    }
+
+    public double getTargetPitch() {
+        return targetPitch;
+    }
+
+
+    public double getLauncherVelocity() {
+        return m_LauncherMotor.getEncoder().getVelocity();
+    }
+
+    public double getTargetLauncherVelocity() {
+        return targetLauncherVelocity;
+    }
+
+    public void setLauncherVelocity(double velocity) {
+        targetLauncherVelocity = velocity; 
+    }
+
+    public void startYawZeroing() {
+        yawIsZeroed = false;
+        yawOffset = 0;
+        hardLimitDebouncer = new Debouncer(
+            TurretConstants.Yaw.Zeroing.DEBOUNCE_TIME,
+            DebounceType.kRising
+        );
+    }
 }
 
