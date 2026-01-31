@@ -51,8 +51,6 @@ public class RobotContainer {
     // @Logged
     public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
-    private final AutoChooser autoChooser;
-
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
 
@@ -76,26 +74,6 @@ public class RobotContainer {
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
-
-        swerveDriveSubsystem.configurePathplanner();
-        autoChooser = new AutoChooser();
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-        autoChooser.onChange(new Consumer<Command>() {
-            @Override
-            public void accept(Command t) {
-                if (t instanceof PathPlannerAuto) {
-                    PathPlannerAuto auto = (PathPlannerAuto) t;
-                    swerveDriveSubsystem
-                        .getField()
-                        .getObject("autoStart")
-                        .setPose(
-                            AllianceFlipUtil.apply(
-                                auto.getStartingPose()
-                            )
-                        );
-                }
-            }
-        });
     }
 
     
@@ -126,7 +104,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return new Command() {};
     }
 
     public SwerveSubsystem getSwerveSubsystem() {
