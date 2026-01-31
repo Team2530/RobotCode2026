@@ -109,7 +109,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     double startTime = Timer.getFPGATimestamp();
-    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run(); 
 
     double currentTime = Timer.getFPGATimestamp();
     loopTime = currentTime - lastLoopTime;
@@ -122,9 +122,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {
-    m_robotContainer.getSwerveSubsystem().stopDrive();
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {
