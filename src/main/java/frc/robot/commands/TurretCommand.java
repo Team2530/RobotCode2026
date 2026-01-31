@@ -32,7 +32,7 @@ public class TurretCommand extends Command {
     @Override
     public void execute() {
         m_LauncherSubsystem.runLauncher();
-
+        m_LauncherSubsystem.angleTurret(180);
     }
 
     // Called once the command ends or is interrupted.

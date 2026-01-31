@@ -18,7 +18,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.TurretCommand;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -56,6 +58,7 @@ public class RobotContainer {
     @Logged
     private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
 
+    public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -65,8 +68,6 @@ public class RobotContainer {
 
         DataLogManager.logNetworkTables(true);
         DataLogManager.start();
-
-        
 
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
 
@@ -105,7 +106,8 @@ public class RobotContainer {
      * joysticks}.
      */
     private void configureBindings() {
-       
+        operatorXbox.a()
+            .whileTrue(new TurretCommand(TURRET_SUBSYSTEM));
         
     }
 

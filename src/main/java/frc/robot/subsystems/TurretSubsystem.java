@@ -144,7 +144,7 @@ public class TurretSubsystem extends SubsystemBase {
     double output = kP * error;
 
     // Limit output to prevent overshooting
-    output = Math.max(-0.5, Math.min(0.5, output));
+    output = Math.max(-0.2, Math.min(0.2, output));
 
     // Check limits
     if ((currentAngle <= LimitL && output < 0) || (currentAngle >= LimitR && output > 0)) {
@@ -152,10 +152,28 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     if (Math.abs(error) < 2) { // Stops if within 2 degrees of target.
-    output = 0;
+        output = 0;
     }
 
     m_TurretMotor.set(output);
+  }
+
+  public void angleHood(double targetAngle) {
+
+    double currentAngle = getHoodAngle();
+    double error = targetAngle - currentAngle;
+
+    double kP = 0.01; // Proportional gain.
+    double output = kP * error;
+
+    // Limit output to prevent overshooting
+    output = Math.max(-0.2, Math.min(0.2, output));
+
+    if (Math.abs(error) < 1) { // Stops if within 1 degree of target.
+        output = 0;
+    }
+
+    m_HoodMotor.set(output);
   }
 }
 
