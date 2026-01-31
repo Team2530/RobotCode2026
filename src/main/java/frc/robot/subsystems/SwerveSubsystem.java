@@ -39,6 +39,8 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
+
 
 
 @Logged
@@ -168,15 +170,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-
-        // TODO: Update LL Container to use for pose estimation
-
-        // if (DriverStation.isTeleop()) {
-        //     RobotContainer.LLContainer.estimateMT1Odometry(odometry, lastChassisSpeeds);
-        // } else {
-        //     RobotContainer.LLContainer.estimateMT1OdometryAuto(odometry, lastChassisSpeeds);
-        // }
 
         odometry.update(getGyroRotation2d(), getModulePositions());
         fieldRobot.setPose(getOdometryPose());
@@ -361,4 +354,5 @@ public class SwerveSubsystem extends SubsystemBase {
         FieldObject2d obj = field.getObject("autoStart");
         obj.setPose(pose);
     }
+
 }
