@@ -33,7 +33,7 @@ public class ClimberCommand extends Command {
      @Override
     public void end(boolean interrupted) {
         subsystem1.setClimbPreset(ClimbPresets.IDLE);
-        SmartDashboard.putString("Climb Ended", "Ended");
+        SmartDashboard.putString("Climb Ended", "End Fail");
     }
 
      @Override
@@ -47,16 +47,10 @@ public class ClimberCommand extends Command {
             subsystem1.setClimbPreset(ClimbPresets.CLIMBINGDOWN);
             new WaitCommand(Constants.Sleep.finishUP);
             SmartDashboard.putString("Climb Command", "Finished Climb");
-          
-
-    
-        
-        
-        
-
-            if (Robot.isSimulation()) {
-            SmartDashboard.putBoolean("[SIM] Climbed", true);
-            }
+                
+                if (Robot.isSimulation()) {
+                    SmartDashboard.putBoolean("[SIM] Climbed", true);
+                }
             new WaitUntilCommand(driveXbox.a());
             subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP);
             SmartDashboard.putString("Climb Command", "Started Part 1 Going Down");
@@ -65,7 +59,11 @@ public class ClimberCommand extends Command {
             subsystem1.setClimbPreset(ClimbPresets.CLIMBINGDOWN);
             new WaitCommand(Constants.Sleep.finishDN);
             subsystem1.setClimbPreset(ClimbPresets.IDLE);
-            SmartDashboard.putString("Climb Command", "Comgrats, you successfully unclimbed from the bar! You can't return :>");
+            SmartDashboard.putString("Climb Command", "Comgrats, you successfully unclimbed from the bar! You can return with RB.");
+            ClimberCommand.setOutput(0);
+        }
+        if (output == 0) {
+            SmartDashboard.putString("Climb Command", "Idle");
         }
     }
     
