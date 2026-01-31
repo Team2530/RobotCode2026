@@ -113,10 +113,9 @@ public class RobotContainer {
         boolean isXstance;
     
          private void configureBindings() {
-            operatorXbox.x().whileTrue(normalDrive);
-            if (isXstance) {
-            
-            };
+            operatorXbox.x().whileTrue(new InstantCommand(() -> {
+                LauncherSubsystem.setOutput(1);
+            }));
         /*(
         new setXstance(m_Carousel, true)
         );*/

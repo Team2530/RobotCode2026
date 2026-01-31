@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.RelativeEncoder;
@@ -15,13 +16,16 @@ import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import frc.robot.Robot;
+import frc.robot.commands.ClimberCommand;
 import frc.robot.Constants;
 
 public class LauncherSubsystem extends SubsystemBase {
     private static final int LauncherID = Constants.TurretConstants.FlyWheelID;
     private static final double LauncherSpeed = Constants.TurretConstants.FlyWheelSpeed;
+    public static SwerveSubsystem SwerveSubsystem;
 
     private final SparkFlex m_Motor;
+    
     
 
   /** Creates a new ExampleSubsystem. */  
@@ -29,17 +33,35 @@ public class LauncherSubsystem extends SubsystemBase {
     m_Motor = new SparkFlex(LauncherID, MotorType.kBrushless);
   }
 
-void setCoastMode() {
-  SparkMaxConfig config = new SparkMaxConfig();
-  config.idleMode(IdleMode.kCoast);
-}
+  void setCoastMode() {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(IdleMode.kCoast);
+  }
 
-public void runLauncher() {
-  m_Motor.set(LauncherSpeed);
-}
+  public void runLauncher() {
+    m_Motor.set(LauncherSpeed);
+  }
+      
+  public void stopLauncher() {
+    m_Motor.set(0.0);
+  }
+
+  public void initalize() { //Helps make trigger keys
+    if (output == 1) {
+      runLauncher();
+    }
+    if (output == 0) {
+      stopLauncher();
+    }
+  }
+  
+  private static double output;
     
-public void stopLauncher() {
-  m_Motor.set(0.0);
-}
-
+  public static void setOutput(double output) {
+    LauncherSubsystem.output = output;
+  } 
+  public double getOutput() {
+    return output;
+  }
+  
 }
