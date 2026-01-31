@@ -85,10 +85,10 @@ public class ClimberCommand extends Command {
     private CommandXboxController driveXbox;
     
     
-    private double output;
+    private static double output;
     
     public static void setOutput(double output) {
-        this.output = output;
+        ClimberCommand.output = output;
     } 
     public double getOutput() {
         return output;
