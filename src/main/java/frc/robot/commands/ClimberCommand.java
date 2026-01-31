@@ -38,6 +38,7 @@ public class ClimberCommand extends Command {
 
      @Override
     public void initialize() {
+        if (output == 1) {
         CommandScheduler.getInstance().schedule();
             subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP); //TODO: Sequence command group this
             SmartDashboard.putString("Climb Command", "Started Part 1 Climb");
@@ -53,10 +54,9 @@ public class ClimberCommand extends Command {
         
         
 
-        if (Robot.isSimulation()) {
+            if (Robot.isSimulation()) {
             SmartDashboard.putBoolean("[SIM] Climbed", true);
-        
-        }
+            }
             new WaitUntilCommand(driveXbox.a());
             subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP);
             SmartDashboard.putString("Climb Command", "Started Part 1 Going Down");
@@ -65,8 +65,8 @@ public class ClimberCommand extends Command {
             subsystem1.setClimbPreset(ClimbPresets.CLIMBINGDOWN);
             new WaitCommand(Constants.Sleep.finishDN);
             subsystem1.setClimbPreset(ClimbPresets.IDLE);
-            SmartDashboard.putString("Climb Command", "Comgrats, you successfully unclimbed from the bar!");
-
+            SmartDashboard.putString("Climb Command", "Comgrats, you successfully unclimbed from the bar! You can't return :>");
+        }
     }
     
     public ClimbPresets getClimbPreset() {
@@ -82,5 +82,15 @@ public class ClimberCommand extends Command {
     public CommandXboxController getDriverXbox() {
         return getDriverXbox();
     }
-    private CommandXboxController driveXbox; 
+    private CommandXboxController driveXbox;
+    
+    
+    private double output;
+    
+    public static void setOutput(double output) {
+        this.output = output;
+    } 
+    public double getOutput() {
+        return output;
+    }
 }
