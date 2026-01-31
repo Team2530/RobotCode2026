@@ -146,8 +146,8 @@ public final class Constants {
   public static class IntakeMotors {
     public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed
     public static final double INTAKE_SPEED = 0.6;
-    public static final int INTAKE_MOTOR1 = 5;
-    public static final double INTAKE_SPEED1 = 0.6;
+    public static final int INTAKE_PIVOT_MOTOR1 = 5;
+    public static final double INTAKE_PIVOT_SPEED = 0.6;
   }
   //----Climb Motors---\\
   public static class ClimbMotors {
