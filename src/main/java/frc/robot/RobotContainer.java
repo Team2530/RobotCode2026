@@ -51,7 +51,7 @@ public class RobotContainer {
      private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
      private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
      private static final Limelight LL_BF = new Limelight(LimelightType.LL4, "limelight-bf", true, true);
-
+    //Might have to change limelight names after 2026 firmware update....
      //initalizing limelight container (Group)
      public static final LimelightContainer LLContainer = new LimelightContainer(LL_BF, LL_BL, LL_BR, LL_FR);
 
