@@ -22,11 +22,15 @@ import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.LoaderSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.commands.LoaderCommand;
 import frc.robot.commands.ShooterCommand;
+import frc.robot.util.LimelightContainer;
+
 
 
 
@@ -42,12 +46,14 @@ import frc.robot.commands.ShooterCommand;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
 
-    // TODO: ADD Limelights
-    // private static final Limelight LL_name = new Limelight(LimelightType.LL4, "limelight-name", true, true);
+// These are initating the individual Limlight(s)
+     private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
+     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
+     private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
+     private static final Limelight LL_BF = new Limelight(LimelightType.LL4, "limelight-bf", true, true);
 
-    // TODO: initalize Limelight container
-    // @Logged
-    // public static final LimelightContainer LLContainer = new LimelightContainer(LL_name1, LL_name2, LL_name3);
+     //initalizing limelight container (Group)
+     public static final LimelightContainer LLContainer = new LimelightContainer(LL_BF, LL_BL, LL_BR, LL_FR);
 
     // @Logged
     public final CommandXboxController driverXbox = new CommandXboxController(
