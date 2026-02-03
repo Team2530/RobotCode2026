@@ -30,7 +30,8 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
       this.intakePreset = intake;
       boolean intakeActive = intake == IntakePresets.INTAKE;
       boolean intakeInactive = intake == IntakePresets.IDLE;
-      if (IntakePresets.INTAKE == intake) {
+      if (IntakePresets.OUT == intake) {
+        if (IntakePresets.INTAKE == intake) {
         m_intakesubsystemMotor.set(Constants.IntakeMotors.INTAKE_SPEED);
         SmartDashboard.putString("Intake Subsystem", "Begin");
         
@@ -38,6 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
         if (Robot.isSimulation()) {
             SmartDashboard.putBoolean("[SIM] Intaking", true);
         
+        }
         }
       }
       if (IntakePresets.IDLE == intake) {
@@ -58,6 +60,7 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
     }
     
     public enum IntakePresets {
+      OUT,
       INTAKE,
       IDLE,
   }

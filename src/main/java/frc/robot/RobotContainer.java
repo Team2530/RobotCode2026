@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -112,15 +113,31 @@ public class RobotContainer {
          */
         boolean isXstance;
     
-         private void configureBindings() {
+         private void configureBindings() { // Using binary send and recive
+
+            // Firing
             operatorXbox.x().whileTrue(new InstantCommand(() -> {
                 LauncherSubsystem.setOutput(1);
             }));
-        /*(
-        new setXstance(m_Carousel, true)
-        );*/
+            operatorXbox.x().whileFalse(new InstantCommand(() -> {
+                LauncherSubsystem.setOutput(0);
+            }));
+       
+            // Climb
             operatorXbox.rightBumper().onTrue(new InstantCommand(() -> {
                 ClimberCommand.setOutput(1);
+            }));
+            // Start Intaking
+            driverXbox.x().whileTrue(new InstantCommand(() -> {
+                IntakeCommand.setStart(1);
+            }));
+            driverXbox.x().whileFalse(new InstantCommand(() -> {
+                IntakeCommand.setStart(0);
+            }));
+
+            // Drop Intake (Light tap needed, no need for hold)
+            operatorXbox.a().onTrue(new InstantCommand(() -> {
+                IntakeCommand.setDown(1);
             }));
     
        

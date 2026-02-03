@@ -6,7 +6,7 @@ package frc.robot.commands;
 // import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+// import edu.wpi.first.wpilibj2.command.CommandScheduler;
 //import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 //import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -39,8 +39,7 @@ public class ClimberCommand extends Command {
      @Override
     public void initialize() {
         if (output == 1) {
-        CommandScheduler.getInstance().schedule();
-            subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP); //TODO: Sequence command group this
+            subsystem1.setClimbPreset(ClimbPresets.CLIMBINGUP); //TODO: Sequence command group this, I'm not sure how
             SmartDashboard.putString("Climb Command", "Started Part 1 Climb");
             new WaitCommand(Constants.Sleep.up);
             SmartDashboard.putString("Climb Command", "Finished Part 1 Climb");
@@ -59,7 +58,7 @@ public class ClimberCommand extends Command {
             subsystem1.setClimbPreset(ClimbPresets.CLIMBINGDOWN);
             new WaitCommand(Constants.Sleep.finishDN);
             subsystem1.setClimbPreset(ClimbPresets.IDLE);
-            SmartDashboard.putString("Climb Command", "Comgrats, you successfully unclimbed from the bar! You can return with RB.");
+            SmartDashboard.putString("Climb Command", "Congrats, you successfully unclimbed from the bar! You can return with RB.");
             ClimberCommand.setOutput(0);
         }
         if (output == 0) {
