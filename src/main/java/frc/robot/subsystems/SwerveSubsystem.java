@@ -330,11 +330,19 @@ public class SwerveSubsystem extends SubsystemBase {
             sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
 
-        // Apply the generated speeds
-        // TODO: find driveFieldRelative method
-        //(speeds);
+        
+        setChassisSpeedsAUTO(speeds);
     }
-    
+
+    public void setChassisSpeedsAUTO(ChassisSpeeds speeds) {
+        double tmp = speeds.vxMetersPerSecond;
+        speeds.vxMetersPerSecond = speeds.vyMetersPerSecond;
+        speeds.vyMetersPerSecond = tmp;
+        tmp = speeds.omegaRadiansPerSecond;
+        speeds.omegaRadiansPerSecond *= -1;
+        
+    }
+
     @Override
     public void periodic() {}
 
