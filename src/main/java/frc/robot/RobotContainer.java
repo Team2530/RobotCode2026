@@ -114,7 +114,7 @@ public class RobotContainer {
         });
     }
 
-    private Command intakeDoing(){
+    private Command intaking(){
         return new InstantCommand(() -> {
             new ParallelCommandGroup(
                new IntakeCommand(intakeSubsystem)
@@ -139,7 +139,7 @@ public class RobotContainer {
     private void configureBindings() {
        //This is ment for operator controls
        
-       operatorXbox.leftTrigger().whileTrue(intakeDoing());
+       operatorXbox.leftTrigger().whileTrue(intaking());
        operatorXbox.rightTrigger().whileTrue(shootTurret());
 
     }
