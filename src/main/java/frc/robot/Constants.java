@@ -87,6 +87,7 @@ public final class Constants {
     public static final double MAX_ROBOT_VELOCITY = 4.2;
     public static final double MAX_ROBOT_RAD_VELOCITY = 6.0;
 
+    
 
     // (((((65kg×1(m/s^2))/4)×(4in/2))/6.75)/(0.0194Nm/A))×(0.033ohm)
     public static final double GLOBAL_kA = 0.135; // V/(m/ss)
@@ -101,6 +102,12 @@ public final class Constants {
     public static final PIDConstants TRANSLATION_ASSIST = new PIDConstants(8, 0, 0.01);
     public static final PIDConstants ROTATION_ASSIST = new PIDConstants(7.0, 0, 0.02);
 
+    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
+        new Translation2d(TRACK_WIDTH / 2.0, WHEEL_BASE / 2.0),
+        new Translation2d(TRACK_WIDTH / 2.0, -WHEEL_BASE / 2.0),
+        new Translation2d(-TRACK_WIDTH / 2.0, WHEEL_BASE / 2.0),
+        new Translation2d(-TRACK_WIDTH / 2.0, -WHEEL_BASE / 2.0));
+      
     public static final class ControlConstants {
         public static final double REGULAR_DRIVE_MULT = 1.0;
         public static final double TURTLE_DRIVE_MULT = 0.25;
