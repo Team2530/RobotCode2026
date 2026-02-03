@@ -5,7 +5,12 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 
@@ -36,9 +41,9 @@ public class TurretSubsystem extends SubsystemBase {
     private final PIDController pitchPID;
 
 
+    // yaw logic
     private boolean yawIsZeroed;
     private double yawOffset;
-    private Debouncer hardLimitDebouncer;
 
     public TurretSubsystem() {
         // Initialize Motors and Encoders
@@ -99,16 +104,6 @@ public class TurretSubsystem extends SubsystemBase {
                     getTargetPitch()
                 )
             );
-        } else {
-             if (hardLimitDebouncer.calculate(
-                m_YawMotor.getOutputCurrent() 
-                    > TurretConstants.Yaw.Zeroing.CURRENT_LIMIT
-            )) {
-                m_YawMotor.setVoltage(0);
-
-                yawIsZeroed = true;
-                yawOffset = e_YawEncoder.getPosition();
-            }
         }
     }
 
@@ -121,7 +116,11 @@ public class TurretSubsystem extends SubsystemBase {
     public double getYaw() {
         return MathUtil.angleModulus(
             Units.rotationsToRadians(
-                e_YawEncoder.getPosition() / TurretConstants.Yaw.GEAR_RATIO
+                (e_YawEncoder.getPosition() 
+                    + Units.degreesToRotations(
+                        TurretConstants.Yaw.ANGLE_MIN
+                    ) - yawOffset
+                ) / TurretConstants.Yaw.GEAR_RATIO
             )
         );
     }
@@ -163,11 +162,55 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void startYawZeroing() {
         yawIsZeroed = false;
-        yawOffset = 0;
-        hardLimitDebouncer = new Debouncer(
-            TurretConstants.Yaw.Zeroing.DEBOUNCE_TIME,
-            DebounceType.kRising
-        );
+
+        class zeroingPassCommand extends Command{
+            private Debouncer hardLimitDebouncer;
+            private double passVoltage;
+            
+            public zeroingPassCommand(double voltage) {
+                hardLimitDebouncer = new Debouncer(
+                    TurretConstants.Yaw.Zeroing.DEBOUNCE_TIME,
+                    DebounceType.kRising
+            );
+
+                passVoltage = voltage;
+            }
+
+            @Override
+            public void initialize() {
+                m_YawMotor.setVoltage(passVoltage);
+            };
+
+            @Override
+            public boolean isFinished() {
+                return hardLimitDebouncer.calculate(
+                    m_YawMotor.getOutputCurrent() 
+                        > TurretConstants.Yaw.Zeroing.CURRENT_LIMIT
+                );
+            };
+
+            @Override
+            public void end(boolean interrupted) {
+                m_YawMotor.setVoltage(0);
+            }
+        };
+
+        CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
+            // move to zero, rough pass
+            new zeroingPassCommand(5),
+            // back it up a little
+            new InstantCommand(() -> {
+                m_YawMotor.setVoltage(-5);
+            }),
+            new WaitCommand(0.5),
+            // move to zero, fine pass
+            new zeroingPassCommand(1),
+            new InstantCommand(() -> {
+                yawIsZeroed = true;
+                yawOffset = e_YawEncoder.getPosition();
+            })
+        ));
+        
     }
 }
 
