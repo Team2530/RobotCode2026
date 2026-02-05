@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -354,6 +355,10 @@ public class SwerveSubsystem extends SubsystemBase {
     
     public Pose2d getPose() {
         return swerveDrive.getPose();
+    }
+    
+    public Rotation3d getRotation() {
+        return swerveDrive.getGyroRotation3d();
     }
 
     public void setMotorBrake(boolean isBraking) {

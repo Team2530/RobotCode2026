@@ -16,6 +16,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -332,10 +333,46 @@ public final class Constants {
     public static final class Offsets {
         public static final double YAW_ENCODER_ANGLE = 0;
         public static final double PITCH_ENCODER_ANGLE = 0;
+
+        // TODO: update
+        // position relative to the center of the robot, in meters
+        public static final double X = Units.inchesToMeters(10);
+        public static final double Y = Units.inchesToMeters(10);
+        // Height of Shooter from Ground, in meters
+        public static final double Z = Units.inchesToMeters(20); 
+        public static final Translation3d TRANSLATION = new Translation3d(
+            X,
+            Y,
+            Z
+        );
     }
 
-    public static final double ShooterHeight = Units.inchesToMeters(20); // UPDATE THIS | Height of Shooter from Ground in Inches
-    public static final double GoalHeight = Units.inchesToMeters(72); //Height of Hub Funnel
+    public static final class TargetingOptimizer {
+        public static final int INTERPOLATION_POINTS = 9;
+        public static final int MAX_EVALUATIONS = 1000;
+        
+        public static final double MAXIMUM_TIME = 5;
+        // meters per second
+        public static final double MAXIMUM_VELOCITY = 10;
+
+        public static final double[] LOWER_BOUNDS = {
+            // yaw
+            Yaw.ANGLE_MIN,
+            // pitch
+            Pitch.ANGLE_MIN,
+            // velocity
+            0,
+            // time
+            0
+        };
+        public static final double[] UPPER_BOUNDS = {
+            Yaw.ANGLE_MAX,
+            Pitch.ANGLE_MAX,
+            MAXIMUM_VELOCITY,
+            MAXIMUM_TIME
+        };
+    }
+
   }
 
   public static final class IndexerConstants {

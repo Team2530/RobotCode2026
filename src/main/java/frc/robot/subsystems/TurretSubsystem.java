@@ -7,6 +7,8 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,6 +17,15 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+
+import org.apache.commons.math3.analysis.MultivariateFunction;
+import org.apache.commons.math3.optim.InitialGuess;
+import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.SimpleBounds;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 
@@ -79,6 +90,22 @@ public class TurretSubsystem extends SubsystemBase {
         RELATIVE
     }
 
+    private class TurretState {
+        public final double yaw;
+        public final double pitch;
+        public final double launcherVelocity;
+    
+        public TurretState(
+            double yaw,
+            double pitch,
+            double launcherVelocity
+        ) {
+            this.yaw = yaw;
+            this.pitch = pitch;
+            this.launcherVelocity = launcherVelocity;
+        }
+    }
+
     private final SwerveSubsystem swerveSubsystem; 
     // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
     private final SparkMax m_LauncherMotor;
@@ -97,6 +124,9 @@ public class TurretSubsystem extends SubsystemBase {
     private final PIDController launcherPID;
     private final PIDController yawPID;
     private final PIDController pitchPID;
+
+    private final BOBYQAOptimizer targetingOptimizer;
+    private final MultivariateFunction optimizerFunction;
 
     // yaw logic
     private boolean yawIsZeroed;
@@ -140,30 +170,97 @@ public class TurretSubsystem extends SubsystemBase {
             TurretConstants.Pitch.PID.D
         );
 
+        targetingOptimizer = new BOBYQAOptimizer(
+            TurretConstants.TargetingOptimizer.INTERPOLATION_POINTS
+        );
+        optimizerFunction = new MultivariateFunction() {
+            @Override
+            public double value(double[] point) {
+                return calculateError(
+                        point[0],
+                        point[1],
+                        point[2],
+                        point[3]
+                );
+            }
+        };
+
         setTarget(TurretTargets.HUB);
 
         startYawZeroing();
     }
 
+    private double calculateError(
+        double yaw,
+        double pitch,
+        double velocity,
+        double time
+    ) {
+        return 0;
+    }
+
     @Override
     public void periodic() {
         if (yawIsZeroed) {
+            // get difference to target
+            Translation3d toTarget;
+            switch (targetingMode) {
+                case ABSOLUTE:
+                    toTarget = targetPosition
+                        .minus(getLauncherPosition())
+                        .getTranslation();
+                    break;
+                case RELATIVE:
+                    toTarget = new Translation3d(
+                        targetPosition.getX(),       
+                        targetPosition.getY(),       
+                        targetPosition.getZ()
+                    );
+                    break;
+            }
+
+            // use difference to set guess and optimize from there
+            // TODO: set guesses with `toTarget`
+            double[] guess = {
+                // yaw
+                // pitch
+                // velocity
+                // time
+            };
+
+            double[] targetOptimum = targetingOptimizer.optimize(
+                new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
+                new ObjectiveFunction(optimizerFunction),
+                GoalType.MINIMIZE,
+                new InitialGuess(guess),
+                new SimpleBounds(
+                    TurretConstants.TargetingOptimizer.LOWER_BOUNDS, 
+                    TurretConstants.TargetingOptimizer.UPPER_BOUNDS
+                )
+            ).getPoint();
+
+            double optimalYaw = targetOptimum[0];
+            double optimalPitch = targetOptimum[1];
+            double optimalVelocity = targetOptimum[2];
+            // i don't think we need time?
+
+            // calculate voltages and send to motors
             m_LauncherMotor.setVoltage(
                 launcherPID.calculate(
                     getLauncherVelocity(), 
-                    getTargetLauncherVelocity()
+                    calculateExitToLauncherVelocity(optimalVelocity)
                 )
             );
             m_YawMotor.setVoltage(
                 yawPID.calculate(
                     getYaw(),
-                    getTargetYaw()
+                    optimalYaw
                 )
             );
             m_PitchMotor.setVoltage(
                 pitchPID.calculate(
                     getPitch(),
-                    getTargetPitch()
+                    optimalPitch
                 )
             );
         }
@@ -193,6 +290,11 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getLauncherVelocity() {
         return m_LauncherMotor.getEncoder().getVelocity();
+    }
+
+    // TODO: this
+    private double calculateExitToLauncherVelocity(double exitVelocity) {
+        return 1;
     }
     
     public void startYawZeroing() {
@@ -284,6 +386,24 @@ public class TurretSubsystem extends SubsystemBase {
     
     public Pose3d getTargetPosition() {
         return targetPosition;
+    }
+
+    /*
+     * Returns the field-relative position of the launcher
+     *
+     * @return A field relative Pose3d
+     */
+    public Pose3d getLauncherPosition() {
+        return new Pose3d(
+                swerveSubsystem.getPose()
+        ).plus(
+            new Transform3d(
+                TurretConstants.Offsets.TRANSLATION.rotateBy(
+                    swerveSubsystem.getRotation()
+                ),
+                new Rotation3d()
+            )
+        );
     }
 }
 
