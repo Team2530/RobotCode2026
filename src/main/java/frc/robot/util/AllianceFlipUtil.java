@@ -19,11 +19,15 @@ import frc.robot.Constants.FieldConstants;
 public class AllianceFlipUtil {
 
   public static double applyX(double x) {
-    return shouldFlip() ? FieldConstants.FIELD_LENGTH - x : x;
+    return shouldFlip() 
+        ? FieldConstants.FIELD_LENGTH - x 
+        : x;
   }
 
   public static double applyY(double y) {
-    return shouldFlip() ? FieldConstants.FIELD_WIDTH - y : y;
+    return shouldFlip() 
+        ? FieldConstants.FIELD_WIDTH - y 
+        : y;
   }
 
   public static Translation2d apply(Translation2d translation) {
@@ -31,7 +35,9 @@ public class AllianceFlipUtil {
   }
 
   public static Rotation2d apply(Rotation2d rotation) {
-    return shouldFlip() ? rotation.rotateBy(Rotation2d.kPi) : rotation;
+    return shouldFlip() 
+        ? rotation.rotateBy(Rotation2d.kPi) 
+        : rotation;
   }
 
   public static Pose2d apply(Pose2d pose) {
@@ -40,15 +46,11 @@ public class AllianceFlipUtil {
         : pose;
   }
 
-  public static Pose2d flip(Pose2d pose) {
-    return new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()));
-  }
-
-  public static ArrayList<Pose2d> flip(List<Pose2d> poses) {
+  public static ArrayList<Pose2d> apply(List<Pose2d> poses) {
     ArrayList<Pose2d> flippedPoses = new ArrayList<Pose2d>();
 
     for (Pose2d pose : poses) {
-      flippedPoses.add(flip(pose));
+      flippedPoses.add(apply(pose));
     }
 
     return flippedPoses;
