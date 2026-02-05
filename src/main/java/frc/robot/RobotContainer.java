@@ -136,12 +136,17 @@ public class RobotContainer {
             }));
 
             // Drop Intake (Light tap needed, no need for hold. Hold until ready to intake, driver holds for the rest, reset automaticly)
+            // An auto system will be made to remove this for faster gameplay.
             operatorXbox.a().onTrue(new InstantCommand(() -> {
                 IntakeCommand.setDown(1);
             }));
 
+            // EMS for Intake (Emergency Use, Reverses Intake to clear)
             operatorXbox.y().whileTrue(new InstantCommand(() -> {
                 IntakeCommand.setEMS(1);
+            }));
+            operatorXbox.y().whileFalse(new InstantCommand(() -> {
+                IntakeCommand.setEMS(0);
             }));
     
        
