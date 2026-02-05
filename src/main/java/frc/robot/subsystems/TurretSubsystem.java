@@ -4,7 +4,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -19,33 +23,89 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.AllianceFlipUtil;
 
 public class TurretSubsystem extends SubsystemBase {
-    // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
+    
+    public enum TurretTargets {
+        // TODO: double check these positions
+        HUB(
+            new Pose3d(
+                Units.inchesToMeters(162.15), 
+                Units.inchesToMeters(182.1),
+                Units.inchesToMeters(72),
+                new Rotation3d()
+            )
+        ),
+        SHUTTLE_LEFT(
+            new Pose3d(
+                Units.inchesToMeters(79.3), 
+                Units.inchesToMeters(79.3),
+                Units.inchesToMeters(0),
+                new Rotation3d()
+            )
+        ),
+        SHUTTLE_RIGHT(
+            new Pose3d(
+                Units.inchesToMeters(238.4), 
+                Units.inchesToMeters(79.3),
+                Units.inchesToMeters(0),
+                new Rotation3d()
+            )
+        ),
+        CUSTOM(
+            new Pose3d(
+                Double.MAX_VALUE,
+                Double.MAX_VALUE,
+                Double.MAX_VALUE,
+                new Rotation3d()
+            )
+        );
 
+        public Pose3d position;
+
+        private TurretTargets(
+            Pose3d position
+        ) {
+            this.position = AllianceFlipUtil.apply(position);
+        }
+    }
+
+    public enum TargetingMode {
+        // like field relative
+        ABSOLUTE,
+        // robot absolute
+        RELATIVE
+    }
+
+    private final SwerveSubsystem swerveSubsystem; 
+    // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
     private final SparkMax m_LauncherMotor;
     private final SparkMax m_YawMotor;
     private final SparkMax m_PitchMotor;
 
     private final RelativeEncoder e_LauncherEncoder;
     private final RelativeEncoder e_YawEncoder;
-    // lets just pray its a  cancoder
+    // lets just pray its a cancoder
     private final CANcoder e_PitchEncoder;
 
-    private double targetLauncherVelocity;
-    private double targetYaw;
-    private double targetPitch;
+    private TurretTargets target;
+    private TargetingMode targetingMode;
+    private Pose3d targetPosition;
 
     private final PIDController launcherPID;
     private final PIDController yawPID;
     private final PIDController pitchPID;
 
-
     // yaw logic
     private boolean yawIsZeroed;
     private double yawOffset;
 
-    public TurretSubsystem() {
+    public TurretSubsystem(
+        SwerveSubsystem swerveSubsystem
+    ) {
+        this.swerveSubsystem = swerveSubsystem;
         // Initialize Motors and Encoders
         m_LauncherMotor = new SparkMax(
             TurretConstants.CanIDs.LAUNCHER_MOTOR, 
@@ -80,6 +140,8 @@ public class TurretSubsystem extends SubsystemBase {
             TurretConstants.Pitch.PID.D
         );
 
+        setTarget(TurretTargets.HUB);
+
         startYawZeroing();
     }
 
@@ -107,12 +169,6 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
-
-    public void setYaw(double angle) {
-        // TODO: limit handling
-        targetYaw = angle;
-    }
-
     public double getYaw() {
         return MathUtil.angleModulus(
             Units.rotationsToRadians(
@@ -125,15 +181,6 @@ public class TurretSubsystem extends SubsystemBase {
         );
     }
 
-    public double getTargetYaw() {
-        return targetYaw;
-    }
-
-    public void setPitch(double angle) {
-        // TODO: limit handling
-        targetPitch = angle;
-    }
-
     public double getPitch() {
         return MathUtil.angleModulus(
             Units.rotationsToRadians(
@@ -143,23 +190,11 @@ public class TurretSubsystem extends SubsystemBase {
         );
     }
 
-    public double getTargetPitch() {
-        return targetPitch;
-    }
-
 
     public double getLauncherVelocity() {
         return m_LauncherMotor.getEncoder().getVelocity();
     }
-
-    public double getTargetLauncherVelocity() {
-        return targetLauncherVelocity;
-    }
-
-    public void setLauncherVelocity(double velocity) {
-        targetLauncherVelocity = velocity; 
-    }
-
+    
     public void startYawZeroing() {
         yawIsZeroed = false;
 
@@ -211,6 +246,44 @@ public class TurretSubsystem extends SubsystemBase {
             })
         ));
         
+    }
+
+    public void setTarget(TurretTargets target) {
+        this.targetingMode = TargetingMode.ABSOLUTE;
+        this.target = target;
+        this.targetPosition = target.position;
+    }
+
+    public void setTarget(Pose3d target) {
+        this.target = TurretTargets.CUSTOM;
+        this.targetPosition = target;
+    }
+
+    public void setTarget(Pose2d target) {
+        this.target = TurretTargets.CUSTOM;
+        this.targetPosition = new Pose3d(target);
+    }
+
+    public void setRelativeTarget(Pose3d target) {
+        setTarget(target);
+        this.targetingMode = TargetingMode.RELATIVE;
+    }
+
+    public void setRelativeTarget(Pose2d target) {
+        setTarget(target);
+        this.targetingMode = TargetingMode.RELATIVE;
+    }
+
+    public TargetingMode getTargetingMode() {
+        return targetingMode;
+    }
+
+    public TurretTargets getTargetName() {
+        return target;
+    }
+    
+    public Pose3d getTargetPosition() {
+        return targetPosition;
     }
 }
 
