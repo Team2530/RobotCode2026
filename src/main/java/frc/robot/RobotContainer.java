@@ -9,22 +9,20 @@ import java.util.function.Consumer;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import choreo.auto.AutoChooser;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
 import frc.robot.subsystems.Limelight;
@@ -40,18 +38,6 @@ import frc.robot.subsystems.Limelight;
  */
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
-
-    // TODO: ADD Limelights
-    // private static final Limelight LL_name = new Limelight(LimelightType.LL4, "limelight-name", true, true);
-
-    // TODO: initalize Limelight container
-    // @Logged
-    // public static final LimelightContainer LLContainer = new LimelightContainer(LL_name1, LL_name2, LL_name3);
-    
-    
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-
-
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
     private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
@@ -65,7 +51,7 @@ public class RobotContainer {
     // @Logged
     public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
-    private final SendableChooser<Command> autoChooser;
+    private final AutoChooser autoChooser;
 
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
@@ -92,36 +78,29 @@ public class RobotContainer {
         // NamedCommands.registerCommand(null, getAutonomousCommand());
 
         swerveDriveSubsystem.configurePathplanner();
-        autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser = new AutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
-
         autoChooser.onChange(new Consumer<Command>() {
             @Override
             public void accept(Command t) {
                 if (t instanceof PathPlannerAuto) {
                     PathPlannerAuto auto = (PathPlannerAuto) t;
-                    swerveDriveSubsystem.setAutoStartingPose(auto.getStartingPose());
+                    swerveDriveSubsystem
+                        .getField()
+                        .getObject("autoStart")
+                        .setPose(
+                            AllianceFlipUtil.apply(
+                                auto.getStartingPose()
+                            )
+                        );
                 }
             }
         });
     }
 
-    private Command shootTurret(){
-        return new InstantCommand(() -> {
-            new ParallelCommandGroup(
-                //shooter, turret, and indexer will go here
-            );
-        });
-    }
+    
 
-    private Command intaking(){
-        return new InstantCommand(() -> {
-            new ParallelCommandGroup(
-               new IntakeCommand(intakeSubsystem)
-                //putting down the intake will go here
-            );
-        });
-    }
+
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
      * created via the
@@ -139,9 +118,6 @@ public class RobotContainer {
     private void configureBindings() {
        //This is ment for operator controls
        
-       operatorXbox.leftTrigger().whileTrue(intaking());
-       operatorXbox.rightTrigger().whileTrue(shootTurret());
-
     }
 
     /**
@@ -150,7 +126,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        swerveDriveSubsystem.setGyroToEstimate();
         return autoChooser.getSelected();
     }
 
