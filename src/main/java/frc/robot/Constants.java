@@ -251,19 +251,6 @@ public final class Constants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
     public static final boolean LOG_TO_NETWORKTABLES = true;
   }
-
-  public static final class PathPlannerConstants {
-
-    // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
-    public static final PIDConstants TRANSLATION_PID = new PIDConstants(15.0, 0, 0.005);
-    public static final PIDConstants ROTATION_PID = new PIDConstants(9.0, 0, 0.03); // was 10 and 9
-
-    public static final PPHolonomicDriveController HOLONOMIC_FOLLOWER_CONTROLLER = new PPHolonomicDriveController(
-        TRANSLATION_PID,
-        ROTATION_PID);
-    }
-    
-
   public static final class PoseConstants {
 
     public static final double kPositionStdDevX = 0.1;
