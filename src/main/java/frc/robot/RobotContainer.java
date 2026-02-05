@@ -135,7 +135,7 @@ public class RobotContainer {
                 IntakeCommand.setStart(0);
             }));
 
-            // Drop Intake (Light tap needed, no need for hold)
+            // Drop Intake (Light tap needed, no need for hold. Hold until ready to intake, driver holds for the rest, reset automaticly)
             operatorXbox.a().onTrue(new InstantCommand(() -> {
                 IntakeCommand.setDown(1);
             }));
