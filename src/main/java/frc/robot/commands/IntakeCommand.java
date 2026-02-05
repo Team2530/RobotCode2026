@@ -45,6 +45,12 @@ public class IntakeCommand extends Command {
 
             }
         }
+        if (EMS == 1) {
+            subsystem.setIntakePreset(IntakePresets.INTAKECLEAR);
+            if (EMS == 0) {
+                subsystem.setIntakePreset(IntakePresets.IDLE);
+            }
+        }
         
     }
     private static double start;
@@ -62,5 +68,13 @@ public class IntakeCommand extends Command {
     } 
     public double getdown() {
         return down;
+    }
+    private static double EMS;
+    
+    public static void setEMS(double ems) {
+        IntakeCommand.EMS = ems;
+    } 
+    public double getEMG() {
+        return EMS;
     }
 }

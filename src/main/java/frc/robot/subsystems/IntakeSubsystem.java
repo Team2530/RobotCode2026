@@ -31,8 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
           
     public void setIntakePreset(IntakePresets intake) {
       this.intakePreset = intake;
-      boolean intakeActive = intake == IntakePresets.INTAKE;
-      boolean intakeInactive = intake == IntakePresets.IDLE;
+      
       if (IntakePresets.OUT == intake) {
         m_intakerotationMotor.set(Constants.IntakeMotors.INTAKE_PIVOT_SPEED);
         new WaitCommand(1);// TODO: Change so that it got to the right position
@@ -60,6 +59,9 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
         
         }
       }
+      if (IntakePresets.INTAKECLEAR == intake) {
+        m_intakesubsystemMotor.set(-Constants.IntakeMotors.INTAKE_SPEED);
+      }
     }
     
        
@@ -69,6 +71,7 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
     
     public enum IntakePresets {
       OUT,
+      INTAKECLEAR,
       INTAKE,
       IDLE,
   }

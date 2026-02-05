@@ -139,6 +139,10 @@ public class RobotContainer {
             operatorXbox.a().onTrue(new InstantCommand(() -> {
                 IntakeCommand.setDown(1);
             }));
+
+            operatorXbox.y().whileTrue(new InstantCommand(() -> {
+                IntakeCommand.setEMS(1);
+            }));
     
        
     }
