@@ -58,15 +58,19 @@ public class RobotContainer {
     // @Logged
     public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
+    //Subsystems
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+
+    public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    
 
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     @Logged
     private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
 
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    
 
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -122,9 +126,11 @@ public class RobotContainer {
      */
     private void configureBindings() {
        //This is ment for operator controls
-        operatorXbox.leftTrigger().whileTrue(getIntakingCommand());
+        operatorXbox.leftTrigger().onTrue(new InstantCommand(() -> {
+            intakeSubsystem.setIntakePreset(IntakePresets.INTAKE);
+        }));
         operatorXbox.rightTrigger().whileTrue(getShootingCommand());
-
+        
     }
 
     /**
