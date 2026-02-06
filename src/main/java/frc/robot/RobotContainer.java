@@ -52,7 +52,7 @@ public class RobotContainer {
     public final CommandXboxController operatorXbox = new CommandXboxController(
             ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
-    private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
@@ -110,7 +110,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        swerveDriveSubsystem.setGyroToEstimate();
         return autoChooser.getSelected();
     }
 
