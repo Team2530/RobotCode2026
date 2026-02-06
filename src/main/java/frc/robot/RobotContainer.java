@@ -78,20 +78,9 @@ public class RobotContainer {
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
 
-        swerveDriveSubsystem.configurePathplanner();
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-
-        autoChooser.onChange(new Consumer<Command>() {
-            @Override
-            public void accept(Command t) {
-                if (t instanceof PathPlannerAuto) {
-                    PathPlannerAuto auto = (PathPlannerAuto) t;
-                    swerveDriveSubsystem.setAutoStartingPose(auto.getStartingPose());
-                }
-            }
-        });
+    
     }
+
 
     
 

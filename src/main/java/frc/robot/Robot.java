@@ -8,9 +8,10 @@ import org.littletonrobotics.urcl.URCL;
 
 import com.ctre.phoenix6.SignalLogger;
 
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.EpilogueConfiguration;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -44,8 +45,6 @@ public class Robot extends TimedRobot {
   @Logged
   private RobotContainer m_robotContainer;
 
-  public static SendableChooser<String> autoChooser = new SendableChooser<>();
-
   double lastLoopTime = Timer.getFPGATimestamp();
   @Logged
   double loopTime = 0.02;
@@ -71,12 +70,11 @@ public class Robot extends TimedRobot {
       URCL.start(DataLogManager.getLog());
     }
 
-    Epilogue.configure(config -> {
-      config.backend = new FileBackend(DataLogManager.getLog());
-      config.minimumImportance = Logged.Importance.DEBUG;
-    });
+    // TODO: Check if this is correct
+    EpilogueConfiguration config = new EpilogueConfiguration();
+    config.backend = new FileBackend(DataLogManager.getLog());
 
-    Epilogue.bind(this);
+    // Epilogue.bind(this);
   }
 
   /**
@@ -87,8 +85,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-
-    SmartDashboard.putData(autoChooser);
 
     // Put git/code version metadata on networktables
     NetworkTable versionTable = NetworkTableInstance.getDefault().getTable("Version");
@@ -113,7 +109,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     double startTime = Timer.getFPGATimestamp();
-    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run(); 
 
     double currentTime = Timer.getFPGATimestamp();
     loopTime = currentTime - lastLoopTime;
@@ -126,9 +122,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {
-    m_robotContainer.getSwerveSubsystem().stopDrive();
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {
