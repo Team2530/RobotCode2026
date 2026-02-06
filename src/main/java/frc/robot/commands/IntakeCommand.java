@@ -73,6 +73,7 @@ public class IntakeCommand extends Command {
     public double getdown() {
         return down;
     }
+    //EMS (Emergency Management system)
     private static double EMS;
     
     public static void setEMS(double ems) {
