@@ -10,28 +10,27 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import frc.robot.Robot;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.Constants;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 public class LauncherSubsystem extends SubsystemBase {
     private static final int LauncherID = Constants.TurretConstants.FlyWheelID;
     private static final double LauncherSpeed = Constants.TurretConstants.FlyWheelSpeed;
     public static SwerveSubsystem SwerveSubsystem;
 
-    private final SparkFlex m_Motor;
+    private final TalonFX m_Motor;
     
     
 
   /** Creates a new ExampleSubsystem. */  
   public LauncherSubsystem() {
-    m_Motor = new SparkFlex(LauncherID, MotorType.kBrushless);
+    m_Motor = new TalonFX(LauncherID);
   }
+
 
   void setCoastMode() {
     SparkMaxConfig config = new SparkMaxConfig();

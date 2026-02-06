@@ -4,7 +4,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-import com.revrobotics.spark.SparkFlex;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -14,24 +15,22 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
 
     
 
-    private final SparkFlex m_intakesubsystemMotor;
-    private final SparkFlex m_intakerotationMotor;
+    private final TalonFX m_intakesubsystemMotor;
+    private final SparkMax m_intakerotationMotor;
     private IntakePresets intakePreset;
     
     public IntakeSubsystem() {
-      m_intakesubsystemMotor = new SparkFlex(Constants.IntakeMotors.INTAKESUBSYSTEM_MOTOR, MotorType.kBrushless);//TODO: Change to ACTUAL motor type
-      m_intakerotationMotor = new SparkFlex(Constants.IntakeMotors.INTAKE_PIVOT_MOTOR, MotorType.kBrushless);
+      m_intakesubsystemMotor = new TalonFX(Constants.IntakeMotors.INTAKESUBSYSTEM_MOTOR);
+      m_intakerotationMotor = new SparkMax(Constants.IntakeMotors.INTAKE_PIVOT_MOTOR,MotorType.kBrushless);
     }
     public void runIntake() {
     m_intakesubsystemMotor.set(Constants.IntakeMotors.INTAKE_SPEED);
         
-    }//TODO: Update m_intakeMotor when fixed
-      //After intake is touching the floor, activate the intake entry motor.
-      // When released, Lift Intake and reverse motor for 2 secs at x2 speed. (NOT DONE)
+    }
           
     public void setIntakePreset(IntakePresets intake) {
       this.intakePreset = intake;
-      
+
       if (IntakePresets.OUT == intake) {
         m_intakerotationMotor.set(Constants.IntakeMotors.INTAKE_PIVOT_SPEED);
         new WaitCommand(1);// TODO: Change so that it got to the right position

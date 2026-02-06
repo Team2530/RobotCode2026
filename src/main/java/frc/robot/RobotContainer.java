@@ -136,7 +136,7 @@ public class RobotContainer {
             }));
 
             // Drop Intake (Light tap needed, no need for hold. Hold until ready to intake, driver holds for the rest, reset automaticly)
-            // An auto system will be made to remove this for faster gameplay.
+            // An auto system will be made to remove this for faster gameplay. (all you got to do is replace the check for down with start :>)
             operatorXbox.a().onTrue(new InstantCommand(() -> {
                 IntakeCommand.setDown(1);
             }));
