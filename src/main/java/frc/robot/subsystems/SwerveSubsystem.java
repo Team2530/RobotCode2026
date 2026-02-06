@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
@@ -357,6 +358,25 @@ public class SwerveSubsystem extends SubsystemBase {
         return swerveDrive.getPose();
     }
     
+    public ChassisSpeeds getVelocity() {
+        return swerveDrive.getFieldVelocity();
+    }
+
+    public double getXVelocity() {
+        return getVelocity().vxMetersPerSecond;
+    }
+
+    public double getYVelocity() {
+        return getVelocity().vyMetersPerSecond;
+    }
+
+    /*
+     * angular velocity in radians per second
+     */
+    public double getAngularVelocity() {
+        return getVelocity().omegaRadiansPerSecond;
+    }
+
     public Rotation3d getRotation() {
         return swerveDrive.getGyroRotation3d();
     }
