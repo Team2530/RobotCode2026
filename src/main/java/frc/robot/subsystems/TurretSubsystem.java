@@ -33,6 +33,9 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
@@ -108,9 +111,12 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final SwerveSubsystem swerveSubsystem; 
     // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
+    private final TalonFX m_XLauncherMotor; //x60
+    private final TalonFX m_XYawMotor;      //x40
     private final SparkMax m_LauncherMotor;
     private final SparkMax m_YawMotor;
-    private final SparkMax m_PitchMotor;
+    private final SparkMax m_PitchMotor;   //Neo 550
+
 
     private final RelativeEncoder e_LauncherEncoder;
     private final RelativeEncoder e_YawEncoder;
@@ -120,6 +126,8 @@ public class TurretSubsystem extends SubsystemBase {
     private TurretTargets target;
     private TargetingMode targetingMode;
     private Pose3d targetPosition;
+    private Translation3d toTarget; 
+    private Translation3d targetRobotRelative;
 
     private final PIDController launcherPID;
     private final PIDController yawPID;
@@ -132,17 +140,22 @@ public class TurretSubsystem extends SubsystemBase {
     private boolean yawIsZeroed;
     private double yawOffset;
 
-    public TurretSubsystem(
-        SwerveSubsystem swerveSubsystem
-    ) {
+
+    public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
         this.swerveSubsystem = swerveSubsystem;
         // Initialize Motors and Encoders
+        m_XLauncherMotor = new TalonFX(
+            TurretConstants.CanIDs.LAUNCHER_MOTOR 
+            );
+        m_XYawMotor = new TalonFX(
+            TurretConstants.CanIDs.YAW_MOTOR 
+            );
         m_LauncherMotor = new SparkMax(
-            TurretConstants.CanIDs.LAUNCHER_MOTOR, 
+            TurretConstants.CanIDs.LAUNCHER_MOTOR,
             MotorType.kBrushless
         );
         m_YawMotor = new SparkMax(
-            TurretConstants.CanIDs.YAW_MOTOR, 
+            TurretConstants.CanIDs.YAW_MOTOR,
             MotorType.kBrushless
         );
         m_PitchMotor = new SparkMax(
@@ -189,21 +202,35 @@ public class TurretSubsystem extends SubsystemBase {
 
         startYawZeroing();
     }
-
+    
     private double calculateError(
-        double yaw,
+        double yaw, 
         double pitch,
-        double velocity,
+        double speed,
         double time
     ) {
-        return 0;
+        double g = 9.81; // m/s^2
+        double dbx = speed * Math.cos(pitch) * Math.cos(yaw) * time;
+        // X component of the ball's position relative to the robot. 
+        double dby = speed * Math.cos(pitch) * Math.sin(yaw) * time;
+        // Y component of the ball's position relative to the robot. 
+        double dbz = (-.5 * g * time * time) + (speed * Math.sin(pitch) * time);
+        // Z (vertical) component of the ball's position relative to the robot. 
+
+
+        double squaredError = (dbx - targetRobotRelative.getX()) * (dbx - targetRobotRelative.getX())
+                            + (dby - targetRobotRelative.getY()) * (dby - targetRobotRelative.getY())
+                            + (dbz - targetRobotRelative.getZ()) * (dbz - targetRobotRelative.getZ());
+        // targetRobotRelative is 
+
+        return (squaredError); // Return error squared to avoid sqrt for optimization. 
+                            // For this, minimizing squared error should be equivalent to minimizing error. 
     }
 
     @Override
     public void periodic() {
         if (yawIsZeroed) {
             // get difference to target
-            Translation3d toTarget;
             switch (targetingMode) {
                 case ABSOLUTE:
                     toTarget = targetPosition
@@ -218,53 +245,61 @@ public class TurretSubsystem extends SubsystemBase {
                     );
                     break;
             }
-
-            // use difference to set guess and optimize from there
-            // TODO: set guesses with `toTarget`
-            double[] guess = {
-                // yaw
-                // pitch
-                // velocity
-                // time
-            };
-
-            double[] targetOptimum = targetingOptimizer.optimize(
-                new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
-                new ObjectiveFunction(optimizerFunction),
-                GoalType.MINIMIZE,
-                new InitialGuess(guess),
-                new SimpleBounds(
-                    TurretConstants.TargetingOptimizer.LOWER_BOUNDS, 
-                    TurretConstants.TargetingOptimizer.UPPER_BOUNDS
-                )
-            ).getPoint();
-
-            double optimalYaw = targetOptimum[0];
-            double optimalPitch = targetOptimum[1];
-            double optimalVelocity = targetOptimum[2];
-            // i don't think we need time?
-
-            // calculate voltages and send to motors
-            m_LauncherMotor.setVoltage(
-                launcherPID.calculate(
-                    getLauncherVelocity(), 
-                    calculateExitToLauncherVelocity(optimalVelocity)
-                )
-            );
-            m_YawMotor.setVoltage(
-                yawPID.calculate(
-                    getYaw(),
-                    optimalYaw
-                )
-            );
-            m_PitchMotor.setVoltage(
-                pitchPID.calculate(
-                    getPitch(),
-                    optimalPitch
-                )
-            );
+            targetRobotRelative = toTarget;
         }
+
+        
+        // use difference to set guess and optimize from there
+        // TODO: set guesses with `toTarget`
+        double targetDistance = Math.sqrt(
+            ((targetRobotRelative.getX())*(targetRobotRelative.getX()))
+            +((targetRobotRelative.getY())*(targetRobotRelative.getY())) 
+        );
+        double[] guess = {
+            // Start optimizer at current position to reduce optimization time.
+            getYaw(),               
+            getPitch(),
+            getLauncherVelocity(),
+            0
+        };
+
+        double[] targetOptimum = targetingOptimizer.optimize(
+            new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
+            new ObjectiveFunction(optimizerFunction),
+            GoalType.MINIMIZE,
+            new InitialGuess(guess),
+            new SimpleBounds(
+                TurretConstants.TargetingOptimizer.LOWER_BOUNDS, 
+                TurretConstants.TargetingOptimizer.UPPER_BOUNDS
+            )
+        ).getPoint();
+
+        double optimalYaw = targetOptimum[0];
+        double optimalPitch = targetOptimum[1];
+        double optimalVelocity = targetOptimum[2];
+        // i don't think we need time?
+
+        // calculate voltages and send to motors
+        m_LauncherMotor.setVoltage(
+            launcherPID.calculate(
+                getLauncherVelocity(), 
+                calculateExitToLauncherVelocity(optimalVelocity)
+            )
+        );
+        m_YawMotor.setVoltage(
+            yawPID.calculate(
+                getYaw(),
+                optimalYaw
+            )
+        );
+        m_PitchMotor.setVoltage(
+            pitchPID.calculate(
+                getPitch(),
+                optimalPitch
+            )
+        );
     }
+    
 
     public double getYaw() {
         return MathUtil.angleModulus(
@@ -406,4 +441,3 @@ public class TurretSubsystem extends SubsystemBase {
         );
     }
 }
-

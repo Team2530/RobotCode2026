@@ -31,15 +31,13 @@ public class TurretCommand extends Command {
     // Called repeatedly while the command is scheduled.
     @Override
     public void execute() {
-        m_LauncherSubsystem.runLauncher();
-        m_LauncherSubsystem.angleTurret(180);
+
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         // This is crucial: stop the motor when the command ends (i.e., button is released)
-        m_LauncherSubsystem.stopLauncher();
     }
 
     // Returns true when the command should end.

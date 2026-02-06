@@ -61,7 +61,7 @@ public class RobotContainer {
     @Logged
     private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
 
-    public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
+    // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -95,8 +95,7 @@ public class RobotContainer {
      * joysticks}.
      */
     private void configureBindings() {
-        operatorXbox.a()
-            .whileTrue(new TurretCommand(TURRET_SUBSYSTEM));
+
         
     }
 
