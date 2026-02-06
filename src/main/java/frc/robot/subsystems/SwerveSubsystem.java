@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-
+import edu.wpi.first.units.measure.Distance;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -35,13 +35,15 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.Constants.choreoConstants;
+
 
 public class SwerveSubsystem extends SubsystemBase {
-
+    //Choreo PID Controllers
     private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
     private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
     private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
-
+    
     private final SwerveDrive swerveDrive;
 
     private final SendableChooser<SwerveGearing> gearChooser;
@@ -322,6 +324,8 @@ public class SwerveSubsystem extends SubsystemBase {
      public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = getPose();
+        
+        double length = choreoConstants.myLengthVariable;
 
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(

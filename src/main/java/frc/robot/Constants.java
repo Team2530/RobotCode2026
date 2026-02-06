@@ -6,12 +6,16 @@ package frc.robot;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Optional;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import choreo.Choreo;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,8 +23,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.DriveConstants.PIDs.Drive;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
@@ -253,7 +260,12 @@ public final class Constants {
     }
 
   }
-
+  public static final class choreoConstants {
+    public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
+    public static final double myLengthVariable = Units.inchesToMeters(39.3701);
+    
+  
+  }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
     public static final boolean LOG_TO_NETWORKTABLES = true;
