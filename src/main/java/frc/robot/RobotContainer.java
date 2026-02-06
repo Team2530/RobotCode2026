@@ -17,8 +17,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -91,25 +93,9 @@ public class RobotContainer {
     private boolean intakeDown = false;
     
     //TODO: Fix this with grouped commands 
-    private Command getIntakingCommand() {
-        //if (!intakeDown){
-            intakeDown = true;
-            return new ParallelCommandGroup(
-                new IntakeCommand(intakeSubsystem)
-                //intake down here
-            );
-        //}
-        
     
-       
-        
-    }
 
-    private Command getShootingCommand() {
-        return new ParallelCommandGroup(
-            //putting up shooting, turret, and indexer commands here
-        );
-    }
+   
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
      * created via the
@@ -126,10 +112,27 @@ public class RobotContainer {
      */
     private void configureBindings() {
        //This is ment for operator controls
-        operatorXbox.leftTrigger().onTrue(new InstantCommand(() -> {
-            intakeSubsystem.setIntakePreset(IntakePresets.INTAKE);
-        }));
-        operatorXbox.rightTrigger().whileTrue(getShootingCommand());
+
+       //Intake Controls
+       //Will need to add intake down all of this is filler for now
+        operatorXbox.leftTrigger().whileTrue(new SequentialCommandGroup(
+            new ConditionalCommand(
+                new InstantCommand(() -> {
+                    intakeDown = true;
+                    if (intakeDown) {
+                        intakeSubsystem.setIntakePreset(IntakePresets.INTAKE);
+                    } else {
+                        intakeSubsystem.setIntakePreset(IntakePresets.IDLE);
+                    }
+                }),
+                new InstantCommand(),
+                () -> intakeDown
+               //intake down here
+            ))).whileTrue(new IntakeCommand(intakeSubsystem));
+        
+
+
+        //operatorXbox.rightTrigger().whileTrue(shooting, indexer, turret commands);
         
     }
 
