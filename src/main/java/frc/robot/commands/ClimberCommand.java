@@ -18,6 +18,10 @@ import frc.robot.Robot;
 import frc.robot.subsystems.ClimberSubsystem;
 //import frc.robot.RobotContainer;
 
+/*
+ * FILE POSSIBLE WILL BE DEPRICATED FOR TOURNAMENT
+ *  -PRIORITY SWITCH, HOLD TILL FURTHER NOTICE-
+ */
 public class ClimberCommand extends Command {
     private final ClimberSubsystem subsystem1;
     
