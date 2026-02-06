@@ -258,12 +258,6 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             );
 
-            double currentYawVelocity = e_YawEncoder.getVelocity()
-                + (
-                      1
-                );
-
-
             m_YawMotor.setVoltage(
                 yawPID.calculate(
                     getYaw(),
