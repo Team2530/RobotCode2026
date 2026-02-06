@@ -276,7 +276,19 @@ public final class Constants {
     // TODO: UPDATE BASED ON REAL ROBOT
     public static final class Launcher {
         // inches
-        public static final double WHEEL_DIAMETER =4;
+        public static final double WHEEL_DIAMETER = 4;
+
+        public static final class Flywheel {
+            // WARNING: there are two of these
+            // TODO: update
+            public static final double ROTATIONAL_INERTIA_PER = 1;
+            
+            public static final class Offset {
+                // meters relative to the center of rotation of the yaw
+                public static final double x = 1;
+                public static final double y = 1;
+            }
+        }
 
         public static final class PID {
             public static final double P = 1;
@@ -304,6 +316,12 @@ public final class Constants {
             public static final double P = 1;
             public static final double I = 0;
             public static final double D = 0;
+        }
+
+        public static final class Feedforward {
+            public static final double kS = 0;
+            public static final double kV = 0;
+            public static final double kA = 0;
         }
     }
 

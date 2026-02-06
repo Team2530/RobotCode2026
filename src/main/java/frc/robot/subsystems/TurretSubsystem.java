@@ -2,12 +2,14 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
@@ -18,10 +20,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+import java.util.function.Consumer;
+
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
@@ -109,6 +112,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final PIDController yawPID;
     private final PIDController pitchPID;
 
+    private final SimpleMotorFeedforward yawFeedforward;
+
     private final BOBYQAOptimizer targetingOptimizer;
     private final MultivariateFunction optimizerFunction;
 
@@ -154,6 +159,12 @@ public class TurretSubsystem extends SubsystemBase {
             TurretConstants.Pitch.PID.D
         );
 
+        yawFeedforward = new SimpleMotorFeedforward(
+            TurretConstants.Yaw.Feedforward.kS,
+            TurretConstants.Yaw.Feedforward.kV,
+            TurretConstants.Yaw.Feedforward.kA
+        );
+
         targetingOptimizer = new BOBYQAOptimizer(
             TurretConstants.TargetingOptimizer.INTERPOLATION_POINTS
         );
@@ -183,6 +194,20 @@ public class TurretSubsystem extends SubsystemBase {
         return 0;
     }
 
+    private double relativeAngularVelocityFromLinear(
+        Translation2d toTarget,
+        Translation2d velocity
+    ) {
+        return Math.acos(
+            toTarget.dot(
+                toTarget.plus(velocity)
+            ) / (
+                toTarget.getNorm() 
+                    * toTarget.plus(velocity).getNorm()
+            )
+        );
+    }
+
     @Override
     public void periodic() {
         if (yawIsZeroed) {
@@ -195,11 +220,8 @@ public class TurretSubsystem extends SubsystemBase {
                         .getTranslation();
                     break;
                 case RELATIVE:
-                    toTarget = new Translation3d(
-                        targetPosition.getX(),       
-                        targetPosition.getY(),       
-                        targetPosition.getZ()
-                    );
+                default:
+                    toTarget = targetPosition.getTranslation();
                     break;
             }
 
@@ -235,12 +257,50 @@ public class TurretSubsystem extends SubsystemBase {
                     calculateExitToLauncherVelocity(optimalVelocity)
                 )
             );
+
+            double currentYawVelocity = e_YawEncoder.getVelocity()
+                + (
+                      1
+                );
+
+
             m_YawMotor.setVoltage(
                 yawPID.calculate(
                     getYaw(),
                     optimalYaw
+                ) 
+                // WARNING: dogshit code
+                //
+                // compensate for drivebase movement
+                // essentially, find the change in yaw because of translation,
+                // then offset by the actual yaw velocity
+                + yawFeedforward.calculateWithVelocities(
+                    // translation-based yaw change
+                    relativeAngularVelocityFromLinear(
+                        toTarget.toTranslation2d(),
+                        new Translation2d(
+                            swerveSubsystem.getXVelocity(),
+                            swerveSubsystem.getYVelocity()
+                        )
+                    ),
+                    // turret + swerve rotation based yaw change
+                    e_YawEncoder.getVelocity()
+                        + relativeAngularVelocityFromLinear(
+                            toTarget.toTranslation2d(),
+                            // TODO: check the polarity of this difference
+                            getLauncherPosition().relativeTo(
+                                getLauncherPosition().rotateBy(
+                                    new Rotation3d(
+                                        0,
+                                        0,
+                                        swerveSubsystem.getAngularVelocity()
+                                    )
+                                )
+                            ).toPose2d().getTranslation()
+                        )
                 )
             );
+
             m_PitchMotor.setVoltage(
                 pitchPID.calculate(
                     getPitch(),
