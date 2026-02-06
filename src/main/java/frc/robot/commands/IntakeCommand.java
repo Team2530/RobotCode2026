@@ -61,6 +61,10 @@ public class IntakeCommand extends Command {
     public double getstart() {
         return start;
     }
+/*  
+    // DOWN IS BEING DEPRECATED WHEN IT IS NECESSARY \\
+    \\  REMOVE AND CHANGE DOWN ( REPLACED BY START ) //
+*/
     private static double down;
     
     public static void setDown(double down) {

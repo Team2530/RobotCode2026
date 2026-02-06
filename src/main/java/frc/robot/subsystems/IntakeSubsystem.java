@@ -33,6 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINAL
 
       if (IntakePresets.OUT == intake) {
         m_intakerotationMotor.set(Constants.IntakeMotors.INTAKE_PIVOT_SPEED);
+        SmartDashboard.putString("Intake Subsystem", "Deployed");
         new WaitCommand(1);// TODO: Change so that it got to the right position
         m_intakerotationMotor.set(0);
         if (IntakePresets.INTAKE == intake) {
