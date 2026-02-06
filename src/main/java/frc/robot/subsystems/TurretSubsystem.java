@@ -90,22 +90,6 @@ public class TurretSubsystem extends SubsystemBase {
         RELATIVE
     }
 
-    private class TurretState {
-        public final double yaw;
-        public final double pitch;
-        public final double launcherVelocity;
-    
-        public TurretState(
-            double yaw,
-            double pitch,
-            double launcherVelocity
-        ) {
-            this.yaw = yaw;
-            this.pitch = pitch;
-            this.launcherVelocity = launcherVelocity;
-        }
-    }
-
     private final SwerveSubsystem swerveSubsystem; 
     // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
     private final SparkMax m_LauncherMotor;
