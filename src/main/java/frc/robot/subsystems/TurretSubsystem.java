@@ -12,6 +12,10 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -96,6 +100,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private final SwerveSubsystem swerveSubsystem; 
+
     // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
     private final TalonFX m_XLauncherMotor; //x60
     private final TalonFX m_XYawMotor;      //x40
@@ -103,28 +108,32 @@ public class TurretSubsystem extends SubsystemBase {
     private final SparkMax m_YawMotor;
     private final SparkMax m_PitchMotor;   //Neo 550
 
-
     private final RelativeEncoder e_LauncherEncoder;
     private final RelativeEncoder e_YawEncoder;
     // lets just pray its a cancoder
     private final CANcoder e_PitchEncoder;
 
-    private TurretTargets target;
-    private TargetingMode targetingMode;
-    private Pose3d targetPosition;
-
+    // motor control
     private final PIDController launcherPID;
     private final PIDController yawPID;
     private final PIDController pitchPID;
 
     private final SimpleMotorFeedforward yawFeedforward;
 
-    private final BOBYQAOptimizer targetingOptimizer;
+    // targets
+    private TurretTargets target;
+    private TargetingMode targetingMode;
+    private Pose3d targetPosition;
+
 
     // yaw logic
     private boolean yawIsZeroed;
     private double yawOffset;
 
+    private final BOBYQAOptimizer targetingOptimizer;
+
+    // logging
+    private final StructPublisher<Pose3d> TargetPositionPublisher;
 
     public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
         this.swerveSubsystem = swerveSubsystem;
@@ -181,6 +190,10 @@ public class TurretSubsystem extends SubsystemBase {
         setTarget(TurretTargets.HUB);
 
         startYawZeroing();
+
+        TargetPositionPublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("/Turret/Target_position", Pose3d.struct)
+            .publish();
     }
 
     private double relativeAngularVelocityFromLinear(
@@ -339,6 +352,51 @@ public class TurretSubsystem extends SubsystemBase {
                     optimalPitch
                 )
             );
+
+            TargetPositionPublisher.set(
+                swerveSubsystem.get3dPose()
+                    .plus(
+                        new Transform3d(
+                            toTarget,
+                            new Rotation3d()
+                        )
+                    )
+            );
+            // launcher
+            SmartDashboard.putNumber(
+                "Turret/Launcher/Target_velocity", 
+                optimalVelocity
+            );
+            SmartDashboard.putNumber(
+                "Turret/Launcher/Current_velocity",
+                getLauncherVelocity()
+            );
+            // yaw
+            SmartDashboard.putNumber(
+                "Turret/Yaw/Target_yaw",
+                optimalYaw
+            );
+            SmartDashboard.putNumber(
+                "Turret/Yaw/Current_yaw",
+                getYaw() 
+            );
+            SmartDashboard.putNumber(
+                "Turret/Yaw/Current_velocity",
+                getYawVelocity()
+            );
+            // pitch
+            SmartDashboard.putNumber(
+                "Turret/Pitch/Target_pitch",
+                optimalPitch
+            );
+            SmartDashboard.putNumber(
+                "Turret/Pitch/Current_pitch",
+                getPitch()   
+            );
+            SmartDashboard.putNumber(
+                "Turret/Pitch/Current_velocity",
+                getPitchVelocity()   
+            );
         }
     }
     
@@ -355,12 +413,26 @@ public class TurretSubsystem extends SubsystemBase {
         );
     }
 
+    public double getYawVelocity() {
+        return Units.rotationsToRadians(
+            e_YawEncoder.getVelocity() 
+                / TurretConstants.Yaw.GEAR_RATIO
+        );
+    }
+
     public double getPitch() {
         return MathUtil.angleModulus(
             Units.rotationsToRadians(
                 e_PitchEncoder.getPosition().getValueAsDouble() 
                     / TurretConstants.Pitch.GEAR_RATIO
             )
+        );
+    }
+
+    public double getPitchVelocity() {
+        return Units.rotationsToRadians(
+            e_PitchEncoder.getVelocity().getValueAsDouble()
+                / TurretConstants.Pitch.GEAR_RATIO
         );
     }
 
