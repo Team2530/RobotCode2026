@@ -20,8 +20,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-import java.util.function.Consumer;
-
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -40,6 +38,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 
@@ -113,8 +112,6 @@ public class TurretSubsystem extends SubsystemBase {
     private TurretTargets target;
     private TargetingMode targetingMode;
     private Pose3d targetPosition;
-    private Translation3d toTarget; 
-    private Translation3d targetRobotRelative;
 
     private final PIDController launcherPID;
     private final PIDController yawPID;
@@ -123,7 +120,6 @@ public class TurretSubsystem extends SubsystemBase {
     private final SimpleMotorFeedforward yawFeedforward;
 
     private final BOBYQAOptimizer targetingOptimizer;
-    private final MultivariateFunction optimizerFunction;
 
     // yaw logic
     private boolean yawIsZeroed;
@@ -181,45 +177,10 @@ public class TurretSubsystem extends SubsystemBase {
         targetingOptimizer = new BOBYQAOptimizer(
             TurretConstants.TargetingOptimizer.INTERPOLATION_POINTS
         );
-        optimizerFunction = new MultivariateFunction() {
-            @Override
-            public double value(double[] point) {
-                return calculateError(
-                        point[0],
-                        point[1],
-                        point[2],
-                        point[3]
-                );
-            }
-        };
 
         setTarget(TurretTargets.HUB);
 
         startYawZeroing();
-    }
-    
-    private double calculateError(
-        double yaw, 
-        double pitch,
-        double speed,
-        double time
-    ) {
-        double g = 9.81; // m/s^2
-        double dbx = speed * Math.cos(pitch) * Math.cos(yaw) * time;
-        // X component of the ball's position relative to the robot. 
-        double dby = speed * Math.cos(pitch) * Math.sin(yaw) * time;
-        // Y component of the ball's position relative to the robot. 
-        double dbz = (-.5 * g * time * time) + (speed * Math.sin(pitch) * time);
-        // Z (vertical) component of the ball's position relative to the robot. 
-
-
-        double squaredError = (dbx - targetRobotRelative.getX()) * (dbx - targetRobotRelative.getX())
-                            + (dby - targetRobotRelative.getY()) * (dby - targetRobotRelative.getY())
-                            + (dbz - targetRobotRelative.getZ()) * (dbz - targetRobotRelative.getZ());
-        // targetRobotRelative is 
-
-        return (squaredError); // Return error squared to avoid sqrt for optimization. 
-                            // For this, minimizing squared error should be equivalent to minimizing error. 
     }
 
     private double relativeAngularVelocityFromLinear(
@@ -240,6 +201,7 @@ public class TurretSubsystem extends SubsystemBase {
     public void periodic() {
         if (yawIsZeroed) {
             // get difference to target
+            Translation3d toTarget;
             switch (targetingMode) {
                 case ABSOLUTE:
                     toTarget = targetPosition
@@ -251,15 +213,63 @@ public class TurretSubsystem extends SubsystemBase {
                     toTarget = targetPosition.getTranslation();
                     break;
             }
-            targetRobotRelative = toTarget;
 
             // use difference to set guess and optimize from there
-            // TODO: set guesses with `toTarget`
             double[] guess = {
-                // yaw
-                // pitch
-                // velocity
-                // time
+                // Start optimizer at current position to reduce optimization 
+                // time.
+                getYaw(),               
+                getPitch(),
+                getLauncherVelocity(),
+                0
+            };
+
+            MultivariateFunction optimizerFunction = new MultivariateFunction() {
+                @Override
+                // TODO: constant yaw
+                public double value(double[] point) {
+                    double yaw = point[0];
+                    double pitch = point[1];
+                    double speed = point[2];
+                    double time = point[3];
+
+                    // X component of the ball's position relative to the robot. 
+                    double dbx = speed 
+                        * Math.cos(pitch) 
+                        * Math.cos(yaw) 
+                        * time;
+                    // Y component of the ball's position relative to the robot. 
+                    double dby = speed 
+                        * Math.cos(pitch) 
+                        * Math.sin(yaw) 
+                        * time;
+                    // Z (vertical) component of the ball's position relative to the robot. 
+                    double dbz = (
+                        -0.5 
+                        * FieldConstants.GRAVITY
+                        * Math.pow(time, 2)
+                    ) + (
+                        speed 
+                        * Math.sin(pitch) 
+                        * time
+                    );
+
+
+
+                    // Return error squared to avoid sqrt for optimization. 
+                    // For this, minimizing squared error should be equivalent to minimizing error. 
+                    return Math.pow(
+                        dbx - toTarget.getX(), 
+                        2
+                    ) + Math.pow(
+                        dby - toTarget.getY(), 
+                        2
+                    ) + Math.pow(
+                        dbz - toTarget.getZ(),
+                        2
+                    ); 
+                                        
+                }
             };
 
             double[] targetOptimum = targetingOptimizer.optimize(
@@ -330,57 +340,6 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             );
         }
-
-        
-        // use difference to set guess and optimize from there
-        // TODO: set guesses with `toTarget`
-        double targetDistance = Math.sqrt(
-            ((targetRobotRelative.getX())*(targetRobotRelative.getX()))
-            +((targetRobotRelative.getY())*(targetRobotRelative.getY())) 
-        );
-        double[] guess = {
-            // Start optimizer at current position to reduce optimization time.
-            getYaw(),               
-            getPitch(),
-            getLauncherVelocity(),
-            0
-        };
-
-        double[] targetOptimum = targetingOptimizer.optimize(
-            new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
-            new ObjectiveFunction(optimizerFunction),
-            GoalType.MINIMIZE,
-            new InitialGuess(guess),
-            new SimpleBounds(
-                TurretConstants.TargetingOptimizer.LOWER_BOUNDS, 
-                TurretConstants.TargetingOptimizer.UPPER_BOUNDS
-            )
-        ).getPoint();
-
-        double optimalYaw = targetOptimum[0];
-        double optimalPitch = targetOptimum[1];
-        double optimalVelocity = targetOptimum[2];
-        // i don't think we need time?
-
-        // calculate voltages and send to motors
-        m_LauncherMotor.setVoltage(
-            launcherPID.calculate(
-                getLauncherVelocity(), 
-                calculateExitToLauncherVelocity(optimalVelocity)
-            )
-        );
-        m_YawMotor.setVoltage(
-            yawPID.calculate(
-                getYaw(),
-                optimalYaw
-            )
-        );
-        m_PitchMotor.setVoltage(
-            pitchPID.calculate(
-                getPitch(),
-                optimalPitch
-            )
-        );
     }
     
 
