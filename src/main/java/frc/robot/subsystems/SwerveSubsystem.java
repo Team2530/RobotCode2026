@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -356,6 +357,10 @@ public class SwerveSubsystem extends SubsystemBase {
     
     public Pose2d getPose() {
         return swerveDrive.getPose();
+    }
+
+    public Pose3d get3dPose() {
+        return new Pose3d(getPose());
     }
     
     public ChassisSpeeds getVelocity() {
