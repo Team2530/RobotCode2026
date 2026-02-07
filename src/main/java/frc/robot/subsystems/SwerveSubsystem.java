@@ -13,7 +13,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -36,13 +37,16 @@ import swervelib.imu.Pigeon2Swerve;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.util.LimelightContainer;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 public class SwerveSubsystem extends SubsystemBase {
 
     private final SwerveDrive swerveDrive;
 
-
+    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Odometry Pose", Pose2d.struct).publish();
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
@@ -59,6 +63,9 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public SwerveSubsystem() {
+
+        
+
         // register gearshifter with smartdashboard
         gearChooser = new SendableChooser<>();
 
@@ -300,7 +307,13 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        RobotContainer.LLContainer.estimateMT2Odometry(swerveDrive);
+        if (Robot.isSimulation()) {
+            LimelightContainer.estimateSimOdometry();
+        } else {
+            RobotContainer.LLContainer.estimateMT2Odometry(swerveDrive);
+
+            posePublisher.set(swerveDrive.getPose());
+        }
     }
 
     @Override
