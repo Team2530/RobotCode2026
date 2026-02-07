@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import choreo.auto.AutoChooser;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.XboxController;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DriveCommand;
@@ -26,6 +28,10 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.AllianceFlipUtil;
+import frc.robot.subsystems.Limelight.LimelightType;
+import frc.robot.util.LimelightContainer;
+import frc.robot.subsystems.Limelight;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -38,11 +44,14 @@ import frc.robot.subsystems.SwerveSubsystem;
  */
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
+    // These are initating the individual Limlight(s). The name should match the limelight internal names.
+    private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
+    private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
+    private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
+    private static final Limelight LL_BF = new Limelight(LimelightType.LL4, "limelight-bf", true, true);
 
-    // TODO: ADD Limelights
-    // private static final Limelight LL_name = new Limelight(LimelightType.LL4, "limelight-name", true, true);
-
-    // TODO: initalize Limelight container
+    //initalizing limelight container (Group)
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BF, LL_BL, LL_BR, LL_FR);
     // @Logged
     // public static final LimelightContainer LLContainer = new LimelightContainer(LL_name1, LL_name2, LL_name3);
 
@@ -148,6 +157,35 @@ public class RobotContainer {
             operatorXbox.y().whileFalse(new InstantCommand(() -> {
                 IntakeCommand.setEMS(0);
             }));
+    public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
+    // @Logged
+    public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+
+    @Logged
+    public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+
+    // private final LimeLightSubsystem limeLightSubsystem = new
+    // LimeLightSubsystem();
+    @Logged
+    private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
+
+    /*
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
+        // Configure the trigger bindings
+        configureBindings();
+
+        DataLogManager.logNetworkTables(true);
+        DataLogManager.start();
+
+        
+
+        swerveDriveSubsystem.setDefaultCommand(normalDrive);
+
+        // NamedCommands.registerCommand(null, getAutonomousCommand());
+    }
+
     
        
     }
@@ -158,8 +196,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        swerveDriveSubsystem.setGyroToEstimate();
-        return autoChooser.getSelected();
+        return new Command() {};
     }
 
     public SwerveSubsystem getSwerveSubsystem() {
