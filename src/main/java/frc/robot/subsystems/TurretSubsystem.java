@@ -215,11 +215,15 @@ public class TurretSubsystem extends SubsystemBase {
         if (yawIsZeroed) {
             // get difference to target
             Translation3d toTarget;
+            // TODO: i'm not sure about these poses and rotations
             switch (targetingMode) {
                 case ABSOLUTE:
                     toTarget = targetPosition
                         .minus(getLauncherPosition())
-                        .getTranslation();
+                        .getTranslation()
+                        .rotateBy(
+                            swerveSubsystem.getRotation()
+                        );
                     break;
                 case RELATIVE:
                 default:
