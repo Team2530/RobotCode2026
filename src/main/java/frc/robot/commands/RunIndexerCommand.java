@@ -3,10 +3,10 @@ package frc.robot.commands;
 import frc.robot.subsystems.IndexerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class IndexerCommand extends Command {
+public class RunIndexerCommand extends Command {
     private final IndexerSubsystem m_IndexerSubsystem;
 
-    public IndexerCommand(IndexerSubsystem indexerSubsystem) {
+    public RunIndexerCommand(IndexerSubsystem indexerSubsystem) {
         m_IndexerSubsystem = indexerSubsystem;
         // Require the subsystem to prevent other commands from running on it concurrently
         addRequirements(indexerSubsystem);
