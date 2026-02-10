@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkFlex;
@@ -60,12 +61,12 @@ public class IntakeSubsystem extends SubsystemBase {
         m_FeederMotor.set(targetFeederSpeed);
 
         // WARNING: i'm not sure what the motor behavior will be while holding
-        if (
-            !pivotDebouncer.calculate(
-                m_PivotMotor.getOutputCurrent() 
-                > IntakeConstants.Pivot.Zeroing.CURRENT_LIMIT
-            )
-        ) {
+        boolean isHolding = pivotDebouncer.calculate(
+            m_PivotMotor.getOutputCurrent() 
+            > IntakeConstants.Pivot.Zeroing.CURRENT_LIMIT
+        );
+
+        if (!isHolding) {
             // if moving to deploy / stow
             m_PivotMotor.setVoltage(
                 IntakeConstants.Pivot.DEPLOY_VOLTAGE
@@ -85,6 +86,32 @@ public class IntakeSubsystem extends SubsystemBase {
             );
         }
 
+        SmartDashboard.putNumber(
+            "Intake/Feeder/target_speed",
+            targetFeederSpeed
+        );
+        // TODO: i don't know what units this is in
+        SmartDashboard.putNumber(
+            "Intake/Feeder/velocity",
+            m_FeederMotor.getEncoder().getVelocity()
+        );
+        SmartDashboard.putNumber(
+            "Intake/Feeder/voltage",
+            m_FeederMotor.getBusVoltage()
+        );
+
+        SmartDashboard.putBoolean(
+            "Intake/Pivot/target_is_raised",
+            targetPivotRaised
+        );
+        SmartDashboard.putBoolean(
+            "Intake/Pivot/is_holding",
+            isHolding 
+        );
+        SmartDashboard.putNumber(
+            "Intake/Pivot/voltage",
+            m_PivotMotor.getBusVoltage()
+        );
     }
     
     /*
