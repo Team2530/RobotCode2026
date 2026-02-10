@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -10,10 +11,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -46,7 +50,14 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrive swerveDrive;
 
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Odometry Pose", Pose2d.struct).publish();
+            .getStructTopic("SS swerveDrive Pose", Pose2d.struct).publish();
+    StructArrayPublisher<SwerveModuleState> swerveStatesPublisher = NetworkTableInstance.getDefault()
+            .getStructArrayTopic("SS SwerveModuleState[]", SwerveModuleState.struct).publish();
+
+    StructPublisher<Translation2d> translationPublisher = NetworkTableInstance.getDefault()
+        .getStructTopic("SS.DC Input Translation Speed", Translation2d.struct).publish();
+    StructPublisher<Rotation2d> rotationPublisher = NetworkTableInstance.getDefault()
+        .getStructTopic("SS.DC Input Rotation Speed", Rotation2d.struct).publish();
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
@@ -87,7 +98,7 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putData("Swerve Drive Gearing", gearChooser);
 
         // register sysId commands with smartdashboard
-        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
+        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());
         SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
 
         // instantiate yagsl library classes
@@ -130,10 +141,10 @@ public class SwerveSubsystem extends SubsystemBase {
                         DriveConstants.SwerveModules.OPTIMAL_VOLTAGE, 
                         DriveConstants.SwerveModules.DRIVE_CURRENT_LIMIT, 
                         DriveConstants.SwerveModules.STEER_CURRENT_LIMIT, 
-                        DriveConstants.SwerveModules.DRIVE_RAMP_RATE,
-                        DriveConstants.SwerveModules.STEER_RAMP_RATE,
-                        DriveConstants.SwerveModules.DRIVE_FRICTION_VOLTAGE,
-                        DriveConstants.SwerveModules.STEER_FRICTION_VOLTAGE,
+                        DriveConstants.SwerveModules.DRIVE_RAMP_RATE, 
+                        DriveConstants.SwerveModules.STEER_RAMP_RATE, 
+                        DriveConstants.SwerveModules.DRIVE_FRICTION_VOLTAGE, 
+                        DriveConstants.SwerveModules.STEER_FRICTION_VOLTAGE, 
                         RobotConstants.MOMENT_OF_INERTIA, 
                         RobotConstants.TOTAL_MASS_KG
                 );
@@ -311,13 +322,14 @@ public class SwerveSubsystem extends SubsystemBase {
             LimelightContainer.estimateSimOdometry();
         } else {
             RobotContainer.LLContainer.estimateMT2Odometry(swerveDrive);
-
-            posePublisher.set(swerveDrive.getPose());
         }
+        posePublisher.set(swerveDrive.getPose());
+        swerveStatesPublisher.set(swerveDrive.getStates());
     }
 
     @Override
-    public void simulationPeriodic() {}
+    public void simulationPeriodic() {
+    }
 
     /**
      * drive field-oriented
@@ -325,6 +337,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param rotation angular rate; rads / s
      */
     public void drive(Translation2d translation, double rotation) {
+        translationPublisher.set(translation);
+        rotationPublisher.set(new Rotation2d(rotation));
         swerveDrive.drive(
             translation,
             rotation,
@@ -402,7 +416,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 ),
                 gearing.gearRatio
             )
-        );  
+        );
     }
 
     public Field2d getField() {

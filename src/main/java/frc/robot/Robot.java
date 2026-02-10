@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
 
-  @Logged
+  //@Logged
   private RobotContainer m_robotContainer;
 
   double lastLoopTime = Timer.getFPGATimestamp();

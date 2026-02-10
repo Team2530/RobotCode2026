@@ -31,7 +31,7 @@ import frc.robot.subsystems.Limelight;
  * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-@Logged(strategy = Logged.Strategy.OPT_IN)
+//@Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s)
      private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
