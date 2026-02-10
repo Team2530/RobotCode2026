@@ -77,11 +77,28 @@ public final class Constants {
    *|edits can have catastafic falure---|
 *///|-----------WARNING-----------------|
   //---Intake Motors---\\
-  public static class IntakeMotors {
-    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed. DONE: FALSE
-    public static final double INTAKE_SPEED = 0.6;
-    public static final int INTAKE_MOTOR1 = 5;
-    public static final double INTAKE_SPEED1 = 0.6;
+  public static class IntakeConstants {
+      //TODO: IDs and speeds need to be changed. DONE: FALSE
+      // as in all the wheels on the front that grab the fuel
+      public static class Feeder {
+          public static final int CAN_ID = 4;
+      }
+
+      // as in the motor that lifts the whole structure
+      public static class Pivot {
+          public static final int CAN_ID = 54325432;
+
+          // voltage applied when the pivot is moving between stowed / deployed
+          public static final double DEPLOY_VOLTAGE = 6.0;
+          // voltaged applied when the pivot is holding it's position
+          public static final double HOLD_VOLTAGE = 0.5;
+
+          public static final class Zeroing {
+              // amps ocourse
+              public static final double CURRENT_LIMIT = 35;
+              public static final double DEBOUNCE_TIME = 0.35;
+          }
+      }
   }
 
   public static final class DriveConstants {
