@@ -4,23 +4,23 @@ import frc.robot.subsystems.IndexerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class RunIndexerCommand extends Command {
-    private final IndexerSubsystem m_IndexerSubsystem;
+    private final IndexerSubsystem indexerSubsystem;
 
     public RunIndexerCommand(IndexerSubsystem indexerSubsystem) {
-        m_IndexerSubsystem = indexerSubsystem;
+        this.indexerSubsystem = indexerSubsystem;
         // Require the subsystem to prevent other commands from running on it concurrently
         addRequirements(indexerSubsystem);
     }
     
     @Override
     public void initialize() {
-        m_IndexerSubsystem.run();
+        indexerSubsystem.run();
     }
 
     @Override
     public void end(boolean interrupted) {
         // This is crucial: stop the motor when the command ends (i.e., button is released)
-        m_IndexerSubsystem.stop();
+        indexerSubsystem.stop();
     }
 
     // Returns true when the command should end.
