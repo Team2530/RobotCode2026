@@ -1,48 +1,54 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.CAN;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkFlexExternalEncoder;
-import com.revrobotics.spark.SparkLowLevel;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.Robot;
+
+import frc.robot.Constants.IndexerConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
-    private static final int SpindexerID = Constants.IndexerConstants.IndexerID;
-    private static final double SpindexerSpeed = Constants.IndexerConstants.IndexerSpeed;
 
-    private final SparkMax m_SpindexerMotor;
+    private final SparkMax m_IndexerMotor;
 
-  public IndexerSubsystem() {
-    m_SpindexerMotor = new SparkMax(SpindexerID, MotorType.kBrushless);
-  }
+    public IndexerSubsystem() {
+        m_IndexerMotor = new SparkMax(
+            IndexerConstants.CAN_ID,
+            MotorType.kBrushless
+        );
+    }
 
-  void setCoastMode() {
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kCoast);
-  }
+    public void run() {
+        m_IndexerMotor.set(
+            IndexerConstants.SPEED
+        );
+    }
 
-  public void runIndexer() {
-    m_SpindexerMotor.set(SpindexerSpeed);
-  }
+    /*
+     * set a custom speed for the indexer motor
+     * @param speed - a value between -1 and 1 to set the motor to
+     */
+    public void run(double speed) {
+        m_IndexerMotor.set(speed);
+    }
 
-  public void stopIndexer() {
-    m_SpindexerMotor.set(0.0);
-  }
+    public void run(boolean reverse) {
+        if (!reverse) {
+            run();
+        } else {
+            runReverse();
+        }
+    }
+    
+    public void runReverse() {
+        m_IndexerMotor.set(
+            -IndexerConstants.SPEED
+        );
+    }
+
+    public void stop() {
+        m_IndexerMotor.set(0.0);
+    }
 
 }
 
