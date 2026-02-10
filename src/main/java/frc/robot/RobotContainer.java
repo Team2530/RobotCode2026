@@ -116,19 +116,16 @@ public class RobotContainer {
        //Intake Controls
        //Will need to add intake down all of this is filler for now
         operatorXbox.leftTrigger().whileTrue(new SequentialCommandGroup(
-            new ConditionalCommand(
-                new InstantCommand(() -> {
-                    intakeDown = true;
-                    if (intakeDown) {
-                        intakeSubsystem.setIntakePreset(IntakePresets.INTAKE);
-                    } else {
-                        intakeSubsystem.setIntakePreset(IntakePresets.IDLE);
-                    }
-                }),
-                new InstantCommand(),
-                () -> intakeDown
-               //intake down here
-            ))).whileTrue(new IntakeCommand(intakeSubsystem));
+           new InstantCommand(() -> {
+             // This flips the boolean: if true, becomes false. If false, becomes true.
+             intakeDown = !intakeDown; 
+
+             if (intakeDown) {
+                intakeSubsystem.setIntakePreset(IntakePresets.INTAKE);
+            } else {
+                intakeSubsystem.setIntakePreset(IntakePresets.IDLE);
+            }
+        }, intakeSubsystem))).whileTrue(new IntakeCommand(intakeSubsystem));
         
 
 
