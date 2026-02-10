@@ -137,8 +137,11 @@ public class RobotContainer {
             intakeDown = false;
         }, intakeSubsystem));
 
-        
-        
+        //shuffling.
+        operatorXbox.b().whileTrue(new ParallelCommandGroup(
+            //SHUFFLINGGGGGGGG
+            
+            ));
     }
 
     /**
