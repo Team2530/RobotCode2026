@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -16,10 +17,20 @@ public class IndexerSubsystem extends SubsystemBase {
             IndexerConstants.CAN_ID,
             MotorType.kBrushless
         );
+
+        stop();
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber(
+            "Indexer/velocity",
+            m_IndexerMotor.getEncoder().getVelocity()
+        );
     }
 
     public void run() {
-        m_IndexerMotor.set(
+        run(
             IndexerConstants.SPEED
         );
     }
@@ -30,6 +41,11 @@ public class IndexerSubsystem extends SubsystemBase {
      */
     public void run(double speed) {
         m_IndexerMotor.set(speed);
+
+        SmartDashboard.putNumber(
+            "Indexer/speed",
+            speed
+        );
     }
 
     public void run(boolean reverse) {
@@ -41,13 +57,13 @@ public class IndexerSubsystem extends SubsystemBase {
     }
     
     public void runReverse() {
-        m_IndexerMotor.set(
+        run(
             -IndexerConstants.SPEED
         );
     }
 
     public void stop() {
-        m_IndexerMotor.set(0.0);
+        run(0.0);
     }
 
 }
