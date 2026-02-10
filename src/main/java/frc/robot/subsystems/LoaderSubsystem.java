@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.LoaderConstants;
@@ -16,10 +17,19 @@ public class LoaderSubsystem extends SubsystemBase {
                 LoaderConstants.CAN_ID,
                 MotorType.kBrushless
         );
+        run(0);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber(
+            "Loader/velocity",
+            m_LoaderMotor.getEncoder().getVelocity()
+        );
     }
 
     public void run() {
-        m_LoaderMotor.set(
+        run(
             LoaderConstants.SPEED
         );
     }
@@ -30,6 +40,10 @@ public class LoaderSubsystem extends SubsystemBase {
      */
     public void run(double speed) {
         m_LoaderMotor.set(speed);
+        SmartDashboard.putNumber(
+            "Loader/speed",
+            speed
+        );
     }
 
     public void run(boolean reverse) {
@@ -41,12 +55,12 @@ public class LoaderSubsystem extends SubsystemBase {
     }
     
     public void runReverse() {
-        m_LoaderMotor.set(
+        run(
             -LoaderConstants.SPEED
         );
     }
 
     public void stop() {
-        m_LoaderMotor.set(0.0);
+        run(0.0);
     }
 }
