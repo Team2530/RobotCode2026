@@ -262,7 +262,7 @@ public final class Constants {
   }
   public static final class choreoConstants {
     public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
-    public static final double myLengthVariable = Units.inchesToMeters(39.3701);
+    public static final double length = Units.inchesToMeters(39.3701);
     
   
   }

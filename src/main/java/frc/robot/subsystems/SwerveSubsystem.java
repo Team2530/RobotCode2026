@@ -325,7 +325,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // Get the current pose of the robot
         Pose2d pose = getPose();
         
-        double length = choreoConstants.myLengthVariable;
+        double length = choreoConstants.length;
 
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
