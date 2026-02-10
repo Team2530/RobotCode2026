@@ -12,25 +12,15 @@ public class IndexerCommand extends Command {
         addRequirements(indexerSubsystem);
     }
     
-    // Called once when the command is initially scheduled.
     @Override
     public void initialize() {
-        // Motor action is performed in execute() for continuous speed control, 
-        // but we'll call the method here too for clarity.
+        m_IndexerSubsystem.run();
     }
 
-    // Called repeatedly while the command is scheduled.
-    @Override
-    public void execute() {
-        m_IndexerSubsystem.runIndexer();
-
-    }
-
-    // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         // This is crucial: stop the motor when the command ends (i.e., button is released)
-        m_IndexerSubsystem.stopIndexer();
+        m_IndexerSubsystem.stop();
     }
 
     // Returns true when the command should end.
