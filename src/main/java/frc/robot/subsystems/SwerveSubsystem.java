@@ -314,6 +314,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
             posePublisher.set(swerveDrive.getPose());
         }
+        posePublisher.set(swerveDrive.getPose());
     }
 
     @Override
