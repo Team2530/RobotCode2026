@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RunLoaderCommand extends Command {
     private final LoaderSubsystem loaderSubsystem;
 
-    public RunLoaderCommand(IndexerSubsystem loaderSubsystem) {
+    public RunLoaderCommand(LoaderSubsystem loaderSubsystem) {
         this.loaderSubsystem = loaderSubsystem;
         addRequirements(loaderSubsystem);
     }
