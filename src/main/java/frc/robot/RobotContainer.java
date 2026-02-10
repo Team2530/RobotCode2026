@@ -113,8 +113,7 @@ public class RobotContainer {
     private void configureBindings() {
        //This is ment for operator controls
 
-       //Intake Controls
-       //Will need to add intake down all of this is filler for now
+       //Intake down and intaking.
         operatorXbox.leftTrigger().whileTrue(new SequentialCommandGroup(
            new InstantCommand(() -> {
             
@@ -123,12 +122,22 @@ public class RobotContainer {
                 
             }
             intakeDown = true;
-
-        }, intakeSubsystem))).whileTrue(new IntakeCommand(intakeSubsystem));
+        
+            }, intakeSubsystem))).whileTrue(new IntakeCommand(intakeSubsystem));
         
 
+        //shooting, indexer, and turret.
+        operatorXbox.rightTrigger().whileTrue(new ParallelCommandGroup(
+            //indexer, turret, shooter here.
+        ));
+        
+        //Intake up.
+        operatorXbox.leftBumper().whileTrue(new InstantCommand(() -> {
+            //put intake up here
+            intakeDown = false;
+        }, intakeSubsystem));
 
-        //operatorXbox.rightTrigger().whileTrue(shooting, indexer, turret commands);
+        
         
     }
 
