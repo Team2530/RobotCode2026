@@ -25,16 +25,10 @@ public class IndexerSubsystem extends SubsystemBase {
     private static final int SpindexerID = Constants.IndexerConstants.IndexerID;
     private static final double SpindexerSpeed = Constants.IndexerConstants.IndexerSpeed;
 
-    private static final int LoaderID = Constants.IndexerConstants.LoaderID;
-    private static final double LoaderSpeed = Constants.IndexerConstants.LoaderSpeed;
-
     private final SparkMax m_SpindexerMotor;
-    private final SparkMax m_LoaderMotor;
 
   public IndexerSubsystem() {
     m_SpindexerMotor = new SparkMax(SpindexerID, MotorType.kBrushless);
-    m_LoaderMotor = new SparkMax(LoaderID, MotorType.kBrushless);
-
   }
 
   void setCoastMode() {
@@ -44,12 +38,10 @@ public class IndexerSubsystem extends SubsystemBase {
 
   public void runIndexer() {
     m_SpindexerMotor.set(SpindexerSpeed);
-    m_LoaderMotor.set(LoaderSpeed);
   }
 
   public void stopIndexer() {
     m_SpindexerMotor.set(0.0);
-    m_LoaderMotor.set(0.0);
   }
 
 }
