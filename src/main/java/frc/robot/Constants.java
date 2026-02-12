@@ -18,6 +18,7 @@ import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -28,7 +29,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants.PIDs.Drive;
+import frc.robot.Constants.DriveConstants.SwerveModules.Offsets;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -110,10 +113,11 @@ public final class Constants {
     public static final PIDConstants ROTATION_ASSIST = new PIDConstants(7.0, 0, 0.02);
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
-        new Translation2d(TRACK_WIDTH / 2.0, WHEEL_BASE / 2.0),
-        new Translation2d(TRACK_WIDTH / 2.0, -WHEEL_BASE / 2.0),
-        new Translation2d(-TRACK_WIDTH / 2.0, WHEEL_BASE / 2.0),
-        new Translation2d(-TRACK_WIDTH / 2.0, -WHEEL_BASE / 2.0));
+    new Translation2d(Offsets.FL_X, Offsets.FL_Y), 
+    new Translation2d(Offsets.FR_X, Offsets.FR_Y), 
+    new Translation2d(Offsets.BL_X, Offsets.BL_Y), 
+    new Translation2d(Offsets.BR_X, Offsets.BR_Y)  
+);
       
     public static final class ControlConstants {
         public static final double REGULAR_DRIVE_MULT = 1.0;
@@ -262,7 +266,9 @@ public final class Constants {
   }
   public static final class choreoConstants {
     public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
-    public static final double length = Units.inchesToMeters(39.3701);
+    public final static PIDController xController = new PIDController(10.0, 0.0, 0.0);
+    public final static PIDController yController = new PIDController(10.0, 0.0, 0.0);
+    public final static PIDController headingController = new PIDController(7.5, 0.0, 0.0);
     
   
   }

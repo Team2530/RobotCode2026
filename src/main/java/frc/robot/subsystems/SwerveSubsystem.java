@@ -40,9 +40,7 @@ import frc.robot.Constants.choreoConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
     //Choreo PID Controllers
-    private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
-    private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
-    private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
+    
     
     private final SwerveDrive swerveDrive;
 
@@ -297,7 +295,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     driveConfiguration, 
                     controllerConfiguration,
                     DriveConstants.MAX_ROBOT_VELOCITY, 
-                    new Pose2d() // TODO: choreo's gonna need a different pose
+                    getPose() 
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -318,22 +316,20 @@ public class SwerveSubsystem extends SubsystemBase {
         // idk this seems find
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
 
-        headingController.enableContinuousInput(-Math.PI, Math.PI);
+        choreoConstants.headingController.enableContinuousInput(-Math.PI, Math.PI);
     };
 
      public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = getPose();
         
-        double length = choreoConstants.length;
-
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
-            sample.vx + xController.calculate(pose.getX(), sample.x),
-            sample.vy + yController.calculate(pose.getY(), sample.y),
-            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+            sample.vx + choreoConstants.xController.calculate(pose.getX(), sample.x),
+            sample.vy + choreoConstants.yController.calculate(pose.getY(), sample.y),
+            sample.omega + choreoConstants.headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
-
+        
         
         setChassisSpeedsAUTO(speeds);
     }
@@ -344,6 +340,13 @@ public class SwerveSubsystem extends SubsystemBase {
         speeds.vyMetersPerSecond = tmp;
         tmp = speeds.omegaRadiansPerSecond;
         speeds.omegaRadiansPerSecond *= -1;
+        
+        swerveDrive.drive(
+            new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
+            speeds.omegaRadiansPerSecond,
+            true,  
+            false
+        );
         
     }
 
