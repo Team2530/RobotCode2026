@@ -204,8 +204,6 @@ public class TurretSubsystem extends SubsystemBase {
 
         setTarget(TurretTargets.HUB);
 
-        startYawZeroing();
-
         TargetPositionPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Turret/Target_position", Pose3d.struct)
             .publish();
@@ -245,16 +243,6 @@ public class TurretSubsystem extends SubsystemBase {
                     toTarget = targetPosition.getTranslation();
                     break;
             }
-
-            // use difference to set guess and optimize from there
-            double[] guess = {
-                // Start optimizer at current position to reduce optimization 
-                // time.
-                getYaw(),               
-                getPitch(),
-                getLauncherVelocity(),
-                0
-            };
 
             MultivariateFunction optimizerFunction = new MultivariateFunction() {
                 @Override
@@ -300,8 +288,48 @@ public class TurretSubsystem extends SubsystemBase {
                         dbz - toTarget.getZ(),
                         2
                     ); 
-                                        
                 }
+            };
+           
+            // use difference to set guess and optimize from there
+            double[] guess = {
+                // Start optimizer at current position to reduce optimization 
+                // time.
+                getYaw(),               
+                TurretConstants.Pitch.CONSTANT_ANGLE,
+                getLauncherVelocity(),
+                0
+            };
+
+            // WARNING: the minimum pitch of the turret is dependent on the yaw, 
+            // which presents a problem: we can't update the bounds once they're 
+            // sent to the optimizer.
+            //
+            // my solution to this is to just get the theoretical minimum pitch 
+            // at a straightline to the target; my assumption is that the 
+            // optimizer will be rerun at a frequency that the discrepancies 
+            // wont matter
+            double [] lowerBounds = {
+                TurretConstants.Yaw.ANGLE_MIN,
+                TurretConstants.Pitch.CONSTANT_ANGLE,
+                // WARNING: overridden for constant pitch
+                /*TurretConstants.Pitch.ANGLE_MIN(
+                    Units.radiansToDegrees(
+                        Math.atan2(
+                            toTarget.getY(),
+                            toTarget.getX()
+                        )
+                    )
+                ),*/
+                -1 * TurretConstants.TargetingOptimizer.MAXIMUM_VELOCITY,
+                0
+            };
+            double [] upperBounds = {
+                TurretConstants.Yaw.ANGLE_MAX,
+                TurretConstants.Pitch.CONSTANT_ANGLE,
+                /*TurretConstants.Pitch.ANGLE_MAX,*/
+                TurretConstants.TargetingOptimizer.MAXIMUM_VELOCITY,
+                TurretConstants.TargetingOptimizer.MAXIMUM_TIME
             };
 
             double[] targetOptimum = targetingOptimizer.optimize(
@@ -310,8 +338,8 @@ public class TurretSubsystem extends SubsystemBase {
                 GoalType.MINIMIZE,
                 new InitialGuess(guess),
                 new SimpleBounds(
-                    TurretConstants.TargetingOptimizer.LOWER_BOUNDS, 
-                    TurretConstants.TargetingOptimizer.UPPER_BOUNDS
+                    lowerBounds,
+                    upperBounds
                 )
             ).getPoint();
 
