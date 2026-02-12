@@ -42,6 +42,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
@@ -106,17 +107,14 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX m_XYawMotor;      //x40
     private final SparkMax m_LauncherMotor;
     private final SparkMax m_YawMotor;
-    private final SparkMax m_PitchMotor;   //Neo 550
 
     private final RelativeEncoder e_LauncherEncoder;
     private final RelativeEncoder e_YawEncoder;
     // lets just pray its a cancoder
-    private final CANcoder e_PitchEncoder;
 
     // motor control
     private final PIDController launcherPID;
     private final PIDController yawPID;
-    private final PIDController pitchPID;
 
     private final SimpleMotorFeedforward yawFeedforward;
 
@@ -152,14 +150,10 @@ public class TurretSubsystem extends SubsystemBase {
             TurretConstants.CanIDs.YAW_MOTOR,
             MotorType.kBrushless
         );
-        m_PitchMotor = new SparkMax(
-            TurretConstants.CanIDs.PITCH_MOTOR,
-            MotorType.kBrushless
-        );
+
 
         e_LauncherEncoder = m_LauncherMotor.getEncoder();
         e_YawEncoder = m_YawMotor.getEncoder();
-        e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
 
         launcherPID = new PIDController(
             TurretConstants.Launcher.PID.P,
@@ -171,11 +165,7 @@ public class TurretSubsystem extends SubsystemBase {
             TurretConstants.Yaw.PID.I,
             TurretConstants.Yaw.PID.D
         );
-        pitchPID = new PIDController(
-            TurretConstants.Pitch.PID.P,
-            TurretConstants.Pitch.PID.I,
-            TurretConstants.Pitch.PID.D
-        );
+
 
         yawFeedforward = new SimpleMotorFeedforward(
             TurretConstants.Yaw.Feedforward.kS,
@@ -236,7 +226,6 @@ public class TurretSubsystem extends SubsystemBase {
                 // Start optimizer at current position to reduce optimization 
                 // time.
                 getYaw(),               
-                getPitch(),
                 getLauncherVelocity(),
                 0
             };
@@ -246,22 +235,27 @@ public class TurretSubsystem extends SubsystemBase {
                 // TODO: constant yaw
                 public double value(double[] point) {
                     double yaw = point[0];
-                    double pitch = point[1];
-                    double speed = point[2];
-                    double time = point[3];
+                    double speed = point[1];
+                    double time = point[2];
 
                     // X component of the ball's position relative to the robot. 
                     double dbx = speed 
-                        * Math.cos(pitch) 
-                        * Math.cos(yaw) 
+                        * Math.cos(Constants.TurretConstants.Pitch.Angle) 
+                        * Math.cos(yaw)
                         * time;
-                    dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
+                    dbx += Math.cos(swerveSubsystem.getRotation().getX()) * swerveSubsystem.getXVelocity() * time;
+                    dbx += -swerveSubsystem.getAngularVelocity()
+                        * 0 // Offset from center of rotation to center of launcher.
+                        *time;
                     // Y component of the ball's position relative to the robot. 
                     double dby = speed 
-                        * Math.cos(pitch) 
+                        * Math.cos(Constants.TurretConstants.Pitch.Angle) 
                         * Math.sin(yaw) 
                         * time;
-                    dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
+                    dby += Math.sin(swerveSubsystem.getRotation().getX()) * swerveSubsystem.getXVelocity() * time;
+                    dby += swerveSubsystem.getAngularVelocity()
+                        * 0 // Offset from center of rotation to center of launcher.
+                        *time;
                     // Z (vertical) component of the ball's position relative to the robot. 
                     double dbz = (
                         -0.5 
@@ -269,9 +263,10 @@ public class TurretSubsystem extends SubsystemBase {
                         * Math.pow(time, 2)
                     ) + (
                         speed 
-                        * Math.sin(pitch) 
+                        * Math.sin(Constants.TurretConstants.Pitch.Angle) 
                         * time
                     );
+                    
 
                         
 
@@ -305,8 +300,7 @@ public class TurretSubsystem extends SubsystemBase {
             ).getPoint();
 
             double optimalYaw = targetOptimum[0];
-            double optimalPitch = targetOptimum[1];
-            double optimalVelocity = targetOptimum[2];
+            double optimalVelocity = targetOptimum[1];
             // i don't think we need time?
 
             // calculate voltages and send to motors
@@ -354,12 +348,6 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             );
 
-            m_PitchMotor.setVoltage(
-                pitchPID.calculate(
-                    getPitch(),
-                    optimalPitch
-                )
-            );
 
             TargetPositionPublisher.set(
                 swerveSubsystem.get3dPose()
@@ -392,19 +380,6 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Yaw/Current_velocity",
                 getYawVelocity()
             );
-            // pitch
-            SmartDashboard.putNumber(
-                "Turret/Pitch/Target_pitch",
-                optimalPitch
-            );
-            SmartDashboard.putNumber(
-                "Turret/Pitch/Current_pitch",
-                getPitch()   
-            );
-            SmartDashboard.putNumber(
-                "Turret/Pitch/Current_velocity",
-                getPitchVelocity()   
-            );
         }
     }
     
@@ -427,23 +402,6 @@ public class TurretSubsystem extends SubsystemBase {
                 / TurretConstants.Yaw.GEAR_RATIO
         );
     }
-
-    public double getPitch() {
-        return MathUtil.angleModulus(
-            Units.rotationsToRadians(
-                e_PitchEncoder.getPosition().getValueAsDouble() 
-                    / TurretConstants.Pitch.GEAR_RATIO
-            )
-        );
-    }
-
-    public double getPitchVelocity() {
-        return Units.rotationsToRadians(
-            e_PitchEncoder.getVelocity().getValueAsDouble()
-                / TurretConstants.Pitch.GEAR_RATIO
-        );
-    }
-
 
     public double getLauncherVelocity() {
         return m_LauncherMotor.getEncoder().getVelocity();
