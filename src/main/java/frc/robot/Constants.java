@@ -341,8 +341,7 @@ public final class Constants {
     public static final class Pitch {
         public static final double GEAR_RATIO = 1;
 
-        // TODO: i forgort the value <|:3
-        public static final double CONSTANT_ANGLE = 45;
+        public static final double ANGLE_CONSTANT = 70.5;
 
         // 90 would have the "face" of the turret as vertical
         // 0 wouldd have the "face" be horizontal (outputting up)
@@ -377,7 +376,6 @@ public final class Constants {
         }
         public static final double ANGLE_MAX = 180;
 
-        public static final double ANGLE = 70.5;
 
         public static final class PID {
             public static final double P = 1;
