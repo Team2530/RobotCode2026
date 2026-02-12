@@ -253,15 +253,21 @@ public class TurretSubsystem extends SubsystemBase {
                     // X component of the ball's position relative to the robot. 
                     double dbx = speed 
                         * Math.cos(pitch) 
-                        * Math.cos(yaw) 
+                        * Math.cos(yaw)
                         * time;
                     dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
+                    dbx += -swerveSubsystem.getAngularVelocity()
+                        * 0 // Offset from center of rotation to center of launcher.
+                        *time;
                     // Y component of the ball's position relative to the robot. 
                     double dby = speed 
                         * Math.cos(pitch) 
                         * Math.sin(yaw) 
                         * time;
                     dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
+                    dby += swerveSubsystem.getAngularVelocity()
+                        * 0 // Offset from center of rotation to center of launcher.
+                        *time;
                     // Z (vertical) component of the ball's position relative to the robot. 
                     double dbz = (
                         -0.5 
@@ -272,6 +278,7 @@ public class TurretSubsystem extends SubsystemBase {
                         * Math.sin(pitch) 
                         * time
                     );
+                    
 
                         
 
