@@ -313,8 +313,10 @@ public final class Constants {
 
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
-        public static final double ANGLE_MIN = 90;
-        public static final double ANGLE_MAX = 270;
+        //
+        // WARNING: as of writing, we have a 360 turret
+        public static final double ANGLE_MIN = Double.MIN_VALUE;
+        public static final double ANGLE_MAX = Double.MAX_VALUE;
 
         public static final class Zeroing {
             // amps
@@ -344,7 +346,10 @@ public final class Constants {
 
         // 90 would have the "face" of the turret as vertical
         // 0 wouldd have the "face" be horizontal (outputting up)
-        // the minimum angle is dependent on the yaw
+        /* 
+         * the minimum angle is dependent on the yaw
+         * @param yaw - the angle of the turret yaw in degrees
+         */
         public static double ANGLE_MIN(double yaw) {
             if (
                 Math.abs(yaw - 180) > 0 
@@ -412,23 +417,6 @@ public final class Constants {
         public static final double MAXIMUM_TIME = 5;
         // meters per second
         public static final double MAXIMUM_VELOCITY = 10;
-
-        public static final double[] LOWER_BOUNDS = {
-            // yaw
-            Yaw.ANGLE_MIN,
-            // pitch
-            Pitch.ANGLE_MIN,
-            // velocity
-            0,
-            // time
-            0
-        };
-        public static final double[] UPPER_BOUNDS = {
-            Yaw.ANGLE_MAX,
-            Pitch.ANGLE_MAX,
-            MAXIMUM_VELOCITY,
-            MAXIMUM_TIME
-        };
     }
 
   }
