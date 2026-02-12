@@ -320,6 +320,8 @@ public final class Constants {
         public static final double ANGLE_MIN = 90;
         public static final double ANGLE_MAX = 270;
 
+        public static final double ANGLE = 70.5;
+
         public static final class PID {
             public static final double P = 1;
             public static final double I = 0;
