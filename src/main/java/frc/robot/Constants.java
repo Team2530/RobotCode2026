@@ -40,6 +40,14 @@ public final class Constants {
     public static final int OPERATOR_CONTROLLER_PORT = 1;
   }
 
+  public static class GameConstants {
+    public static class Fuel {
+        // meters 
+        public static final double DIAMETER = Units.inchesToMeters(5.9);
+        public static final double RADIUS = DIAMETER / 2;
+    }
+  }
+
   public static class RobotConstants {
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double robotWidthMeters = Units.inchesToMeters(29.5);
@@ -63,6 +71,21 @@ public final class Constants {
 
       return Alliance.Blue;
     }
+  }
+
+  public static class HopperConstants {
+      // TODO: update
+      
+      // allese in meters
+
+      // i only really need to know about the static face of the hopper
+      public static final double WIDTH = 1;
+      // distance to the top of the hopper, relative to the bottom 
+      // (like the bottom of the wheels) of the robot
+      public static final double ABSOLUTE_HEIGHT = 1;
+      // distance backwards from the center of the robot
+      public static final double OFFSET_Y = 1;
+      // assume the hopper is 
   }
 
   /*|-----------WARNING-----------------|
