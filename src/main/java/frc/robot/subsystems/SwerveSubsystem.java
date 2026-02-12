@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -40,7 +41,18 @@ import frc.robot.Constants.choreoConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
     //Choreo PID Controllers
-    
+    private final PIDController xController = new PIDController(
+        choreoConstants.x_CONTROLLER_P, 
+        choreoConstants.x_CONTROLLER_I, 
+        choreoConstants.x_CONTROLLER_D);
+    private final PIDController yController = new PIDController(
+        choreoConstants.y_CONTROLLER_P, 
+        choreoConstants.y_CONTROLLER_I, 
+        choreoConstants.y_CONTROLLER_D);
+    private final PIDController headingController = new PIDController(
+        choreoConstants.heading_CONTROLLER_P, 
+        choreoConstants.heading_CONTROLLER_I, 
+        choreoConstants.heading_CONTROLLER_D);
     
     private final SwerveDrive swerveDrive;
 
@@ -295,7 +307,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     driveConfiguration, 
                     controllerConfiguration,
                     DriveConstants.MAX_ROBOT_VELOCITY, 
-                    getPose() 
+                    new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(90))
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -316,7 +328,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // idk this seems find
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
 
-        choreoConstants.headingController.enableContinuousInput(-Math.PI, Math.PI);
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
     };
 
      public void followTrajectory(SwerveSample sample) {
@@ -325,9 +337,9 @@ public class SwerveSubsystem extends SubsystemBase {
         
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
-            sample.vx + choreoConstants.xController.calculate(pose.getX(), sample.x),
-            sample.vy + choreoConstants.yController.calculate(pose.getY(), sample.y),
-            sample.omega + choreoConstants.headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
         
         
