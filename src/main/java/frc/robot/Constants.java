@@ -44,6 +44,14 @@ public final class Constants {
     public static final int OPERATOR_CONTROLLER_PORT = 1;
   }
 
+  public static class GameConstants {
+    public static class Fuel {
+        // meters 
+        public static final double DIAMETER = Units.inchesToMeters(5.9);
+        public static final double RADIUS = DIAMETER / 2;
+    }
+  }
+
   public static class RobotConstants {
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double robotWidthMeters = Units.inchesToMeters(29.5);
@@ -67,6 +75,21 @@ public final class Constants {
 
       return Alliance.Blue;
     }
+  }
+
+  public static class HopperConstants {
+      // TODO: update
+      
+      // allese in meters
+
+      // i only really need to know about the static face of the hopper
+      public static final double WIDTH = 1;
+      // distance to the top of the hopper, relative to the bottom 
+      // (like the bottom of the wheels) of the robot
+      public static final double ABSOLUTE_HEIGHT = 1;
+      // distance backwards from the center of the robot
+      public static final double OFFSET_Y = 1;
+      // assume the hopper is 
   }
 
   /*|-----------WARNING-----------------|
@@ -317,8 +340,33 @@ public final class Constants {
         public static final double GEAR_RATIO = 1;
 
         // 90 would have the "face" of the turret as vertical
-        public static final double ANGLE_MIN = 90;
-        public static final double ANGLE_MAX = 270;
+        // the minimum angle is dependent on the yaw
+        public static double ANGLE_MIN(double yaw) {
+            if (
+                Math.abs(yaw - 180) > 0 
+            ) {
+                // dependent on the yaw so we can shoot over the hopper
+                return Math.atan(
+                    (
+                        HopperConstants.ABSOLUTE_HEIGHT 
+                        + GameConstants.Fuel.RADIUS
+                        - TurretConstants.Offsets.Z
+                    ) / (
+                        Math.tan(
+                            Units.degreesToRadians(yaw) 
+                        ) * (
+                            TurretConstants.Offsets.Y 
+                            - HopperConstants.OFFSET_Y
+                        )
+                    )
+                );
+            
+            } else {
+                // physical hardstop of the hood
+                return 90;
+            }
+        }
+        public static final double ANGLE_MAX = 180;
 
         public static final class PID {
             public static final double P = 1;
