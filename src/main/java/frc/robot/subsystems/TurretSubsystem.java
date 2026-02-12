@@ -226,36 +226,46 @@ public class TurretSubsystem extends SubsystemBase {
                 // Start optimizer at current position to reduce optimization 
                 // time.
                 getYaw(),               
+                TurretConstants.Pitch.CONSTANT_ANGLE,
                 getLauncherVelocity(),
                 0
             };
 
-            MultivariateFunction optimizerFunction = new MultivariateFunction() {
+            MultivariateFunction optimizerFunction = new MultivariateFunction() 
+            {
                 @Override
-                // TODO: constant yaw
+                // WARNING: constant pitch 
+                // if we just set the guess pitch and limits to the constant we
+                // should be able to minimize the amount we have to change 
+                // later
                 public double value(double[] point) {
                     double yaw = point[0];
-                    double speed = point[1];
-                    double time = point[2];
+                    double pitch = point[1];
+                    double speed = point[2];
+                    double time = point[3];
 
                     // X component of the ball's position relative to the robot. 
                     double dbx = speed 
-                        * Math.cos(Constants.TurretConstants.Pitch.Angle) 
-                        * Math.cos(yaw)
-                        * time;
-                    dbx += Math.cos(swerveSubsystem.getRotation().getX()) * swerveSubsystem.getXVelocity() * time;
+                        * Math.cos(pitch) 
+                        * Math.cos(yaw);
+                    dbx += Math.cos(
+                        swerveSubsystem.getRotation().getX()
+                    ) * swerveSubsystem.getXVelocity();
                     dbx += -swerveSubsystem.getAngularVelocity()
-                        * 0 // Offset from center of rotation to center of launcher.
-                        *time;
+                        * 0; // Offset from center of rotation to center of launcher.
+                    dbx *= time;
+
                     // Y component of the ball's position relative to the robot. 
                     double dby = speed 
-                        * Math.cos(Constants.TurretConstants.Pitch.Angle) 
-                        * Math.sin(yaw) 
-                        * time;
-                    dby += Math.sin(swerveSubsystem.getRotation().getX()) * swerveSubsystem.getXVelocity() * time;
+                        * Math.cos(pitch) 
+                        * Math.sin(yaw);
+                    dby += Math.sin(
+                            swerveSubsystem.getRotation().getX()
+                    ) * swerveSubsystem.getXVelocity();
                     dby += swerveSubsystem.getAngularVelocity()
-                        * 0 // Offset from center of rotation to center of launcher.
-                        *time;
+                        * 0; // Offset from center of rotation to center of launcher.
+                    dby *= time;
+
                     // Z (vertical) component of the ball's position relative to the robot. 
                     double dbz = (
                         -0.5 
@@ -263,15 +273,10 @@ public class TurretSubsystem extends SubsystemBase {
                         * Math.pow(time, 2)
                     ) + (
                         speed 
-                        * Math.sin(Constants.TurretConstants.Pitch.Angle) 
+                        * Math.sin(pitch) 
                         * time
                     );
                     
-
-                        
-
-
-
                     // Return error squared to avoid sqrt for optimization. 
                     // For this, minimizing squared error should be equivalent to minimizing error. 
                     return Math.pow(
