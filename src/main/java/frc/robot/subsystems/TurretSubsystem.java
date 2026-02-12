@@ -255,7 +255,7 @@ public class TurretSubsystem extends SubsystemBase {
                         * Math.cos(pitch) 
                         * Math.cos(yaw)
                         * time;
-                    dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
+                    dbx += Math.cos(swerveSubsystem.getRotation().getX()) * swerveSubsystem.getXVelocity() * time;
                     dbx += -swerveSubsystem.getAngularVelocity()
                         * 0 // Offset from center of rotation to center of launcher.
                         *time;
@@ -264,7 +264,7 @@ public class TurretSubsystem extends SubsystemBase {
                         * Math.cos(pitch) 
                         * Math.sin(yaw) 
                         * time;
-                    dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
+                    dby += Math.sin(swerveSubsystem.getRotation().getX()) * swerveSubsystem.getXVelocity() * time;
                     dby += swerveSubsystem.getAngularVelocity()
                         * 0 // Offset from center of rotation to center of launcher.
                         *time;
