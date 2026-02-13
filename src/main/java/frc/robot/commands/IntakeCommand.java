@@ -47,9 +47,9 @@ public class IntakeCommand extends Command {
         }
         if (EMS == 1) {
             subsystem.setIntakePreset(IntakePresets.INTAKECLEAR);
-            if (EMS == 0) {
-                subsystem.setIntakePreset(IntakePresets.IDLE);
-            }
+        }
+        else {
+            subsystem.setIntakePreset(IntakePresets.IDLE);
         }
         
     }
