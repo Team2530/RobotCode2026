@@ -57,7 +57,7 @@ public class RobotContainer {
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
 
     // Autonomous chooser
-  
+    private final AutoChooser autoChooser = new AutoChooser();
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     @Logged
@@ -68,7 +68,7 @@ public class RobotContainer {
      */
     public RobotContainer() {
 
-
+        
         // Configure the trigger bindings
         configureBindings();
 
