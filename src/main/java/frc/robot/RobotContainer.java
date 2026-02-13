@@ -57,7 +57,7 @@ public class RobotContainer {
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
 
     // Autonomous chooser
-    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+    private final AutoChooser autoChooser = new AutoChooser();
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     @Logged
@@ -68,9 +68,7 @@ public class RobotContainer {
      */
     public RobotContainer() {
         
-        autoChooser.addOption("Reset to 0,0", 
-        Commands.runOnce(() -> swerveDriveSubsystem.resetOdometry(new Pose2d()), swerveDriveSubsystem)
-        );
+        
 
         // Configure the trigger bindings
         configureBindings();
@@ -113,7 +111,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return Command () {}
     }
 
     public SwerveSubsystem getSwerveSubsystem() {

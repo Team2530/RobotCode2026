@@ -278,7 +278,7 @@ public final class Constants {
     public static final double heading_CONTROLLER_P = 7.5;
     public static final double heading_CONTROLLER_I = 0.0;
     public static final double heading_CONTROLLER_D = 0.0;
-    public static final AutoChooser AUTO_CHOOSER = new AutoChooser();
+    
   }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
