@@ -62,7 +62,7 @@ public class RobotContainer {
                 public final CommandXboxController operatorXbox = new CommandXboxController(
                         ControllerConstants.OPERATOR_CONTROLLER_PORT);
             
-                private final SendableChooser<Command> autoChooser;
+                //private final SendableChooser<Command> autoChooser;
             
                 @Logged
                 public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
@@ -88,19 +88,19 @@ public class RobotContainer {
             
                     // NamedCommands.registerCommand(null, getAutonomousCommand());
             
-                    swerveDriveSubsystem.configurePathplanner();
-                    autoChooser = AutoBuilder.buildAutoChooser();
-                    SmartDashboard.putData("Auto Chooser", autoChooser);
+                    // swerveDriveSubsystem.configurePathplanner();
+                    // autoChooser = AutoBuilder.buildAutoChooser();
+                    // SmartDashboard.putData("Auto Chooser", autoChooser);
             
-                    autoChooser.onChange(new Consumer<Command>() {
-                        @Override
-                        public void accept(Command t) {
-                            if (t instanceof PathPlannerAuto) {
-                                PathPlannerAuto auto = (PathPlannerAuto) t;
-                                swerveDriveSubsystem.setAutoStartingPose(auto.getStartingPose());
-                            }
-                        }
-                    });
+                    // autoChooser.onChange(new Consumer<Command>() {
+                    //     @Override
+                    //     public void accept(Command t) {
+                    //         if (t instanceof PathPlannerAuto) {
+                    //             PathPlannerAuto auto = (PathPlannerAuto) t;
+                    //             swerveDriveSubsystem.setAutoStartingPose(auto.getStartingPose());
+                    //         }
+                    //     }
+                    // });
                 }
             
                 
@@ -157,38 +157,14 @@ public class RobotContainer {
             operatorXbox.y().whileFalse(new InstantCommand(() -> {
                 IntakeCommand.setEMS(0);
             }));
-    public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
-    // @Logged
-    public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
-
-    @Logged
-    public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+        }
 
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
-    @Logged
-    private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
-
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
-    public RobotContainer() {
-        // Configure the trigger bindings
-        configureBindings();
 
-        DataLogManager.logNetworkTables(true);
-        DataLogManager.start();
-
-        
-
-        swerveDriveSubsystem.setDefaultCommand(normalDrive);
-
-        // NamedCommands.registerCommand(null, getAutonomousCommand());
-    }
-
-    
-       
-    }
                 
                     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
