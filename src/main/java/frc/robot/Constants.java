@@ -148,7 +148,6 @@ public final class Constants {
   public static class IntakeMotors {
     //Intake motor 1
     public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed
-    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed. DONE: FALSE
     public static final double INTAKE_SPEED = 0.6;
     //Pivot Motor for intake
     public static final int INTAKE_PIVOT_MOTOR = 5;
@@ -171,7 +170,6 @@ public final class Constants {
 
   
   public static class DriveConstants {
-  public static final class DriveConstants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
     public static final double MAX_ROBOT_VELOCITY = 4.2;
