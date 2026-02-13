@@ -57,7 +57,7 @@ public class RobotContainer {
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
 
     // Autonomous chooser
-    private final AutoChooser autoChooser = new AutoChooser();
+  
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     @Logged
@@ -67,8 +67,7 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        
-        
+
 
         // Configure the trigger bindings
         configureBindings();
@@ -111,7 +110,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return Command () {}
+        return new Command() {};
     }
 
     public SwerveSubsystem getSwerveSubsystem() {
