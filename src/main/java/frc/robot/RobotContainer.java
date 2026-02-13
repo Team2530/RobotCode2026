@@ -110,7 +110,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new Command() {};
+        return autoChooser.selectedCommand();
     }
 
     public SwerveSubsystem getSwerveSubsystem() {
