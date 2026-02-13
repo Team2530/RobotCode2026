@@ -269,8 +269,23 @@ public final class Constants {
             public static final boolean BR_DRIVE_INVERTED = false;
             public static final boolean BR_ANGLE_INVERTED = true;
         };
+
     }
 
+    public static final class Sockets {
+        public static final class Rotation {
+            public static final class HeadingPID {
+                // TODO: tune
+                public static final double P = 1;
+                public static final double I = 0;
+                public static final double D = 0;
+            }
+        }   
+
+        public static final class Translation {
+
+        }   
+    };
   }
 
   public static class CommonConstants {

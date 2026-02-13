@@ -8,9 +8,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -39,10 +40,6 @@ import frc.robot.Constants.RobotConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-    private final SwerveDrive swerveDrive;
-
-    private final SendableChooser<SwerveGearing> gearChooser;
-
     enum SwerveGearing {
         LIGHT(7.03f),
         RIDICULUS(6.03f),
@@ -54,6 +51,186 @@ public class SwerveSubsystem extends SubsystemBase {
             this.gearRatio = gearRatio;
         }
     }
+
+    /*
+     * Control mode of the drivebase rotation
+     */
+    enum SteerMode {
+        RELATIVE,
+        ABSOLUTE,
+        TO_POINT
+    }
+
+    /*
+     * Control mode of the drivebase translation
+     */
+    enum DriveMode {
+        RELATIVE,
+        ABSOLUTE,
+        TO_POINT
+    }
+
+    // WARNING: there might be a better way to do this
+    public class RotationSocket {
+        public interface RotationRequester {
+            public boolean active();
+            public RotationValue value();
+        }
+
+        private interface RotationValue {
+            public SteerMode getMode();
+            /*
+             * get the value of the rotation request, in robot-relative
+             * terms
+             */
+            public Rotation2d getValue();
+        }
+
+        public class RelativeRotation
+            implements RotationValue
+        {
+            private final Rotation2d relative;
+            public RelativeRotation (Rotation2d relative) 
+                { this.relative = relative; }
+
+            public SteerMode getMode() 
+                { return SteerMode.RELATIVE; }
+
+            public Rotation2d getValue() {
+                return relative;
+            }
+        }
+
+        public class AbsoluteRotation
+            implements RotationValue
+        {
+            private static final PIDController rotationPID = new PIDController(
+                DriveConstants.Sockets.Rotation.HeadingPID.P,
+                DriveConstants.Sockets.Rotation.HeadingPID.I,
+                DriveConstants.Sockets.Rotation.HeadingPID.D
+            );
+
+            private final Rotation2d absolute;
+            public AbsoluteRotation(Rotation2d absolute)
+                { this.absolute = absolute; }
+
+            public SteerMode getMode() 
+            { return SteerMode.ABSOLUTE; }
+
+            public Rotation2d getValue() {
+                return new Rotation2d(
+                    rotationPID.calculate(
+                        getRotation()
+                            .toRotation2d()
+                            .getRadians(),
+                        absolute.getRadians()
+                    )
+                );
+            }
+        }
+
+        public class ToPointRotation
+            implements RotationValue
+        {
+            private static final PIDController rotationPID = new PIDController(
+                DriveConstants.Sockets.Rotation.HeadingPID.P,
+                DriveConstants.Sockets.Rotation.HeadingPID.I,
+                DriveConstants.Sockets.Rotation.HeadingPID.D
+            );
+
+            private final Pose2d point;
+            public ToPointRotation(Pose2d point)
+                { this.point = point; }
+
+            public SteerMode getMode() 
+                { return SteerMode.TO_POINT; }
+
+            public Rotation2d getValue() {
+                return new Rotation2d(
+                    rotationPID.calculate(
+                        getRotation()
+                            .toRotation2d()
+                            .getRadians(),
+                        getPose()
+                            .relativeTo(point)
+                            .getTranslation()
+                            .getAngle()
+                            .getRadians()
+                    )
+                );
+            }
+        }
+    }
+
+    public class TranslationSocket {
+        public interface TranslationRequester {
+            public boolean active();
+            public TranslationValue value();
+        }
+
+        private interface TranslationValue {
+            public DriveMode getMode();
+            /*
+             * get the value of the translation request, in field-oriented
+             * terms
+             */
+            public Translation2d getValue();
+        }
+        
+        public class RelativeTranslation
+            implements TranslationValue
+        {
+            private final Translation2d relative;
+            public RelativeTranslation(Translation2d relative) 
+                { this.relative = relative; }
+
+            public DriveMode getMode()
+                { return DriveMode.RELATIVE; }
+
+            public Translation2d getValue() {
+                return relative.rotateBy(
+                    getRotation().toRotation2d()
+                );
+            }
+        }
+
+        public class AbsoluteTranslation
+                implements TranslationValue
+        {
+            private final Translation2d absolute;
+            public AbsoluteTranslation(Translation2d absolute) 
+                { this.absolute = absolute; }
+
+            public DriveMode getMode()
+                { return DriveMode.ABSOLUTE; }
+
+            public Translation2d getValue() {
+                return absolute;
+            }
+        }
+
+        public class ToPointTranslation
+            implements TranslationValue
+        {
+            private final Pose2d point;
+            public ToPointTranslation (Pose2d point) 
+                { this.point = point; }
+
+            public DriveMode getMode() 
+                { return DriveMode.TO_POINT; }
+
+            // TODO: there's a smoother way to do this
+            public Translation2d getValue() {
+                return getPose()
+                    .minus(point)
+                    .getTranslation();
+            }
+        }
+    }
+
+    private final SwerveDrive swerveDrive;
+
+    private final SendableChooser<SwerveGearing> gearChooser;
 
     public SwerveSubsystem() {
         // register gearshifter with smartdashboard
@@ -315,7 +492,9 @@ public class SwerveSubsystem extends SubsystemBase {
     };
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        
+    }
 
     @Override
     public void simulationPeriodic() {}
@@ -325,7 +504,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param translation field-oriented translation; m / s
      * @param rotation angular rate; rads / s
      */
-    public void drive(Translation2d translation, double rotation) {
+    private void drive(Translation2d translation, double rotation) {
         swerveDrive.drive(
             translation,
             rotation,
@@ -339,7 +518,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param translation robot-oriented translation; m / s
      * @param rotation angular rate; rads / s
      */
-    public void driveRobotRelative(
+    private void driveRobotRelative(
         Translation2d translation, 
         double rotation
     ) {
@@ -382,6 +561,7 @@ public class SwerveSubsystem extends SubsystemBase {
         return getVelocity().omegaRadiansPerSecond;
     }
 
+    // WARNING: dunno what units these're in               
     public Rotation3d getRotation() {
         return swerveDrive.getGyroRotation3d();
     }
@@ -390,7 +570,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setMotorIdleMode(isBraking);
     }
 
-    public void xStance() {
+    private void xStance() {
         swerveDrive.lockPose();
     }
 
