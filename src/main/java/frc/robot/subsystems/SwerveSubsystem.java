@@ -37,6 +37,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.choreoConstants;
+import choreo.auto.AutoChooser;
 
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -304,10 +305,10 @@ public class SwerveSubsystem extends SubsystemBase {
             );
 
             swerveDrive = new SwerveDrive(
-                    driveConfiguration, 
-                    controllerConfiguration,
-                    DriveConstants.MAX_ROBOT_VELOCITY, 
-                    new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(90))
+                driveConfiguration, 
+                controllerConfiguration,
+                DriveConstants.MAX_ROBOT_VELOCITY, 
+                new Pose2d(new Translation2d(), Rotation2d.fromRadians(0))
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -14,14 +14,17 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import choreo.Choreo;
+import choreo.auto.AutoChooser;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -83,7 +86,7 @@ public final class Constants {
    *|-----------------------------------|
    *|edits can have catastafic falure---|
 *///|-----------WARNING-----------------|
-  //---Intake Motors---\\
+  //---Intake Motors---\
   public static class IntakeMotors {
     public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed. DONE: FALSE
     public static final double INTAKE_SPEED = 0.6;
@@ -275,6 +278,7 @@ public final class Constants {
     public static final double heading_CONTROLLER_P = 7.5;
     public static final double heading_CONTROLLER_I = 0.0;
     public static final double heading_CONTROLLER_D = 0.0;
+    public static final AutoChooser AUTO_CHOOSER = new AutoChooser();
   }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
