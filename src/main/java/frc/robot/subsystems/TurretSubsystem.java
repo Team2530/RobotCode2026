@@ -300,8 +300,11 @@ public class TurretSubsystem extends SubsystemBase {
             // at a straightline to the target; my assumption is that the 
             // optimizer will be rerun at a frequency that the discrepancies 
             // wont matter
+            //
+            // WARNING: as of writing, we have a 360 turret, so the optimizer is 
+            // unbounded on yaw
             double [] lowerBounds = {
-                TurretConstants.Yaw.ANGLE_MIN,
+                Double.MIN_VALUE,
                 TurretConstants.Pitch.CONSTANT_ANGLE,
                 // WARNING: overridden for constant pitch
                 /*TurretConstants.Pitch.ANGLE_MIN(
@@ -316,7 +319,7 @@ public class TurretSubsystem extends SubsystemBase {
                 0
             };
             double [] upperBounds = {
-                TurretConstants.Yaw.ANGLE_MAX,
+                Double.MAX_VALUE,
                 TurretConstants.Pitch.CONSTANT_ANGLE,
                 /*TurretConstants.Pitch.ANGLE_MAX,*/
                 TurretConstants.TargetingOptimizer.MAXIMUM_VELOCITY,

@@ -314,9 +314,8 @@ public final class Constants {
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
         //
-        // WARNING: as of writing, we have a 360 turret
-        public static final double ANGLE_MIN = Double.MIN_VALUE;
-        public static final double ANGLE_MAX = Double.MAX_VALUE;
+        public static final double ANGLE_MIN = -10;
+        public static final double ANGLE_MAX = 370;
 
         public static final class Zeroing {
             // amps
