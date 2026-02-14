@@ -56,7 +56,7 @@ public class LauncherSubsystem extends SubsystemBase {
   
   private static boolean output;
     
-  public static void setOutput(Boolean output) {
+  public static void setOutput(boolean output) {
     LauncherSubsystem.output = output;
   } 
   public boolean getOutput() {

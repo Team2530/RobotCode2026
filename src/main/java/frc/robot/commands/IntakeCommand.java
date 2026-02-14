@@ -33,7 +33,7 @@ public class IntakeCommand extends Command {
         if (down == 1) {
             subsystem.setIntakePreset(IntakePresets.OUT);
             SmartDashboard.putString("Intake Command", "Started");
-            if (start == true) {
+            if (start) {
                 subsystem.setIntakePreset(IntakePresets.INTAKE);
                     if (Robot.isSimulation()) {
                     SmartDashboard.putBoolean("[SIM] Collecting", true);
@@ -49,7 +49,7 @@ public class IntakeCommand extends Command {
             }
         
         }
-        if (EMS == true) {
+        if (EMS) {
             subsystem.setIntakePreset(IntakePresets.INTAKECLEAR);
         }
         else {
