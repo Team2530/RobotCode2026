@@ -440,6 +440,13 @@ public final class Constants {
     public static final class TargetingOptimizer {
         public static final int INTERPOLATION_POINTS = 9;
         public static final int MAX_EVALUATIONS = 1000;
+
+        // micah says error should only be zero, but i don't think its always
+        // gonna work that way
+        public static final double MAX_ERROR = 0.1;
+        // the largest error the real launcher can have before it self-enables
+        // firing
+        public static final double MAX_REAL_ERROR = 0.5;
         
         public static final double MAXIMUM_TIME = 5;
         // meters per second

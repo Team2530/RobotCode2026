@@ -126,7 +126,11 @@ public class TurretSubsystem extends SubsystemBase {
     private boolean yawIsZeroed;
     private double yawOffset;
 
+    // optimizing
     private final BOBYQAOptimizer targetingOptimizer;
+    private double solutionError;
+    private double realError;
+
 
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
@@ -177,7 +181,7 @@ public class TurretSubsystem extends SubsystemBase {
         startYawZeroing();
 
         TargetPositionPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("/Turret/Target_position", Pose3d.struct)
+            .getStructTopic("Turret/Targeting/Target_position", Pose3d.struct)
             .publish();
     }
 
@@ -332,6 +336,18 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             ).getPoint();
 
+            // store the error values for later use
+            solutionError = optimizerFunction.value(targetOptimum);
+            // calculate the error of current position
+            realError = optimizerFunction.value(new double[] {
+                getYaw(),
+                getPitch(),
+                getLauncherVelocity(),
+                // just steal the optimum time
+                targetOptimum[3]
+            });
+
+
             // modulo by 360 because of the infinite yaw limits
             double optimalYaw = targetOptimum[0] % 360;
             double optimalVelocity = targetOptimum[1];
@@ -383,6 +399,9 @@ public class TurretSubsystem extends SubsystemBase {
             );
 
 
+            // optimizer
+            //
+            // this publishes to "Turret/Targeting/Target_position"
             TargetPositionPublisher.set(
                 swerveSubsystem.get3dPose()
                     .plus(
@@ -391,6 +410,14 @@ public class TurretSubsystem extends SubsystemBase {
                             new Rotation3d()
                         )
                     )
+            );
+            SmartDashboard.putBoolean(
+                "Turret/Targeting/has_valid_solution",
+                hasValidSolution()
+            );
+            SmartDashboard.putBoolean(
+                "Turret/Targeting/at_solution",
+                isAtSolution()
             );
             // launcher
             SmartDashboard.putNumber(
@@ -571,5 +598,26 @@ public class TurretSubsystem extends SubsystemBase {
                 new Rotation3d()
             )
         );
+    }
+
+    /*
+     * @return boolean - true if the turret subsystem was able to generate a
+     * **theoretical** valid solution to the given target
+     */
+    public boolean hasValidSolution() {
+        return solutionError
+            > TurretConstants.TargetingOptimizer.MAX_ERROR;
+    }
+    
+    /*
+     * @return boolean - true if the turret subsystem **is at** a valid solution 
+     * to the given target
+     */
+    public boolean isAtSolution() {
+        return hasValidSolution()
+            && (
+                realError
+                < TurretConstants.TargetingOptimizer.MAX_REAL_ERROR
+            );
     }
 }
