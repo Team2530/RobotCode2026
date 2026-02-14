@@ -126,10 +126,10 @@ public class RobotContainer {
 
             // Firing
             operatorXbox.x().whileTrue(new InstantCommand(() -> {
-                LauncherSubsystem.setOutput(1);
+                LauncherSubsystem.setOutput(true);
             }));
             operatorXbox.x().whileFalse(new InstantCommand(() -> {
-                LauncherSubsystem.setOutput(0);
+                LauncherSubsystem.setOutput(false);
             }));
 
 /*          // Climb
@@ -140,10 +140,10 @@ public class RobotContainer {
             }));
             // Start Intaking
             driverXbox.x().whileTrue(new InstantCommand(() -> {
-                IntakeCommand.setStart(1);
+                IntakeCommand.setStart(true);
             }));
             driverXbox.x().whileFalse(new InstantCommand(() -> {
-                IntakeCommand.setStart(0);
+                IntakeCommand.setStart(false);
             }));
 
             /* Drop Intake (Light tap needed, no need for hold. Hold until ready to intake, driver holds for the rest, reset automaticly)
@@ -154,10 +154,10 @@ public class RobotContainer {
 
             // EMS for Intake (Emergency Use, Reverses Intake to clear)
             operatorXbox.y().whileTrue(new InstantCommand(() -> {
-                IntakeCommand.setEMS(1);
+                IntakeCommand.setEMS(true);
             }));
             operatorXbox.y().whileFalse(new InstantCommand(() -> {
-                IntakeCommand.setEMS(0);
+                IntakeCommand.setEMS(false);
             }));
         }
 

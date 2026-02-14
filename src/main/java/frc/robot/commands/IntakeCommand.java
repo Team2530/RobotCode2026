@@ -33,14 +33,14 @@ public class IntakeCommand extends Command {
         if (down == 1) {
             subsystem.setIntakePreset(IntakePresets.OUT);
             SmartDashboard.putString("Intake Command", "Started");
-            if (start == 1) {
+            if (start == true) {
                 subsystem.setIntakePreset(IntakePresets.INTAKE);
                     if (Robot.isSimulation()) {
                     SmartDashboard.putBoolean("[SIM] Collecting", true);
                 
                 }
             }
-            if (start == 0) {
+            else {
                 setDown(0);
                 subsystem.setIntakePreset(IntakePresets.IDLE);
                 if (Robot.isSimulation()) {
@@ -49,7 +49,7 @@ public class IntakeCommand extends Command {
             }
         
         }
-        if (EMS == 1) {
+        if (EMS == true) {
             subsystem.setIntakePreset(IntakePresets.INTAKECLEAR);
         }
         else {
@@ -57,12 +57,12 @@ public class IntakeCommand extends Command {
         }
         
     }
-    private static double start;
+    private static boolean start;
     
-    public static void setStart(double start) {
+    public static void setStart(Boolean start) {
         IntakeCommand.start = start;
     } 
-    public double getstart() {
+    public boolean getstart() {
         return start;
     }
 /*  
@@ -78,12 +78,12 @@ public class IntakeCommand extends Command {
         return down;
     }
     //EMS (Emergency Management system)
-    private static double EMS;
+    private static boolean EMS;
     
-    public static void setEMS(double ems) {
+    public static void setEMS(Boolean ems) {
         IntakeCommand.EMS = ems;
     } 
-    public double getEMG() {
+    public boolean getEMG() {
         return EMS;
     }
 }

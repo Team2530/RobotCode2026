@@ -46,7 +46,7 @@ public class LauncherSubsystem extends SubsystemBase {
   }
 
   public void initalize() { //Helps make trigger keys
-    if (output == 1) {
+    if (output == true) {
       runLauncher();
     }
     else {
@@ -54,12 +54,12 @@ public class LauncherSubsystem extends SubsystemBase {
     }
   }
   
-  private static double output;
+  private static boolean output;
     
-  public static void setOutput(double output) {
+  public static void setOutput(Boolean output) {
     LauncherSubsystem.output = output;
   } 
-  public double getOutput() {
+  public boolean getOutput() {
     return output;
   }
   
