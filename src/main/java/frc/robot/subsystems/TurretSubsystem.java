@@ -108,6 +108,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final RelativeEncoder e_LauncherEncoder;
     private final RelativeEncoder e_YawEncoder;
     // lets just pray its a cancoder
+    private final CANcoder e_PitchEncoder;
 
     // motor control
     private final PIDController launcherPID;
@@ -145,6 +146,9 @@ public class TurretSubsystem extends SubsystemBase {
 
         e_LauncherEncoder = m_LauncherMotor.getEncoder();
         e_YawEncoder = m_YawMotor.getEncoder();
+        e_PitchEncoder = new CANcoder(
+            TurretConstants.CanIDs.PITCH_ENCODER
+        );
 
         launcherPID = new PIDController(
             TurretConstants.Launcher.PID.P,
@@ -278,7 +282,7 @@ public class TurretSubsystem extends SubsystemBase {
                 // Start optimizer at current position to reduce optimization 
                 // time.
                 getYaw(),               
-                TurretConstants.Pitch.ANGLE_CONSTANT,
+                getPitch(),
                 getLauncherVelocity(),
                 0
             };
@@ -431,6 +435,24 @@ public class TurretSubsystem extends SubsystemBase {
             e_YawEncoder.getVelocity() 
                 / TurretConstants.Yaw.GEAR_RATIO
         );
+    }
+
+    public double getPitch() {
+        return TurretConstants.Pitch.ANGLE_CONSTANT;
+        /*
+        return e_PitchEncoder.getPosition()
+            .getValueAsDouble()
+            / TurretConstants.Pitch.GEAR_RATIO;
+        */
+    }
+
+    public double getPitchVelocity() {
+        return 0;
+        /*
+        return e_PitchEncoder.getVelocity()
+            .getValueAsDouble()
+            / TurretConstants.Pitch.GEAR_RATIO;
+        */
     }
 
     public double getLauncherVelocity() {
