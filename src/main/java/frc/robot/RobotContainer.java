@@ -131,9 +131,11 @@ public class RobotContainer {
             operatorXbox.x().whileFalse(new InstantCommand(() -> {
                 LauncherSubsystem.setOutput(0);
             }));
-       
-            // Climb
-            operatorXbox.rightBumper().onTrue(new InstantCommand(() -> {
+
+/*          // Climb
+*           FILE POSSIBLE WILL BE DEPRICATED FOR TOURNAMENT
+*            -PRIORITY SWITCH, HOLD TILL FURTHER NOTICE-
+*/          operatorXbox.rightBumper().onTrue(new InstantCommand(() -> {
                 ClimberCommand.setOutput(1);
             }));
             // Start Intaking
@@ -144,8 +146,8 @@ public class RobotContainer {
                 IntakeCommand.setStart(0);
             }));
 
-            // Drop Intake (Light tap needed, no need for hold. Hold until ready to intake, driver holds for the rest, reset automaticly)
-            // An auto system will be made to remove this for faster gameplay. (all you got to do is replace the check for down with start :>)
+            /* Drop Intake (Light tap needed, no need for hold. Hold until ready to intake, driver holds for the rest, reset automaticly)
+          */// An auto system will be made to remove this for faster gameplay. (all you got to do is replace the check for down with start :>)
             operatorXbox.a().onTrue(new InstantCommand(() -> {
                 IntakeCommand.setDown(1);
             }));

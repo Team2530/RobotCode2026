@@ -12,6 +12,10 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.commands.ClimberCommand.ClimbPresets;
 
+/*
+ * FILE POSSIBLE WILL BE DEPRICATED FOR TOURNAMENT
+ *  -PRIORITY SWITCH, HOLD TILL FURTHER NOTICE-
+ */
 public class ClimberSubsystem extends SubsystemBase {
     
     private final SparkFlex m_climbsubsystemMotor;

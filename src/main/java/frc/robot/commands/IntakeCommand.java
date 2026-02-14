@@ -29,21 +29,21 @@ public class IntakeCommand extends Command {
         if (down == 1) {
             subsystem.setIntakePreset(IntakePresets.OUT);
             SmartDashboard.putString("Intake Command", "Started");
-            while (start == 1) {
+            if (start == 1) {
                 subsystem.setIntakePreset(IntakePresets.INTAKE);
                     if (Robot.isSimulation()) {
                     SmartDashboard.putBoolean("[SIM] Collecting", true);
                 
                 }
-                if (start == 0) {
-                    setDown(0);
-                    subsystem.setIntakePreset(IntakePresets.IDLE);
-                    if (Robot.isSimulation()) {
-                        SmartDashboard.putBoolean("[SIM] Collecting", false);
-                    }
-                }
-
             }
+            if (start == 0) {
+                setDown(0);
+                subsystem.setIntakePreset(IntakePresets.IDLE);
+                if (Robot.isSimulation()) {
+                    SmartDashboard.putBoolean("[SIM] Collecting", false);
+                }
+            }
+        
         }
         if (EMS == 1) {
             subsystem.setIntakePreset(IntakePresets.INTAKECLEAR);

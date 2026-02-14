@@ -49,7 +49,7 @@ public class LauncherSubsystem extends SubsystemBase {
     if (output == 1) {
       runLauncher();
     }
-    if (output == 0) {
+    else {
       stopLauncher();
     }
   }

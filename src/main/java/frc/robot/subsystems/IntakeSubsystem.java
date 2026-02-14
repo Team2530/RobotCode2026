@@ -11,7 +11,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.commands.IntakeCommand;
 
-public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINALIZED)
+public class IntakeSubsystem extends SubsystemBase {
 
     
 
