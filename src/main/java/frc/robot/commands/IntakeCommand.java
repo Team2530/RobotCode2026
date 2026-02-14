@@ -80,10 +80,10 @@ public class IntakeCommand extends Command {
     //EMS (Emergency Management system)
     private static boolean EMS;
     
-    public static void setEMS(Boolean ems) {
-        IntakeCommand.EMS = ems;
+    public static void setEMS(Boolean emergencyManagementSystem) {
+        IntakeCommand.EMS = emergencyManagementSystem;
     } 
-    public boolean getEMG() {
+    public boolean getEMS() {
         return EMS;
     }
 }
