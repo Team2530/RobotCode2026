@@ -1,37 +1,26 @@
 package frc.robot.commands;
 
-import frc.robot.Robot;
-import frc.robot.subsystems.IntakeSubsystem.IntakePresets;
-import frc.robot.subsystems.IntakeSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+
+import frc.robot.subsystems.IntakeSubsystem.IntakePreset;
+import frc.robot.subsystems.IntakeSubsystem;
 
 public class IntakeCommand extends Command {
     
     private final IntakeSubsystem subsystem;
-
-    
 
     public IntakeCommand(IntakeSubsystem subsystem) {
         this.subsystem = subsystem;
         addRequirements(subsystem);
     }
 
-     @Override
-    public void end(boolean interrupted) {
-        subsystem.setIntakePreset(IntakePresets.IDLE);
-        SmartDashboard.putString("Intake Ended", "Ended");
-    }
-
-     @Override
+    @Override
     public void initialize() {
-        subsystem.setIntakePreset(IntakePresets.INTAKE);
-        SmartDashboard.putString("Intake Command", "Started");
-        
-
-        if (Robot.isSimulation()) {
-            SmartDashboard.putBoolean("[SIM] Collected", true);
-        
-        }
+        subsystem.setPreset(IntakePreset.INTAKING);
+    }
+     
+    @Override
+    public void end(boolean interrupted) {
+        subsystem.setPreset(IntakePreset.STOWED);
     }
 }

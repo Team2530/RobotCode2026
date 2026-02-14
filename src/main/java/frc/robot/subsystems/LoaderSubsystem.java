@@ -1,49 +1,47 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import frc.robot.Constants.LoaderConstants;
 
-import frc.robot.Constants.IndexerConstants;
+public class LoaderSubsystem extends SubsystemBase {
 
-public class IndexerSubsystem extends SubsystemBase {
+    private final SparkMax m_LoaderMotor;
 
-    private final SparkMax m_IndexerMotor;
-
-    public IndexerSubsystem() {
-        m_IndexerMotor = new SparkMax(
-            IndexerConstants.CAN_ID,
-            MotorType.kBrushless
+    public LoaderSubsystem() {
+        m_LoaderMotor = new SparkMax(
+                LoaderConstants.CAN_ID,
+                MotorType.kBrushless
         );
-
-        stop();
+        run(0);
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber(
-            "Indexer/velocity",
-            m_IndexerMotor.getEncoder().getVelocity()
+            "Loader/velocity",
+            m_LoaderMotor.getEncoder().getVelocity()
         );
     }
 
     public void run() {
         run(
-            IndexerConstants.SPEED
+            LoaderConstants.SPEED
         );
     }
 
     /*
-     * set a custom speed for the indexer motor
+     * set a custom speed for the loader motor
      * @param speed - a value between -1 and 1 to set the motor to
      */
     public void run(double speed) {
-        m_IndexerMotor.set(speed);
-
+        m_LoaderMotor.set(speed);
         SmartDashboard.putNumber(
-            "Indexer/speed",
+            "Loader/speed",
             speed
         );
     }
@@ -58,13 +56,11 @@ public class IndexerSubsystem extends SubsystemBase {
     
     public void runReverse() {
         run(
-            -IndexerConstants.SPEED
+            -LoaderConstants.SPEED
         );
     }
 
     public void stop() {
         run(0.0);
     }
-
 }
-

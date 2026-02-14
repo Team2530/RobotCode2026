@@ -102,9 +102,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final SwerveSubsystem swerveSubsystem; 
 
-    // Motor types may need to change, for now they are set to Spark Maxes for Neo 1/2/550.
-    private final TalonFX m_XLauncherMotor; //x60
-    private final TalonFX m_XYawMotor;      //x40
     private final SparkMax m_LauncherMotor;
     private final SparkMax m_YawMotor;
 
@@ -136,12 +133,6 @@ public class TurretSubsystem extends SubsystemBase {
     public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
         this.swerveSubsystem = swerveSubsystem;
         // Initialize Motors and Encoders
-        m_XLauncherMotor = new TalonFX(
-            TurretConstants.CanIDs.LAUNCHER_MOTOR 
-            );
-        m_XYawMotor = new TalonFX(
-            TurretConstants.CanIDs.YAW_MOTOR 
-            );
         m_LauncherMotor = new SparkMax(
             TurretConstants.CanIDs.LAUNCHER_MOTOR,
             MotorType.kBrushless
