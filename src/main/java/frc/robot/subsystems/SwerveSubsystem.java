@@ -55,7 +55,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /*
      * Control mode of the drivebase rotation
      */
-    enum SteerMode {
+    public enum SteerMode {
         RELATIVE,
         ABSOLUTE,
         TO_POINT
@@ -64,7 +64,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /*
      * Control mode of the drivebase translation
      */
-    enum DriveMode {
+    public enum DriveMode {
         RELATIVE,
         ABSOLUTE,
         TO_POINT
