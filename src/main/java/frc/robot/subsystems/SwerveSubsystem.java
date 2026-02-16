@@ -50,10 +50,12 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrive swerveDrive;
 
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("SS swerveDrive Pose", Pose2d.struct).publish();
+            .getStructTopic("odometry pose", Pose2d.struct).publish();
     StructArrayPublisher<SwerveModuleState> swerveStatesPublisher = NetworkTableInstance.getDefault()
             .getStructArrayTopic("SS SwerveModuleState[]", SwerveModuleState.struct).publish();
 
+
+    
     StructPublisher<Translation2d> translationPublisher = NetworkTableInstance.getDefault()
         .getStructTopic("SS.DC Input Translation Speed", Translation2d.struct).publish();
     StructPublisher<Rotation2d> rotationPublisher = NetworkTableInstance.getDefault()
@@ -322,6 +324,8 @@ public class SwerveSubsystem extends SubsystemBase {
             LimelightContainer.estimateSimOdometry();
         } else {
             RobotContainer.LLContainer.estimateMT2Odometry(swerveDrive);
+
+            posePublisher.set(swerveDrive.getPose());
         }
         posePublisher.set(swerveDrive.getPose());
         swerveStatesPublisher.set(swerveDrive.getStates());
