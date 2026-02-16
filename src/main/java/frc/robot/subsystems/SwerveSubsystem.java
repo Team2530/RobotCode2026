@@ -51,15 +51,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
             .getStructTopic("odometry pose", Pose2d.struct).publish();
-    StructArrayPublisher<SwerveModuleState> swerveStatesPublisher = NetworkTableInstance.getDefault()
-            .getStructArrayTopic("SS SwerveModuleState[]", SwerveModuleState.struct).publish();
-
-
+   
     
-    StructPublisher<Translation2d> translationPublisher = NetworkTableInstance.getDefault()
-        .getStructTopic("SS.DC Input Translation Speed", Translation2d.struct).publish();
-    StructPublisher<Rotation2d> rotationPublisher = NetworkTableInstance.getDefault()
-        .getStructTopic("SS.DC Input Rotation Speed", Rotation2d.struct).publish();
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
@@ -328,7 +321,6 @@ public class SwerveSubsystem extends SubsystemBase {
             posePublisher.set(swerveDrive.getPose());
         }
         posePublisher.set(swerveDrive.getPose());
-        swerveStatesPublisher.set(swerveDrive.getStates());
     }
 
     @Override
@@ -341,8 +333,6 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param rotation angular rate; rads / s
      */
     public void drive(Translation2d translation, double rotation) {
-        translationPublisher.set(translation);
-        rotationPublisher.set(new Rotation2d(rotation));
         swerveDrive.drive(
             translation,
             rotation,
@@ -375,6 +365,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public Pose2d getPose() {
         return swerveDrive.getPose();
     }
+
 
     public void setMotorBrake(boolean isBraking) {
         swerveDrive.setMotorIdleMode(isBraking);

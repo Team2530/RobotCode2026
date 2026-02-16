@@ -59,9 +59,9 @@ public class DriveCommand extends Command {
             (ControlConstants.REGULAR_DRIVE_MULT  - ControlConstants.TURTLE_DRIVE_MULT)
             ) + ControlConstants.TURTLE_DRIVE_MULT;
 
-        x *= -driveMultiplier;
-        y *= -driveMultiplier;
-        z *= -driveMultiplier;
+        x *= driveMultiplier;
+        y *= driveMultiplier;
+        z *= driveMultiplier;
 
         // convert to m / s
         x *= DriveConstants.MAX_ROBOT_VELOCITY;
