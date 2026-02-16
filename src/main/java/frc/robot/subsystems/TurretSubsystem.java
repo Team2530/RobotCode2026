@@ -419,6 +419,14 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Targeting/at_solution",
                 isAtSolution()
             );
+            SmartDashboard.putString(
+                "Turret/Targeting/target_name",
+                getTargetName().toString()
+            );
+            SmartDashboard.putString(
+                "Turret/Targeting/targeting_type",
+                getTargetingMode().toString()
+            );
             // launcher
             SmartDashboard.putNumber(
                 "Turret/Launcher/Target_velocity", 
