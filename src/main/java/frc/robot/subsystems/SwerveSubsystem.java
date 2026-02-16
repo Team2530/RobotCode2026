@@ -10,13 +10,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.units.measure.Distance;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -43,14 +41,12 @@ import frc.robot.util.LimelightContainer;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
-
 public class SwerveSubsystem extends SubsystemBase {
 
     private final SwerveDrive swerveDrive;
 
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Odometry Pose", Pose2d.struct).publish();
-
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
@@ -67,6 +63,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public SwerveSubsystem() {
+
         
 
         // register gearshifter with smartdashboard
@@ -282,11 +279,12 @@ public class SwerveSubsystem extends SubsystemBase {
                     DriveConstants.MAX_ROBOT_VELOCITY
             );
 
-        swerveDrive = new SwerveDrive(
-            driveConfiguration, 
-            controllerConfiguration,
-            DriveConstants.MAX_ROBOT_VELOCITY, 
-        );
+            swerveDrive = new SwerveDrive(
+                    driveConfiguration, 
+                    controllerConfiguration,
+                    DriveConstants.MAX_ROBOT_VELOCITY, 
+                    new Pose2d() // TODO: choreo's gonna need a different pose
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -309,19 +307,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-      
         if (Robot.isSimulation()) {
             LimelightContainer.estimateSimOdometry();
-            
-            posePublisher.set(swerveDrive.getPose());
         } else {
             RobotContainer.LLContainer.estimateMT2Odometry(swerveDrive);
 
             posePublisher.set(swerveDrive.getPose());
         }
-        posePublisher.set(swerveDrive.getPose());
     }
-     
+
     @Override
     public void simulationPeriodic() {}
 
@@ -414,6 +408,4 @@ public class SwerveSubsystem extends SubsystemBase {
     public Field2d getField() {
         return swerveDrive.field;
     }
-
-
 }
