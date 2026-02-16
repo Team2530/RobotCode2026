@@ -109,4 +109,8 @@ public abstract class SocketController<
 
         return sockets;
     }
+
+    public SocketType getSocket(SocketNamerator name) {
+        return socketInstances.get(name);
+    }
 }

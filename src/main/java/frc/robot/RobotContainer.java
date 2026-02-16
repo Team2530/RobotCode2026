@@ -22,6 +22,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
+import frc.robot.subsystems.SwerveSubsystem.TranslationSockets;
+import frc.robot.subsystems.SwerveSubsystem.RotationSockets;
 import frc.robot.util.LimelightContainer;
 import frc.robot.subsystems.Limelight;
 
@@ -55,7 +57,15 @@ public class RobotContainer {
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     @Logged
-    private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
+    private final DriveCommand normalDrive = new DriveCommand(
+            swerveDriveSubsystem.getTranslationSocket(
+                TranslationSockets.DRIVE
+            ),
+            swerveDriveSubsystem.getRotationSocket(
+                RotationSockets.DRIVE
+            ),
+            driverXbox.getHID()
+    );
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     /*

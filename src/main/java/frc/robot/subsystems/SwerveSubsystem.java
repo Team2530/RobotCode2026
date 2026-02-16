@@ -89,11 +89,11 @@ public class SwerveSubsystem extends SubsystemBase {
     // 
     // the order here determines the priority of the sockets later
     public enum TranslationSockets {
-
+        DRIVE
     }
 
     public enum RotationSockets {
-
+        DRIVE
     }
     
     // le controlelrs
@@ -547,5 +547,13 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Field2d getField() {
         return swerveDrive.field;
+    }
+
+    public TranslationSocket getTranslationSocket(TranslationSockets name) {
+        return translationSocketController.getSocket(name);
+    }
+
+    public RotationSocket getRotationSocket(RotationSockets name) {
+        return rotationSocketController.getSocket(name);
     }
 }
