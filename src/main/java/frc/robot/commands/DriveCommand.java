@@ -54,6 +54,7 @@ public class DriveCommand extends Command {
 
     private void possessTranslation() {
         translationSocket.possess(
+            this,
             new Requester<TranslationRequest>() {
                 @Override
                 public boolean isRequestingActive() {
@@ -72,6 +73,7 @@ public class DriveCommand extends Command {
 
     private void possessRotation() {
         rotationSocket.possess(
+            this,
             new Requester<RotationRequest>() {
                 @Override
                 public boolean isRequestingActive() {
