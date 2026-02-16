@@ -51,4 +51,8 @@ public abstract class Socket<
             return false;
         }
     }
+
+    public void depossess(){
+        possesser = null;
+    }
 }

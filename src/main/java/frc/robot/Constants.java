@@ -151,6 +151,8 @@ public final class Constants {
             public static final double Y = X; // WARNING: can i do this?
             public static final double Z = 0.08;
 
+            public static final double TRIGGER = 0.1;
+
             // the radius from 0 to 1 after which the angle-based heading 
             // control activates
             public static final double HEADING = 0;
