@@ -139,11 +139,7 @@ public class LimelightContainer {
       if (doRotationRejection(swerveDrive.getGyro(),720)) {
         doRejectUpdate = true;
       }
-      // Limelight position too far from odometry position TODO: Reimplement llpos distance
-      // if ((Math.abs(mt1.pose.getX() - Odometry.getEstimatedPosition().getX()) > 1.5)
-      //     || (Math.abs(mt1.pose.getY() - Odometry.getEstimatedPosition().getY()) > 1.5)) {
-      //   doRejectUpdate = true;
-      // }
+
 
       if (!doRejectUpdate) {
         // Use realistic vision measurement standard deviations (meters, meters, radians)
