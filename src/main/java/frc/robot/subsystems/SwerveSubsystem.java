@@ -8,6 +8,12 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -37,6 +43,10 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.util.swerve.RotationSocket;
+import frc.robot.util.swerve.SocketController;
+import frc.robot.util.swerve.TranslationSocket;
+import frc.robot.util.swerve.Socket;
 
 public class SwerveSubsystem extends SubsystemBase {
 
@@ -73,6 +83,35 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrive swerveDrive;
 
     private final SendableChooser<SwerveGearing> gearChooser;
+
+    // sockets stuff
+    // just the names for the sockets
+    // 
+    // the order here determines the priority of the sockets later
+    public enum TranslationSockets {
+
+    }
+
+    public enum RotationSockets {
+
+    }
+    
+    // le controlelrs
+    //
+    // god this naming sucks here
+    private final SocketController<
+        TranslationSockets,
+        TranslationSocket
+    > translationSocketController;
+    
+    private final SocketController<
+        RotationSockets,
+        RotationSocket
+    > rotationSocketController;
+
+    private TranslationSocket activeTranslationSocket;
+    private RotationSocket activeRotationSocket;
+
 
     public SwerveSubsystem() {
         // register gearshifter with smartdashboard
@@ -331,11 +370,35 @@ public class SwerveSubsystem extends SubsystemBase {
         //
         // idk this seems find
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
+
+        // ok so:
+        // pass swervedrive,
+        // pass naming enum
+        // pass socket class
+        //
+        // and it'll infer the rest :3
+        translationSocketController = new SocketController<>(
+            this,
+            TranslationSockets.class,
+            TranslationSocket.class
+        ) {
+            public TranslationSocket getActiveSocket() {
+                return activeTranslationSocket;
+            }
+        };
+        rotationSocketController = new SocketController<>(
+            this,
+            RotationSockets.class,
+            RotationSocket.class
+        ) {
+            public RotationSocket getActiveSocket() {
+                return activeRotationSocket;
+            }
+        };
     };
 
     @Override
     public void periodic() {
-        
     }
 
     @Override
