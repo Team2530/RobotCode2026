@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms                                                                                                                                                                
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import java.io.File;
@@ -16,9 +12,12 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -39,6 +38,14 @@ public final class Constants {
   public static class ControllerConstants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final int OPERATOR_CONTROLLER_PORT = 1;
+  }
+
+  public static class GameConstants {
+    public static class Fuel {
+        // meters 
+        public static final double DIAMETER = Units.inchesToMeters(5.9);
+        public static final double RADIUS = DIAMETER / 2;
+    }
   }
 
   public static class RobotConstants {
@@ -66,6 +73,21 @@ public final class Constants {
     }
   }
 
+  public static class HopperConstants {
+      // TODO: update
+      
+      // allese in meters
+
+      // i only really need to know about the static face of the hopper
+      public static final double WIDTH = 1;
+      // distance to the top of the hopper, relative to the bottom 
+      // (like the bottom of the wheels) of the robot
+      public static final double ABSOLUTE_HEIGHT = 1;
+      // distance backwards from the center of the robot
+      public static final double OFFSET_Y = 1;
+      // assume the hopper is 
+  }
+
   /*|-----------WARNING-----------------|
    *|edit with caution, used in all subs|
    *|-----------------------------------|
@@ -74,11 +96,28 @@ public final class Constants {
    *|edits can have catastafic falure---|
 *///|-----------WARNING-----------------|
   //---Intake Motors---\\
-  public static class IntakeMotors {
-    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed. DONE: FALSE
-    public static final double INTAKE_SPEED = 0.6;
-    public static final int INTAKE_MOTOR1 = 5;
-    public static final double INTAKE_SPEED1 = 0.6;
+  public static class IntakeConstants {
+      //TODO: IDs and speeds need to be changed. DONE: FALSE
+      // as in all the wheels on the front that grab the fuel
+      public static class Feeder {
+          public static final int CAN_ID = 4;
+      }
+
+      // as in the motor that lifts the whole structure
+      public static class Pivot {
+          public static final int CAN_ID = 54325432;
+
+          // voltage applied when the pivot is moving between stowed / deployed
+          public static final double DEPLOY_VOLTAGE = 6.0;
+          // voltaged applied when the pivot is holding it's position
+          public static final double HOLD_VOLTAGE = 0.5;
+
+          public static final class Zeroing {
+              // amps ocourse
+              public static final double CURRENT_LIMIT = 35;
+              public static final double DEBOUNCE_TIME = 0.35;
+          }
+      }
   }
 
   public static final class DriveConstants {
@@ -243,8 +282,23 @@ public final class Constants {
             public static final boolean BR_DRIVE_INVERTED = false;
             public static final boolean BR_ANGLE_INVERTED = true;
         };
+
     }
 
+    public static final class Sockets {
+        public static final class Rotation {
+            public static final class HeadingPID {
+                // TODO: tune
+                public static final double P = 1;
+                public static final double I = 0;
+                public static final double D = 0;
+            }
+        }   
+
+        public static final class Translation {
+
+        }   
+    };
   }
 
   public static class CommonConstants {
@@ -268,6 +322,155 @@ public final class Constants {
             put(i, TAG_LAYOUT.getTagPose(i + 1).get().toPose2d());
         }
       }};
+  }
+  public static final class TurretConstants {
 
+    // TODO: UPDATE BASED ON REAL ROBOT
+
+    public static final class Position{
+        public static final double PosX = Units.inchesToMeters(10);
+        public static final double PosY = Units.inchesToMeters(10);
+        public static final double PosZ = Units.inchesToMeters(10);
+    }
+    public static final class Launcher {
+        // inches
+        public static final double WHEEL_DIAMETER = 4;
+
+        public static final class PID {
+            public static final double P = 1;
+            public static final double I = 0;
+            public static final double D = 0;
+        }
+    }
+
+    public static final class Yaw {
+        public static final double GEAR_RATIO = 1;
+
+        // angular limits on yaw movement
+        // 180 is pointed directly out the turret side
+        //
+        public static final double ANGLE_MIN = -10;
+        public static final double ANGLE_MAX = 370;
+
+        public static final class Zeroing {
+            // amps
+            public static final double CURRENT_LIMIT = 35;
+            // time above current limit to register as hitting the hard limit
+            public static final double DEBOUNCE_TIME = 0.25;
+        }
+
+        public static final class PID {
+            public static final double P = 1;
+            public static final double I = 0;
+            public static final double D = 0;
+        }
+
+        public static final class Feedforward {
+            public static final double kS = 0;
+            public static final double kV = 0;
+            public static final double kA = 0;
+        }
+    }
+
+    public static final class Pitch {
+        public static final double GEAR_RATIO = 1;
+        
+        public static final double ANGLE_CONSTANT = 70.5;
+
+        // 90 would have the "face" of the turret as vertical
+        // 0 wouldd have the "face" be horizontal (outputting up)
+        /* 
+         * the minimum angle is dependent on the yaw
+         * @param yaw - the angle of the turret yaw in degrees
+         */
+        public static double ANGLE_MIN(double yaw) {
+            if (
+                Math.abs(yaw - 180) > 0 
+            ) {
+                // dependent on the yaw so we can shoot over the hopper
+                return Math.atan(
+                    (
+                        HopperConstants.ABSOLUTE_HEIGHT 
+                        + GameConstants.Fuel.RADIUS
+                        - TurretConstants.Offsets.Z
+                    ) / (
+                        Math.tan(
+                            Units.degreesToRadians(yaw) 
+                        ) * (
+                            TurretConstants.Offsets.Y 
+                            - HopperConstants.OFFSET_Y
+                        )
+                    )
+                );
+            
+            } else {
+                // physical hardstop of the hood
+                return 90;
+            }
+        }
+        public static final double ANGLE_MAX = 180;
+
+        
+        public static final class PID {
+            public static final double P = 1;
+            public static final double I = 0;
+            public static final double D = 0;
+        }
+    }
+
+    public static final class CanIDs {
+        public static final int LAUNCHER_MOTOR = 20;
+
+        public static final int YAW_MOTOR = 21;
+
+        public static final int PITCH_MOTOR = 22;
+        public static final int PITCH_ENCODER = 23;
+    }
+
+    public static final class Offsets {
+        public static final double YAW_ENCODER_ANGLE = 0;
+        public static final double PITCH_ENCODER_ANGLE = 0;
+
+        // TODO: update
+        // position relative to the center of the robot, in meters
+        public static final double X = Units.inchesToMeters(10);
+        public static final double Y = Units.inchesToMeters(10);
+        // Height of Shooter from Ground, in meters
+        public static final double Z = Units.inchesToMeters(20); 
+        public static final Translation3d TRANSLATION = new Translation3d(
+            X,
+            Y,
+            Z
+        );
+    }
+
+    public static final class TargetingOptimizer {
+        public static final int INTERPOLATION_POINTS = 9;
+        public static final int MAX_EVALUATIONS = 1000;
+
+        // micah says error should only be zero, but i don't think its always
+        // gonna work that way
+        public static final double MAX_ERROR = 0.1;
+        // the largest error the real launcher can have before it self-enables
+        // firing
+        public static final double MAX_REAL_ERROR = 0.5;
+        
+        public static final double MAXIMUM_TIME = 5;
+        // meters per second
+        public static final double MAXIMUM_VELOCITY = 10;
+        
+    }
+
+  }
+
+  public static final class IndexerConstants {
+      // TODO: UPDATE BASED ON REAL ROBOT
+      public static final int CAN_ID = 23;
+      public static final double SPEED = 0.60;
+  }
+
+  public static final class LoaderConstants {
+      public static final int CAN_ID = 24;
+      public static final double SPEED = 0.60;
   }
 }

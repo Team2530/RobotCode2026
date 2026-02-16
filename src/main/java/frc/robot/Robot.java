@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.Orchestra;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -39,7 +41,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
-
+  TalonFX m_Instrument1 = new TalonFX(5);
+  // REPEAT FOR EVERY KRAKEN 
+  Orchestra m_orchestra = new Orchestra();
   private Command m_autonomousCommand;
 
   @Logged
@@ -85,6 +89,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+
 
     // Put git/code version metadata on networktables
     NetworkTable versionTable = NetworkTableInstance.getDefault().getTable("Version");
@@ -150,6 +155,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_orchestra.addInstrument(m_Instrument1);
+    // REPEAT FOR ALL KRAKENS
+    m_orchestra.loadMusic("Symphony5.chrp");
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
