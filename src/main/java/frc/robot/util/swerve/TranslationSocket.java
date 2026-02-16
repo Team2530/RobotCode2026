@@ -6,7 +6,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem.DriveMode;
 
-public class TranslationSocket extends Socket {
+public class TranslationSocket 
+    extends Socket<TranslationSocket.TranslationRequest> 
+{
 
     public TranslationSocket(
         SocketController controller,
@@ -18,10 +20,12 @@ public class TranslationSocket extends Socket {
         );
     }
 
-    private interface TranslationRequest extends BaseRequestValue<
-        DriveMode,
-        Translation2d
-    > {};
+    public interface TranslationRequest
+        extends BaseRequestValue<
+            DriveMode,
+            Translation2d
+        >
+    {};
     
     public class RelativeTranslationRequest
         implements TranslationRequest

@@ -2,12 +2,14 @@ package frc.robot.util.swerve;
 
 import frc.robot.subsystems.SwerveSubsystem;
 
-public abstract class Socket {
+public abstract class Socket<
+    RequestType extends BaseRequestValue
+>{
 
     private final SocketController controller;
     protected final SwerveSubsystem swerve;
 
-    private Requester possesser = null;
+    private Requester<RequestType> possesser = null;
 
     public Socket(
         SocketController controller,
@@ -33,7 +35,15 @@ public abstract class Socket {
         return possesser != null;
     }
 
-    public boolean possess(Requester requester) {
+    public RequestType getRequest() {
+        if (isPossessed()) {
+            return possesser.getRequest();
+        } else {
+            return null;
+        }
+    }
+
+    public boolean possess(Requester<RequestType> requester) {
         if (!isPossessed()) {
             possesser = requester;
             return true;

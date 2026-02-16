@@ -399,6 +399,21 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        TranslationSocket[] sortedTranslationSockets =
+            translationSocketController.getSortedSockets();
+        RotationSocket[] sortedRotationSockets =
+            rotationSocketController.getSortedSockets();
+
+        // for now, just take the top priority socket from both
+        TranslationSocket topTranslationSocket = sortedTranslationSockets[0];
+        RotationSocket topRotationSocket = sortedRotationSockets[0];
+
+        // SEND IT
+        drive(
+            topTranslationSocket.getRequest().getUsableValue(),
+            topRotationSocket.getRequest().getUsableValue()
+        );
+
     }
 
     @Override
@@ -417,6 +432,18 @@ public class SwerveSubsystem extends SubsystemBase {
             false
         );
     }
+    
+    /**
+     * drive field-oriented
+     * @param translation field-oriented translation; m / s
+     * @param rotation angular rate; rads / s
+     */
+    private void drive(Translation2d translation, Rotation2d rotation) {
+        drive(
+            translation,
+            rotation.getRadians()
+        );
+    }
 
     /**
      * drive robot-oriented
@@ -424,7 +451,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param rotation angular rate; rads / s
      */
     private void driveRobotRelative(
-        Translation2d translation, 
+        Translation2d translation,
         double rotation
     ) {
         swerveDrive.drive(

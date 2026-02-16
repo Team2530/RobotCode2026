@@ -8,7 +8,9 @@ import frc.robot.subsystems.SwerveSubsystem.SteerMode;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants.DriveConstants;
 
-public class RotationSocket extends Socket {
+public class RotationSocket
+    extends Socket<RotationSocket.RotationRequest>
+{
 
     public RotationSocket(
         SocketController controller,
@@ -25,7 +27,8 @@ public class RotationSocket extends Socket {
        extends BaseRequestValue<
             SteerMode,
             Rotation2d
-        > {};
+        >
+    {};
 
     public class RelativeRotationRequest
         implements RotationRequest
