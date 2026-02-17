@@ -13,7 +13,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.commands.IntakeCommand;
+//import frc.robot.commands.IntakeCommand;
 
 public class IntakeSubsystem extends SubsystemBase {
 
