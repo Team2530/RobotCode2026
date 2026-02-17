@@ -16,13 +16,19 @@ public class EmergencyManagementSystem extends SubsystemBase {
     //use this space to defind other thing before linker
     
     public EMSoutput EMSoutput;
+    private EmergencyManagementSystem emergencyManagementSystem;
     
     public EmergencyManagementSystem() { //Linker
 
     }
 
     public void runEMS() { //Executer
-        
+        if (EMSIntake) {
+            emergencyManagementSystem.setEMSoutput(EMSoutput.INTAKETRIGGER);
+        }
+        else {
+            emergencyManagementSystem.setEMSoutput(EMSoutput.INACTIVE);
+        }
     }
     
     public void setEMSoutput(EMSoutput active){
@@ -32,7 +38,7 @@ public class EmergencyManagementSystem extends SubsystemBase {
             SmartDashboard.putString("Emergency Management System", "Intake has triggered 'Emergency Mode'");
         }
         else {
-            
+            SmartDashboard.putString("Emergency Management System", "System Inactive, no emergencies being delt with");
         }
     }
 
