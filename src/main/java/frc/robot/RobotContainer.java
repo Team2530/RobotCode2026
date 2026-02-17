@@ -27,6 +27,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Limelight;
 
 /**
@@ -62,6 +63,8 @@ public class RobotContainer {
     // LimeLightSubsystem();
     @Logged
     private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
+
+    private final LEDSubsystem m_leds = new LEDSubsystem(9, swerveDriveSubsystem, normalDrive); // TODO: Change PWM Port for LEDS
 
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
