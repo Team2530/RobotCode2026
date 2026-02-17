@@ -1,0 +1,52 @@
+/*
+ * This File contains the Emergecy responce tht will react
+ * when a specific button is press. (EMS's in act:1)
+ */
+
+package frc.robot.subsystems;
+
+import java.util.EmptyStackException;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.subsystems.IntakeSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+public class EmergencyManagementSystem extends SubsystemBase {
+    //use this space to defind other thing before linker
+    
+    public EMSoutput EMSoutput;
+    
+    public EmergencyManagementSystem() { //Linker
+
+    }
+
+    public void runEMS() { //Executer
+        
+    }
+    
+    public void setEMSoutput(EMSoutput active){
+        this.EMSoutput = active;
+
+        if (EMSoutput.INTAKETRIGGER == active) {
+            SmartDashboard.putString("Emergency Management System", "Intake has triggered 'Emergency Mode'");
+        }
+        else {
+            
+        }
+    }
+
+    public enum EMSoutput{ //Control panel, only intake has this system installed
+        INACTIVE,
+        INTAKETRIGGER,
+    }
+
+    public static Boolean EMSIntake;
+    
+    public static void setEMSIntake(Boolean emsintake) {
+        EmergencyManagementSystem.EMSIntake = emsintake;
+    } 
+    public boolean getEMSIntake() {
+        return EMSIntake;
+    }
+}   

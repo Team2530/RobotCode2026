@@ -25,13 +25,17 @@ import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.subsystems.EmergencyManagementSystem;
 // import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.EmergencyManagementSystem.EMSoutput;
 // import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.EmergencyManagementSystem;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -154,10 +158,10 @@ public class RobotContainer {
 
             // EMS for Intake (Emergency Use, Reverses Intake to clear)
             operatorXbox.y().whileTrue(new InstantCommand(() -> {
-                IntakeCommand.setEMS(true);
+                EmergencyManagementSystem.setEMSIntake(true);
             }));
             operatorXbox.y().whileFalse(new InstantCommand(() -> {
-                IntakeCommand.setEMS(false);
+                EmergencyManagementSystem.setEMSIntake(false);
             }));
         }
 

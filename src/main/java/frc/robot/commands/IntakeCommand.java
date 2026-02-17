@@ -7,13 +7,16 @@ package frc.robot.commands;
 import frc.robot.Robot;
 import frc.robot.subsystems.IntakeSubsystem.IntakePresets;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.EmergencyManagementSystem.EMSoutput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 //import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.EmergencyManagementSystem;
 
 public class IntakeCommand extends Command {
     
     private final IntakeSubsystem subsystem;
+    private EmergencyManagementSystem.EMSoutput EMSIntake;
 
     
 
@@ -49,15 +52,15 @@ public class IntakeCommand extends Command {
             }
         
         }
-        if (EMS) {
-            subsystem.setIntakePreset(IntakePresets.INTAKECLEAR);
+        if (EMSIntake == EMSoutput.INTAKETRIGGER) {
+                    subsystem.setIntakePreset(IntakePresets.INTAKECLEAR);
         }
         else {
             subsystem.setIntakePreset(IntakePresets.IDLE);
         }
         
     }
-    private static boolean start;
+            private static boolean start;
     
     public static void setStart(Boolean start) {
         IntakeCommand.start = start;
@@ -77,13 +80,5 @@ public class IntakeCommand extends Command {
     public double getdown() {
         return down;
     }
-    //EMS (Emergency Management system)
-    private static boolean EMS;
-    
-    public static void setEMS(Boolean emergencyManagementSystem) {
-        IntakeCommand.EMS = emergencyManagementSystem;
-    } 
-    public boolean getEMS() {
-        return EMS;
-    }
+
 }
