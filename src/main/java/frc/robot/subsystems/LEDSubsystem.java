@@ -57,7 +57,7 @@ public class LEDSubsystem extends SubsystemBase {
         m_led = new AddressableLED(portPWM);
 
         // Length is expensive to set, so only set it once, then just update data
-        m_ledBuffer = new AddressableLEDBuffer(40);
+        m_ledBuffer = new AddressableLEDBuffer(40); // TODO: Update length
 
         m_led.setLength(m_ledBuffer.getLength());
 
@@ -99,7 +99,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     private void sinColor(int r, int g, int b, double waves, double center, double amp, double tscroll) {
         double lambda = m_ledBuffer.getLength() / (2 * waves);
-        for (int i = 0; i < 20; ++i) {
+        for (int i = 0; i < 20; ++i) { // TODO: Update Length
             double fx = Math.cos((i / lambda) * Math.PI + Timer.getFPGATimestamp() * tscroll * Math.PI) * amp + center;
             setLED(i,
                     MathUtil.clamp((int) (r * fx), 0, 255),
@@ -125,7 +125,7 @@ public class LEDSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         final double ctime = 20;
-        double ltmult = ctime / 20.0;
+        double ltmult = ctime / 20.0; // TODO: Update length?
 
         double mtime = DriverStation.getMatchTime();
 
