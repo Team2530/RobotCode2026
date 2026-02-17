@@ -350,7 +350,9 @@ public class TurretSubsystem extends SubsystemBase {
 
             // modulo by 360 because of the infinite yaw limits
             double optimalYaw = targetOptimum[0] % 360;
-            double optimalVelocity = targetOptimum[1];
+            double optimalPitch = targetOptimum[1];
+            double optimalVelocity = targetOptimum[2];
+            double optimalTime = targetOptimum[3];
             // i don't think we need time?
 
             // calculate voltages and send to motors
@@ -426,6 +428,10 @@ public class TurretSubsystem extends SubsystemBase {
             SmartDashboard.putString(
                 "Turret/Targeting/targeting_type",
                 getTargetingMode().toString()
+            );
+            SmartDashboard.putNumber(
+                "Turret/Targeting/time_to_kill",
+                optimalTime
             );
             // launcher
             SmartDashboard.putNumber(
