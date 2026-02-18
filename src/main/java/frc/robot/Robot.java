@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.Elastic;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -137,6 +138,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
        CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
+
+    Elastic.selectTab("Autonomous");
   }
 
   /** This function is called periodically during autonomous. */
@@ -149,6 +152,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    Elastic.selectTab("Teleop");
   }
 
   /** This function is called periodically during operator control. */
@@ -160,6 +165,8 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    Elastic.selectTab("Debug");
   }
 
   /** This function is called periodically during test mode. */
