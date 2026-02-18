@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import java.util.function.Consumer;
@@ -23,7 +19,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.TurretCommand;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
@@ -64,6 +62,7 @@ public class RobotContainer {
     @Logged
     private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
 
+    // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -73,8 +72,6 @@ public class RobotContainer {
 
         DataLogManager.logNetworkTables(true);
         DataLogManager.start();
-
-        
 
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
 

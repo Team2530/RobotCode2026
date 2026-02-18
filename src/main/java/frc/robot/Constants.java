@@ -101,7 +101,6 @@ public final class Constants {
       // as in all the wheels on the front that grab the fuel
       public static class Feeder {
           public static final int CAN_ID = 4;
-          public static final double INTAKE_SPEED = 0.5;
       }
 
       // as in the motor that lifts the whole structure
@@ -325,14 +324,7 @@ public final class Constants {
       }};
   }
   public static final class TurretConstants {
-
     // TODO: UPDATE BASED ON REAL ROBOT
-
-    public static final class Position{
-        public static final double PosX = Units.inchesToMeters(10);
-        public static final double PosY = Units.inchesToMeters(10);
-        public static final double PosZ = Units.inchesToMeters(10);
-    }
     public static final class Launcher {
         // inches
         public static final double WHEEL_DIAMETER = 4;
@@ -349,9 +341,8 @@ public final class Constants {
 
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
-        //
-        public static final double ANGLE_MIN = -10;
-        public static final double ANGLE_MAX = 370;
+        public static final double ANGLE_MIN = 90;
+        public static final double ANGLE_MAX = 270;
 
         public static final class Zeroing {
             // amps
