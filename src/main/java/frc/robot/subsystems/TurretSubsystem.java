@@ -39,10 +39,13 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.LoaderConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 
@@ -101,14 +104,14 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final SwerveSubsystem swerveSubsystem; 
 
-    private final SparkMax m_LauncherMotor;
-    private final SparkMax m_YawMotor;
-    private final SparkMax m_PitchMotor;   //Neo 550
+    private final TalonFX m_LauncherMotor;
+    private final TalonFX m_YawMotor;
+    // TODO: this
+    // private final SparkMax m_PitchMotor;   //Neo 550
 
-    private final RelativeEncoder e_LauncherEncoder;
-    private final RelativeEncoder e_YawEncoder;
     // lets just pray its a cancoder
-    private final CANcoder e_PitchEncoder;
+    // TODO: this
+    // private final CANcoder e_PitchEncoder;
 
     // motor control
     private final PIDController launcherPID;
@@ -135,22 +138,43 @@ public class TurretSubsystem extends SubsystemBase {
     public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
         this.swerveSubsystem = swerveSubsystem;
         // Initialize Motors and Encoders
-        m_LauncherMotor = new SparkMax(
-            TurretConstants.CanIDs.LAUNCHER_MOTOR,
-            MotorType.kBrushless
+        m_LauncherMotor = new TalonFX(
+            TurretConstants.CanIDs.LAUNCHER_MOTOR
         );
-        m_YawMotor = new SparkMax(
-            TurretConstants.CanIDs.YAW_MOTOR,
-            MotorType.kBrushless
+        m_YawMotor = new TalonFX(
+            TurretConstants.CanIDs.YAW_MOTOR
         );
+        // TODO: this
+        /*
         m_PitchMotor = new SparkMax(
             TurretConstants.CanIDs.PITCH_MOTOR,
             MotorType.kBrushless
         );
+        */
 
-        e_LauncherEncoder = m_LauncherMotor.getEncoder();
-        e_YawEncoder = m_YawMotor.getEncoder();
-        e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
+        m_LauncherMotor.getConfigurator()
+            .apply(
+                new TalonFXConfiguration().withMotorOutput(
+                    new MotorOutputConfigs().withInverted(
+                        TurretConstants.Launcher.REVERSE
+                            ? InvertedValue.Clockwise_Positive    
+                            : InvertedValue.CounterClockwise_Positive        
+                    )
+                )
+            );
+        m_YawMotor.getConfigurator()
+            .apply(
+                new TalonFXConfiguration().withMotorOutput(
+                    new MotorOutputConfigs().withInverted(
+                        TurretConstants.Yaw.REVERSE
+                            ? InvertedValue.Clockwise_Positive    
+                            : InvertedValue.CounterClockwise_Positive        
+                    )
+                )
+            );
+
+        // TODO: this
+        // e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
 
         launcherPID = new PIDController(
             TurretConstants.Launcher.PID.P,
@@ -183,7 +207,7 @@ public class TurretSubsystem extends SubsystemBase {
         startYawZeroing();
 
         TargetPositionPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("/Turret/Target_position", Pose3d.struct)
+            .getStructTopic("Turret/Target_position", Pose3d.struct)
             .publish();
     }
 
@@ -264,10 +288,6 @@ public class TurretSubsystem extends SubsystemBase {
                         * time
                     );
 
-                        
-
-
-
                     // Return error squared to avoid sqrt for optimization. 
                     // For this, minimizing squared error should be equivalent to minimizing error. 
                     return Math.pow(
@@ -328,7 +348,7 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     ),
                     // turret + swerve rotation based yaw change
-                    e_YawEncoder.getVelocity()
+                    m_YawMotor.getVelocity().getValueAsDouble()
                         + relativeAngularVelocityFromLinear(
                             toTarget.toTranslation2d(),
                             // TODO: check the polarity of this difference
@@ -345,12 +365,15 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             );
 
+            // TODO: this
+            /*
             m_PitchMotor.setVoltage(
                 pitchPID.calculate(
                     getPitch(),
                     optimalPitch
                 )
             );
+            */
 
             TargetPositionPublisher.set(
                 swerveSubsystem.get3dPose()
@@ -403,7 +426,7 @@ public class TurretSubsystem extends SubsystemBase {
     public double getYaw() {
         return MathUtil.angleModulus(
             Units.rotationsToRadians(
-                (e_YawEncoder.getPosition() 
+                (m_YawMotor.getPosition().getValueAsDouble() 
                     + Units.degreesToRotations(
                         TurretConstants.Yaw.ANGLE_MIN
                     ) - yawOffset
@@ -414,30 +437,38 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getYawVelocity() {
         return Units.rotationsToRadians(
-            e_YawEncoder.getVelocity() 
+            m_YawMotor.getVelocity().getValueAsDouble() 
                 / TurretConstants.Yaw.GEAR_RATIO
         );
     }
 
+    // TODO: this
     public double getPitch() {
+        return 0;
+        /*
         return MathUtil.angleModulus(
             Units.rotationsToRadians(
                 e_PitchEncoder.getPosition().getValueAsDouble() 
                     / TurretConstants.Pitch.GEAR_RATIO
             )
         );
+        */
     }
 
+    // TODO: this
     public double getPitchVelocity() {
+        return 0;
+        /*
         return Units.rotationsToRadians(
             e_PitchEncoder.getVelocity().getValueAsDouble()
                 / TurretConstants.Pitch.GEAR_RATIO
         );
+        */
     }
 
 
     public double getLauncherVelocity() {
-        return m_LauncherMotor.getEncoder().getVelocity();
+        return m_LauncherMotor.getVelocity().getValueAsDouble();
     }
 
     // TODO: this
@@ -469,7 +500,7 @@ public class TurretSubsystem extends SubsystemBase {
             @Override
             public boolean isFinished() {
                 return hardLimitDebouncer.calculate(
-                    m_YawMotor.getOutputCurrent() 
+                    m_YawMotor.getSupplyCurrent().getValueAsDouble() 
                         > TurretConstants.Yaw.Zeroing.CURRENT_LIMIT
                 );
             };
@@ -492,7 +523,8 @@ public class TurretSubsystem extends SubsystemBase {
             new zeroingPassCommand(1),
             new InstantCommand(() -> {
                 yawIsZeroed = true;
-                yawOffset = e_YawEncoder.getPosition();
+                yawOffset = m_YawMotor.getPosition()
+                    .getValueAsDouble();
             })
         ));
         
