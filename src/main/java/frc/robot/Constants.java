@@ -101,6 +101,7 @@ public final class Constants {
       // as in all the wheels on the front that grab the fuel
       public static class Feeder {
           public static final int CAN_ID = 4;
+          public static final double INTAKE_SPEED = 0.5;
       }
 
       // as in the motor that lifts the whole structure

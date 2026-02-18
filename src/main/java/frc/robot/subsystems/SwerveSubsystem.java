@@ -10,7 +10,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
@@ -32,13 +35,23 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.DriveConstants.PIDs.Drive;
 import frc.robot.Constants.RobotConstants;
+import choreo.auto.AutoFactory;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-    private final SwerveDrive swerveDrive;
 
     private final SendableChooser<SwerveGearing> gearChooser;
+    private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
+
+
+    private final SwerveDrive swerveDrive;
 
     enum SwerveGearing {
         LIGHT(7.03f),
@@ -50,10 +63,13 @@ public class SwerveSubsystem extends SubsystemBase {
         private SwerveGearing(float gearRatio) {
             this.gearRatio = gearRatio;
         }
+
     }
 
     public SwerveSubsystem() {
         // register gearshifter with smartdashboard
+
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
         gearChooser = new SendableChooser<>();
 
         gearChooser.addOption(
@@ -86,7 +102,7 @@ public class SwerveSubsystem extends SubsystemBase {
             sysIdAngleCommand()
         );
 
-
+        
         // instantiate yagsl library classes
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -311,6 +327,17 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
     };
 
+    public void followTrajectory(SwerveSample sample) {
+            Pose2d pose = getPose();
+            ChassisSpeeds speeds = new ChassisSpeeds(
+                sample.vx + xController.calculate(pose.getX(), sample.x),
+                sample.vy + yController.calculate(pose.getY(), sample.y),
+                sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+                );
+
+        drive(new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond), speeds.omegaRadiansPerSecond); //TODO: check if this is correct
+    }
+
     @Override
     public void periodic() {}
 
@@ -354,6 +381,33 @@ public class SwerveSubsystem extends SubsystemBase {
     
     public Pose2d getPose() {
         return swerveDrive.getPose();
+    }
+
+    public Pose3d get3dPose() {
+        return new Pose3d(getPose());
+    }
+    
+    public ChassisSpeeds getVelocity() {
+        return swerveDrive.getFieldVelocity();
+    }
+
+    public double getXVelocity() {
+        return getVelocity().vxMetersPerSecond;
+    }
+
+    public double getYVelocity() {
+        return getVelocity().vyMetersPerSecond;
+    }
+
+    /*
+     * angular velocity in radians per second
+     */
+    public double getAngularVelocity() {
+        return getVelocity().omegaRadiansPerSecond;
+    }
+
+    public Rotation3d getRotation() {
+        return swerveDrive.getGyroRotation3d();
     }
 
     public void setMotorBrake(boolean isBraking) {
