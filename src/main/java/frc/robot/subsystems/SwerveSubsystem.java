@@ -93,7 +93,8 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public enum RotationSockets {
-        DRIVE
+        DRIVE,
+        TURRET
     }
     
     // le controlelrs

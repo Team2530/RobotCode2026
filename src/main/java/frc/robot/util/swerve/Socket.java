@@ -11,9 +11,9 @@ public abstract class Socket<
     private final SocketController controller;
     protected final SwerveSubsystem swerve;
 
-    private Command requestingCommand = null;
-    private Subsystem requestingSubsystem = null;
-    private Requester<RequestType> possesser = null;
+    private Command requestingCommand;
+    private Subsystem requestingSubsystem;
+    private Requester<RequestType> possesser;
 
     public Socket(
         SocketController controller,
@@ -21,12 +21,20 @@ public abstract class Socket<
     ) {
         this.controller = controller;
         this.swerve = swerve;
+
+        this.requestingCommand = null;
+        this.requestingSubsystem = null;
+        this.possesser = null;
     }
 
     public boolean isActive() {
         return controller.getActiveSocket()
             .equals(this);
     };
+
+    public boolean isAcknowledged() {
+        return controller.isAcknowledged(this);
+    }
 
     public boolean isRequestingActive() {
         return (
@@ -61,6 +69,7 @@ public abstract class Socket<
     private boolean possess(Requester<RequestType> requester) {
         if (!isPossessed()) {
             possesser = requester;
+            controller.requestAcknowledgement(this);
             return true;
         } else {
             return false;

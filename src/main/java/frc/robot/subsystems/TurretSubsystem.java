@@ -46,6 +46,9 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.swerve.Requester;
+import frc.robot.util.swerve.RotationSocket;
+import frc.robot.util.swerve.RotationSocket.RotationRequest;
 
 public class TurretSubsystem extends SubsystemBase {
     
@@ -100,7 +103,11 @@ public class TurretSubsystem extends SubsystemBase {
         RELATIVE
     }
 
-    private final SwerveSubsystem swerveSubsystem; 
+    private final SwerveSubsystem swerveSubsystem;
+    private final RotationSocket rotationSocket;
+
+    private boolean isRequestingActive;
+    private RotationRequest rotationRequest;
 
     private final SparkMax m_LauncherMotor;
     private final SparkMax m_YawMotor;
@@ -135,8 +142,12 @@ public class TurretSubsystem extends SubsystemBase {
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
 
-    public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
+    public TurretSubsystem(
+        SwerveSubsystem swerveSubsystem,
+        RotationSocket rotationSocket
+    ) {
         this.swerveSubsystem = swerveSubsystem;
+        this.rotationSocket = rotationSocket;
         // Initialize Motors and Encoders
         m_LauncherMotor = new SparkMax(
             TurretConstants.CanIDs.LAUNCHER_MOTOR,
@@ -185,6 +196,26 @@ public class TurretSubsystem extends SubsystemBase {
             .publish();
     }
 
+    private void possessRotationSocket() {
+        rotationSocket.possess(
+            this,
+            new Requester<RotationRequest>() {
+                @Override
+                public boolean isRequestingActive() {
+                    return isRequestingActive;
+                }
+
+                public RotationRequest getRequest() {
+                    return rotationRequest;
+                };
+            } 
+        );
+    }
+
+    private void depossessRotationSocket() {
+        rotationSocket.depossess();
+    }
+
     private double relativeAngularVelocityFromLinear(
         Translation2d toTarget,
         Translation2d velocity
@@ -197,6 +228,10 @@ public class TurretSubsystem extends SubsystemBase {
                     * toTarget.plus(velocity).getNorm()
             )
         );
+    }
+
+    private double absoluteRotationFromRelative(double relative) {
+        return 0;
     }
 
     @Override
@@ -358,22 +393,18 @@ public class TurretSubsystem extends SubsystemBase {
             // calculate voltages and send to motors
             m_LauncherMotor.setVoltage(
                 launcherPID.calculate(
-                    getLauncherVelocity(), 
+                    getLauncherVelocity(),
                     calculateExitToLauncherVelocity(optimalVelocity)
                 )
             );
-
-            m_YawMotor.setVoltage(
-                yawPID.calculate(
-                    getYaw(),
-                    optimalYaw
-                ) 
-                // WARNING: dogshit code
-                //
-                // compensate for drivebase movement
-                // essentially, find the change in yaw because of translation,
-                // then offset by the actual yaw velocity
-                + yawFeedforward.calculateWithVelocities(
+        
+            // WARNING: dogshit code
+            //
+            // compensate for drivebase movement
+            // essentially, find the change in yaw because of translation,
+            // then offset by the actual yaw velocity
+            double yawFeedforwardOutput =
+                yawFeedforward.calculateWithVelocities(
                     // translation-based yaw change
                     relativeAngularVelocityFromLinear(
                         toTarget.toTranslation2d(),
@@ -397,7 +428,71 @@ public class TurretSubsystem extends SubsystemBase {
                                 )
                             ).toPose2d().getTranslation()
                         )
-                )
+                );
+            double outputYaw = optimalYaw;
+            // WARNING: doggier shittier code
+            //
+            // if within the drivebase assist margin
+            String yawControlStatus = "";
+            if (
+                optimalYaw - TurretConstants.Yaw.ANGLE_MIN
+                    < TurretConstants.Yaw.ASSIST_MARGIN
+                || TurretConstants.Yaw.ANGLE_MAX - optimalYaw
+                    < TurretConstants.Yaw.ASSIST_MARGIN
+            ) {
+                // start requesting assistance
+                if (!isRequestingActive) {
+                    isRequestingActive = true;
+                    possessRotationSocket();
+                }
+
+                if (rotationSocket.isActive()) {
+                    yawControlStatus += "|RECIEVING ASSISTANCE";
+                } else {
+                    yawControlStatus += "|ASSISTANCE DENIED";
+                }
+                
+                if (
+                    optimalYaw > TurretConstants.Yaw.ANGLE_MAX
+                    || optimalYaw < TurretConstants.Yaw.ANGLE_MIN
+                ) {
+                    outputYaw = Math.clamp(
+                        optimalYaw,
+                        TurretConstants.Yaw.ANGLE_MIN,
+                        TurretConstants.Yaw.ANGLE_MAX
+                    );
+                    yawFeedforwardOutput = 0;
+                }
+
+                // fullspin if the optimal and actual yaw are on different sides
+                // of the dead middlepoint and if the optimal angle is beyond
+                // the dead middlepoint by the deadband amount
+                if (
+                    (
+                        (optimalYaw < 180)
+                        != (getYaw() < 180)
+                    ) && (
+                        Math.abs(optimalYaw - 180)
+                        < (180 - TurretConstants.Yaw.FULLSPIN_DEADBAND)
+                    )
+                ) {
+                    yawControlStatus = "FULLSPIN";
+                    if (optimalYaw > 180) {
+                        outputYaw = TurretConstants.Yaw.ANGLE_MAX;
+                    } else {
+                        outputYaw = TurretConstants.Yaw.ANGLE_MIN;
+                    }
+                }
+            } else if (isRequestingActive) {
+                isRequestingActive = false;
+                depossessRotationSocket();
+            }
+
+            m_YawMotor.setVoltage(
+                yawPID.calculate(
+                    getYaw(),
+                    outputYaw
+                ) + yawFeedforwardOutput
             );
 
 
@@ -454,6 +549,10 @@ public class TurretSubsystem extends SubsystemBase {
             SmartDashboard.putNumber(
                 "Turret/Yaw/Current_velocity",
                 getYawVelocity()
+            );
+            SmartDashboard.putString(
+                "Turret/Yaw/control_status",
+                yawControlStatus
             );
         }
     }

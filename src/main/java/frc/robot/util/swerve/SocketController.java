@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -21,6 +23,7 @@ public abstract class SocketController<
         SocketNamerator,
         SocketType
     > socketInstances;
+    private final HashSet<SocketType> acknowledgements;
 
     public SocketController(
         SwerveSubsystem swerve,
@@ -73,11 +76,14 @@ public abstract class SocketController<
                 }
             }
         );
+        this.acknowledgements = new HashSet<>();
         for (SocketNamerator name : socketNames.getEnumConstants()) {
+            SocketType newSocket = newSocketInstance();
             socketInstances.put(
                 name,
-                newSocketInstance()
+                newSocket
             );
+            acknowledgements.add(newSocket);
         }
     }
 
@@ -107,10 +113,20 @@ public abstract class SocketController<
         );
         socketInstances.values().toArray(sockets);
 
+        acknowledgements.clear();
+
         return sockets;
     }
 
     public SocketType getSocket(SocketNamerator name) {
         return socketInstances.get(name);
+    }
+
+    public void requestAcknowledgement(SocketType socket) {
+        acknowledgements.add(socket);
+    }
+
+    public boolean isAcknowledged(SocketType socket) {
+        return !acknowledgements.contains(socket);
     }
 }

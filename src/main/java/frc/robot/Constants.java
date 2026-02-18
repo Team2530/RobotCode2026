@@ -344,8 +344,18 @@ public final class Constants {
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
         //
-        public static final double ANGLE_MIN = -10;
-        public static final double ANGLE_MAX = 370;
+        public static final double ANGLE_MIN = 10;
+        public static final double ANGLE_MAX = 350;
+        // the angular margin from the hard stop after which the turret
+        // subsystem begins to request assistance from the drivebase.
+        //
+        // i.e., if the yaw is at 29, the min angle is 10, and the margin is at
+        // 20, the turret subsystem will request that the drivebase rotate the
+        // remaining 1 degree.
+        public static final double ASSIST_MARGIN = 20;
+        // the extra degrees beyond the midpoint (0) that the turret goes for a
+        // full rotation the other direction to aim
+        public static final double FULLSPIN_DEADBAND = 5;
 
         public static final class Zeroing {
             // amps
