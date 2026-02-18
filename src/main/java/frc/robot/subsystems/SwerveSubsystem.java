@@ -35,6 +35,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.DriveConstants.PIDs.Drive;
 import frc.robot.Constants.RobotConstants;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
@@ -43,12 +44,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-    private final SwerveDrive swerveDrive;
 
     private final SendableChooser<SwerveGearing> gearChooser;
     private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
     private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
     private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
+
+    private Command m_autonomousCommand;
+    private final Drive swerveDrive = new Drive();
+    private final AutoFactory autoFactory;
 
 
     enum SwerveGearing {
@@ -66,6 +70,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public SwerveSubsystem() {
         // register gearshifter with smartdashboard
+
+        
+        autoFactory = new AutoFactory(
+            swerveDrive::getPose,
+            swerveDrive::resetOdometry,
+            swerveDrive::followTrajectory,
+            true,
+            swerveDrive,
+            
+        );
+
         headingController.enableContinuousInput(-Math.PI, Math.PI);
         gearChooser = new SendableChooser<>();
 
