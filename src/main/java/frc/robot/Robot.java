@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
-
+  // Declare Krakens for Music
   TalonFX m_DriveFR = new TalonFX(4);
   TalonFX m_DriveFL = new TalonFX(1);
   TalonFX m_DriveBR = new TalonFX(10);
@@ -47,15 +47,14 @@ public class Robot extends TimedRobot {
   TalonFX m_SteerBL = new TalonFX(8);
 
   TalonFX m_Intake = new TalonFX(13);
-  TalonFX m_Turret = new TalonFX(15);
-  TalonFX m_Shooter = new TalonFX(14);
+  TalonFX m_Turret = new TalonFX(14);
+  TalonFX m_Shooter = new TalonFX(15);
   TalonFX m_Loader = new TalonFX(16);
-  // REPEAT FOR EVERY KRAKEN 
-  
-  Orchestra m_orchestra = new Orchestra();
+
+  public static Orchestra m_orchestra = new Orchestra();
+
   private Command m_autonomousCommand;
 
-  @Logged
   private RobotContainer m_robotContainer;
 
   double lastLoopTime = Timer.getFPGATimestamp();
@@ -98,6 +97,21 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+
+    m_orchestra.addInstrument(m_DriveBL);
+    m_orchestra.addInstrument(m_DriveBR);
+    m_orchestra.addInstrument(m_DriveFL);
+    m_orchestra.addInstrument(m_DriveFR);
+    m_orchestra.addInstrument(m_SteerBL);
+    m_orchestra.addInstrument(m_SteerBR);
+    m_orchestra.addInstrument(m_SteerFL);
+    m_orchestra.addInstrument(m_SteerFR);
+    m_orchestra.addInstrument(m_Intake);
+    m_orchestra.addInstrument(m_Turret);
+    m_orchestra.addInstrument(m_Shooter);
+    m_orchestra.addInstrument(m_Loader);
+    m_orchestra.loadMusic("ClimbSuccess.chrp");
+
 
     // Put git/code version metadata on networktables
     NetworkTable versionTable = NetworkTableInstance.getDefault().getTable("Version");
@@ -163,19 +177,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    m_orchestra.addInstrument(m_DriveBL);
-    m_orchestra.addInstrument(m_DriveBR);
-    m_orchestra.addInstrument(m_DriveFL);
-    m_orchestra.addInstrument(m_DriveFR);
-    m_orchestra.addInstrument(m_SteerBL);
-    m_orchestra.addInstrument(m_SteerBR);
-    m_orchestra.addInstrument(m_SteerFL);
-    m_orchestra.addInstrument(m_SteerFR);
-    m_orchestra.addInstrument(m_Intake);
-    m_orchestra.addInstrument(m_Turret);
-    m_orchestra.addInstrument(m_Shooter);
-    m_orchestra.addInstrument(m_Loader);
-    m_orchestra.loadMusic("Symphony5.chrp");
+
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

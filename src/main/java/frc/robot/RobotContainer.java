@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.Constants.ControllerConstants;
@@ -24,6 +26,9 @@ import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
 import frc.robot.subsystems.Limelight;
+
+import com.ctre.phoenix6.Orchestra;
+import frc.robot.Robot;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -92,7 +97,9 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
-        
+        // Remove later. Just for testing the music. 
+        driverXbox.a()
+            .onTrue(Commands.runOnce(() -> Robot.m_orchestra.play()));
     }
 
     /**
