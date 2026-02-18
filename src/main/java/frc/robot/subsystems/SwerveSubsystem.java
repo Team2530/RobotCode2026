@@ -8,15 +8,15 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import choreo.trajectory.SwerveSample;
-import edu.wpi.first.math.controller.PIDController;
+
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
+
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -36,28 +36,20 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
-import frc.robot.Constants.choreoConstants;
-import choreo.auto.AutoChooser;
-
+import choreo.auto.AutoFactory;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class SwerveSubsystem extends SubsystemBase {
-    //Choreo PID Controllers
-    private final PIDController xController = new PIDController(
-        choreoConstants.x_CONTROLLER_P, 
-        choreoConstants.x_CONTROLLER_I, 
-        choreoConstants.x_CONTROLLER_D);
-    private final PIDController yController = new PIDController(
-        choreoConstants.y_CONTROLLER_P, 
-        choreoConstants.y_CONTROLLER_I, 
-        choreoConstants.y_CONTROLLER_D);
-    private final PIDController headingController = new PIDController(
-        choreoConstants.heading_CONTROLLER_P, 
-        choreoConstants.heading_CONTROLLER_I, 
-        choreoConstants.heading_CONTROLLER_D);
-    
+
     private final SwerveDrive swerveDrive;
 
     private final SendableChooser<SwerveGearing> gearChooser;
+    private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
+
 
     enum SwerveGearing {
         LIGHT(7.03f),
@@ -69,10 +61,12 @@ public class SwerveSubsystem extends SubsystemBase {
         private SwerveGearing(float gearRatio) {
             this.gearRatio = gearRatio;
         }
+
     }
 
     public SwerveSubsystem() {
         // register gearshifter with smartdashboard
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
         gearChooser = new SendableChooser<>();
 
         gearChooser.addOption(
@@ -105,7 +99,7 @@ public class SwerveSubsystem extends SubsystemBase {
             sysIdAngleCommand()
         );
 
-
+        
         // instantiate yagsl library classes
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -305,10 +299,10 @@ public class SwerveSubsystem extends SubsystemBase {
             );
 
             swerveDrive = new SwerveDrive(
-                driveConfiguration, 
-                controllerConfiguration,
-                DriveConstants.MAX_ROBOT_VELOCITY, 
-                new Pose2d(new Translation2d(), new Rotation2d())
+                    driveConfiguration, 
+                    controllerConfiguration,
+                    DriveConstants.MAX_ROBOT_VELOCITY, 
+                    new Pose2d() // TODO: choreo's gonna need a different pose
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -328,39 +322,17 @@ public class SwerveSubsystem extends SubsystemBase {
         //
         // idk this seems find
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
-
-        headingController.enableContinuousInput(-Math.PI, Math.PI);
     };
 
-     public void followTrajectory(SwerveSample sample) {
-        // Get the current pose of the robot
-        Pose2d pose = getPose();
-        
-        // Generate the next speeds for the robot
-        ChassisSpeeds speeds = new ChassisSpeeds(
-            sample.vx + xController.calculate(pose.getX(), sample.x),
-            sample.vy + yController.calculate(pose.getY(), sample.y),
-            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
-        );
-        
-        
-        setChassisSpeedsAUTO(speeds);
-    }
+    public void followTrajectory(SwerveSample sample) {
+            Pose2d pose = getPose();
+            ChassisSpeeds speeds = new ChassisSpeeds(
+                sample.vx + xController.calculate(pose.getX(), sample.x),
+                sample.vy + yController.calculate(pose.getY(), sample.y),
+                sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+                );
 
-    public void setChassisSpeedsAUTO(ChassisSpeeds speeds) {
-        double tmp = speeds.vxMetersPerSecond;
-        speeds.vxMetersPerSecond = speeds.vyMetersPerSecond;
-        speeds.vyMetersPerSecond = tmp;
-        tmp = speeds.omegaRadiansPerSecond;
-        speeds.omegaRadiansPerSecond *= -1;
-        
-        swerveDrive.drive(
-            new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
-            speeds.omegaRadiansPerSecond,
-            true,  
-            false
-        );
-        
+        drive(new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond), speeds.omegaRadiansPerSecond); //TODO: check if this is correct
     }
 
     @Override
@@ -406,6 +378,33 @@ public class SwerveSubsystem extends SubsystemBase {
     
     public Pose2d getPose() {
         return swerveDrive.getPose();
+    }
+
+    public Pose3d get3dPose() {
+        return new Pose3d(getPose());
+    }
+    
+    public ChassisSpeeds getVelocity() {
+        return swerveDrive.getFieldVelocity();
+    }
+
+    public double getXVelocity() {
+        return getVelocity().vxMetersPerSecond;
+    }
+
+    public double getYVelocity() {
+        return getVelocity().vyMetersPerSecond;
+    }
+
+    /*
+     * angular velocity in radians per second
+     */
+    public double getAngularVelocity() {
+        return getVelocity().omegaRadiansPerSecond;
+    }
+
+    public Rotation3d getRotation() {
+        return swerveDrive.getGyroRotation3d();
     }
 
     public void setMotorBrake(boolean isBraking) {
