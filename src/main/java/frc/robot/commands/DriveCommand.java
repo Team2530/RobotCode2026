@@ -6,6 +6,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.ControlConstants;
@@ -75,6 +76,10 @@ public class DriveCommand extends Command {
         subsystem.drive(
             new Translation2d(x, y),
             z
+        );
+        SmartDashboard.putNumber(
+            "Swerve/DriveCommand/drive_multiplier",
+            driveMultiplier
         );
     }
 

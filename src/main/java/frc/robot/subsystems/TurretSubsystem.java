@@ -389,37 +389,44 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Launcher/Target_velocity", 
                 optimalVelocity
             );
-            SmartDashboard.putNumber(
-                "Turret/Launcher/Current_velocity",
-                getLauncherVelocity()
-            );
             // yaw
             SmartDashboard.putNumber(
                 "Turret/Yaw/Target_yaw",
                 optimalYaw
-            );
-            SmartDashboard.putNumber(
-                "Turret/Yaw/Current_yaw",
-                getYaw() 
-            );
-            SmartDashboard.putNumber(
-                "Turret/Yaw/Current_velocity",
-                getYawVelocity()
             );
             // pitch
             SmartDashboard.putNumber(
                 "Turret/Pitch/Target_pitch",
                 optimalPitch
             );
-            SmartDashboard.putNumber(
-                "Turret/Pitch/Current_pitch",
-                getPitch()   
-            );
-            SmartDashboard.putNumber(
-                "Turret/Pitch/Current_velocity",
-                getPitchVelocity()   
-            );
         }
+        // launcher
+        SmartDashboard.putNumber(
+            "Turret/Launcher/Current_velocity",
+            getLauncherVelocity()
+        );
+        // yaw
+        SmartDashboard.putNumber(
+            "Turret/Yaw/Current_yaw",
+            getYaw() 
+        );
+        SmartDashboard.putNumber(
+            "Turret/Yaw/Current_velocity",
+            getYawVelocity()
+        );
+        SmartDashboard.putBoolean(
+            "Turret/Yaw/is_zeroed",
+            yawIsZeroed
+        );
+        // pitch
+        SmartDashboard.putNumber(
+            "Turret/Pitch/Current_pitch",
+            getPitch()   
+        );
+        SmartDashboard.putNumber(
+            "Turret/Pitch/Current_velocity",
+            getPitchVelocity()   
+        );
     }
     
 
