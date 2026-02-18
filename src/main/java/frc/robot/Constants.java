@@ -40,6 +40,14 @@ public final class Constants {
     public static final int OPERATOR_CONTROLLER_PORT = 1;
   }
 
+  public static class GameConstants {
+    public static class Fuel {
+        // meters 
+        public static final double DIAMETER = Units.inchesToMeters(5.9);
+        public static final double RADIUS = DIAMETER / 2;
+    }
+  }
+
   public static class RobotConstants {
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final double robotWidthMeters = Units.inchesToMeters(29.5);
@@ -63,6 +71,21 @@ public final class Constants {
 
       return Alliance.Blue;
     }
+  }
+
+  public static class HopperConstants {
+      // TODO: update
+      
+      // allese in meters
+
+      // i only really need to know about the static face of the hopper
+      public static final double WIDTH = 1;
+      // distance to the top of the hopper, relative to the bottom 
+      // (like the bottom of the wheels) of the robot
+      public static final double ABSOLUTE_HEIGHT = 1;
+      // distance backwards from the center of the robot
+      public static final double OFFSET_Y = 1;
+      // assume the hopper is 
   }
 
   /*|-----------WARNING-----------------|
@@ -127,6 +150,8 @@ public final class Constants {
             public static final double X = 0.1;
             public static final double Y = X; // WARNING: can i do this?
             public static final double Z = 0.08;
+
+            public static final double TRIGGER = 0.1;
 
             // the radius from 0 to 1 after which the angle-based heading 
             // control activates
@@ -259,8 +284,23 @@ public final class Constants {
             public static final boolean BR_DRIVE_INVERTED = false;
             public static final boolean BR_ANGLE_INVERTED = true;
         };
+
     }
 
+    public static final class Sockets {
+        public static final class Rotation {
+            public static final class HeadingPID {
+                // TODO: tune
+                public static final double P = 1;
+                public static final double I = 0;
+                public static final double D = 0;
+            }
+        }   
+
+        public static final class Translation {
+
+        }   
+    };
   }
 
   public static class CommonConstants {
@@ -303,8 +343,19 @@ public final class Constants {
 
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
-        public static final double ANGLE_MIN = 90;
-        public static final double ANGLE_MAX = 270;
+        //
+        public static final double ANGLE_MIN = 10;
+        public static final double ANGLE_MAX = 350;
+        // the angular margin from the hard stop after which the turret
+        // subsystem begins to request assistance from the drivebase.
+        //
+        // i.e., if the yaw is at 29, the min angle is 10, and the margin is at
+        // 20, the turret subsystem will request that the drivebase rotate the
+        // remaining 1 degree.
+        public static final double ASSIST_MARGIN = 20;
+        // the extra degrees beyond the midpoint (0) that the turret goes for a
+        // full rotation the other direction to aim
+        public static final double FULLSPIN_DEADBAND = 5;
 
         public static final class Zeroing {
             // amps
@@ -329,9 +380,41 @@ public final class Constants {
     public static final class Pitch {
         public static final double GEAR_RATIO = 1;
 
+        public static final double ANGLE_CONSTANT = 70.5;
+
         // 90 would have the "face" of the turret as vertical
-        public static final double ANGLE_MIN = 90;
-        public static final double ANGLE_MAX = 270;
+        // 0 wouldd have the "face" be horizontal (outputting up)
+        /* 
+         * the minimum angle is dependent on the yaw
+         * @param yaw - the angle of the turret yaw in degrees
+         */
+        public static double ANGLE_MIN(double yaw) {
+            if (
+                Math.abs(yaw - 180) > 0 
+            ) {
+                // dependent on the yaw so we can shoot over the hopper
+                return Math.atan(
+                    (
+                        HopperConstants.ABSOLUTE_HEIGHT 
+                        + GameConstants.Fuel.RADIUS
+                        - TurretConstants.Offsets.Z
+                    ) / (
+                        Math.tan(
+                            Units.degreesToRadians(yaw) 
+                        ) * (
+                            TurretConstants.Offsets.Y 
+                            - HopperConstants.OFFSET_Y
+                        )
+                    )
+                );
+            
+            } else {
+                // physical hardstop of the hood
+                return 90;
+            }
+        }
+        public static final double ANGLE_MAX = 180;
+
 
         public static final class PID {
             public static final double P = 1;
@@ -369,27 +452,17 @@ public final class Constants {
     public static final class TargetingOptimizer {
         public static final int INTERPOLATION_POINTS = 9;
         public static final int MAX_EVALUATIONS = 1000;
+
+        // micah says error should only be zero, but i don't think its always
+        // gonna work that way
+        public static final double MAX_ERROR = 0.1;
+        // the largest error the real launcher can have before it self-enables
+        // firing
+        public static final double MAX_REAL_ERROR = 0.5;
         
         public static final double MAXIMUM_TIME = 5;
         // meters per second
         public static final double MAXIMUM_VELOCITY = 10;
-
-        public static final double[] LOWER_BOUNDS = {
-            // yaw
-            Yaw.ANGLE_MIN,
-            // pitch
-            Pitch.ANGLE_MIN,
-            // velocity
-            0,
-            // time
-            0
-        };
-        public static final double[] UPPER_BOUNDS = {
-            Yaw.ANGLE_MAX,
-            Pitch.ANGLE_MAX,
-            MAXIMUM_VELOCITY,
-            MAXIMUM_TIME
-        };
     }
 
   }
