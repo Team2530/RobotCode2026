@@ -77,22 +77,24 @@ public final class Constants {
       //TODO: IDs and speeds need to be changed. DONE: FALSE
       // as in all the wheels on the front that grab the fuel
       public static class Feeder {
-          public static final int CAN_ID = 4;
+        public static final boolean REVERSE = true;  
+        public static final int CAN_ID = 13;
       }
 
       // as in the motor that lifts the whole structure
       public static class Pivot {
-          public static final int CAN_ID = 54325432;
+          public static final int CAN_ID = 23;
 
-          // voltage applied when the pivot is moving between stowed / deployed
-          public static final double DEPLOY_VOLTAGE = 6.0;
-          // voltaged applied when the pivot is holding it's position
-          public static final double HOLD_VOLTAGE = 0.5;
+          // both of these have values from 1.0 to -1.0
+          // output applied when the pivot is moving between stowed / deployed
+          public static final double DEPLOY_OUTPUT = 0.2;
+          // voltaged applied when the pivot is holding it's position\
+          public static final double HOLD_OUTPUT = 0.1;
 
           public static final class Zeroing {
               // amps ocourse
               public static final double CURRENT_LIMIT = 35;
-              public static final double DEBOUNCE_TIME = 0.35;
+              public static final double DEBOUNCE_TIME = 0.15;
           }
       }
   }
@@ -101,7 +103,7 @@ public final class Constants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
     public static final double MAX_ROBOT_VELOCITY = 4.2;
-    public static final double MAX_ROBOT_RAD_VELOCITY = 6.0;
+    public static final double MAX_ROBOT_RAD_VELOCITY = 1;
 
 
     // (((((65kg×1(m/s^2))/4)×(4in/2))/6.75)/(0.0194Nm/A))×(0.033ohm)
@@ -230,10 +232,10 @@ public final class Constants {
         public static final class Offsets {
             // inches left of the center of the robot
             public static final double FL_X = 9.75;
-            // inchest forward of the center of the robot
-            public static final double FL_Y = 12.263;
-            // as in absolute encoder offset in terms of a full rotation
-            public static final double FL_ANGLE = 0.245850;
+                // inchest forward of the center of the robot
+                public static final double FL_Y = 12.263;
+                // as in absolute encoder offset in terms of a full rotation
+                public static final double FL_ANGLE = 0.245850;
             public static final boolean FL_ENCODER_INVERTED = false;
             public static final boolean FL_DRIVE_INVERTED = false;
             public static final boolean FL_ANGLE_INVERTED = true;
@@ -247,7 +249,7 @@ public final class Constants {
 
             public static final double BL_X = -9.75;
             public static final double BL_Y = 12.263;
-            public static final double BL_ANGLE = 0.003906;
+            public static final double BL_ANGLE = 0.917969;
             public static final boolean BL_ENCODER_INVERTED = false;
             public static final boolean BL_DRIVE_INVERTED = false;
             public static final boolean BL_ANGLE_INVERTED = true;
@@ -290,6 +292,7 @@ public final class Constants {
     public static final class Launcher {
         // inches
         public static final double WHEEL_DIAMETER = 4;
+        public static final boolean REVERSE = false;
 
         public static final class PID {
             public static final double P = 1;
@@ -299,7 +302,8 @@ public final class Constants {
     }
 
     public static final class Yaw {
-        public static final double GEAR_RATIO = 1;
+        public static final double GEAR_RATIO = 9;
+        public static final boolean REVERSE = false;
 
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
@@ -341,12 +345,12 @@ public final class Constants {
     }
 
     public static final class CanIDs {
-        public static final int LAUNCHER_MOTOR = 20;
+        public static final int LAUNCHER_MOTOR = 15;
 
-        public static final int YAW_MOTOR = 21;
+        public static final int YAW_MOTOR = 14;
 
-        public static final int PITCH_MOTOR = 22;
-        public static final int PITCH_ENCODER = 23;
+        public static final int PITCH_MOTOR = 41;
+        public static final int PITCH_ENCODER = 40;
     }
 
     public static final class Offsets {
@@ -396,12 +400,14 @@ public final class Constants {
 
   public static final class IndexerConstants {
       // TODO: UPDATE BASED ON REAL ROBOT
-      public static final int CAN_ID = 23;
-      public static final double SPEED = 0.60;
+      public static final boolean REVERSE = true;
+      public static final int CAN_ID = 24;
+      public static final double SPEED = 0.80;
   }
 
   public static final class LoaderConstants {
-      public static final int CAN_ID = 24;
-      public static final double SPEED = 0.60;
+      public static final boolean REVERSE = true;
+      public static final int CAN_ID = 16;
+      public static final double SPEED = 0.80;
   }
 }
