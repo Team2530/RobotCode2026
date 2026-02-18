@@ -483,9 +483,7 @@ public class TurretSubsystem extends SubsystemBase {
         return 1;
     }
     
-    public void startYawZeroing() {
-        yawIsZeroed = false;
-
+    public Command zeroYawCommand() {
         class zeroingPassCommand extends Command{
             private Debouncer hardLimitDebouncer;
             private double passVoltage;
@@ -518,7 +516,12 @@ public class TurretSubsystem extends SubsystemBase {
             }
         };
 
-        CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
+        return new SequentialCommandGroup(
+            new InstantCommand(
+                () -> {
+                    yawIsZeroed = false;
+                }
+            ),
             // move to zero, rough pass
             new zeroingPassCommand(5),
             // back it up a little
@@ -528,13 +531,14 @@ public class TurretSubsystem extends SubsystemBase {
             new WaitCommand(0.5),
             // move to zero, fine pass
             new zeroingPassCommand(1),
-            new InstantCommand(() -> {
-                yawIsZeroed = true;
-                yawOffset = m_YawMotor.getPosition()
-                    .getValueAsDouble();
-            })
-        ));
-        
+            new InstantCommand(
+                () -> {
+                    yawIsZeroed = true;
+                    yawOffset = m_YawMotor.getPosition()
+                        .getValueAsDouble();
+                }
+            )
+        );
     }
 
     public void setTarget(TurretTargets target) {

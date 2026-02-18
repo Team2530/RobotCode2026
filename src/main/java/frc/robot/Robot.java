@@ -91,6 +91,11 @@ public class Robot extends TimedRobot {
     versionTable.putValue("DIRTY", NetworkTableValue.makeBoolean(BuildConstants.DIRTY != 0));
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+
+    CommandScheduler.getInstance()
+      .schedule(
+        m_robotContainer.getInitCommand() 
+      );
   }
 
   /**

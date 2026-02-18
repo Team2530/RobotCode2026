@@ -120,4 +120,10 @@ public class RobotContainer {
     public CommandXboxController getOperatorXbox() {
         return operatorXbox;
     }
+
+    public Command getInitCommand() {
+        return new ParallelCommandGroup(
+            turretSubsystem.zeroYawCommand()
+        );
+    }
 }
