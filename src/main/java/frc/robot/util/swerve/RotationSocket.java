@@ -34,8 +34,11 @@ public class RotationSocket
         implements RotationRequest
     {
         private final Rotation2d relative;
+
         public RelativeRotationRequest(Rotation2d relative)
             { this.relative = relative; }
+        public RelativeRotationRequest(double relative) 
+            { this(new Rotation2d(relative)); }
 
         public SteerMode getMode() 
             { return SteerMode.RELATIVE; }

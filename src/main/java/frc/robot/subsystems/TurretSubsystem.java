@@ -257,7 +257,11 @@ public class TurretSubsystem extends SubsystemBase {
         );
     }
 
-    private double absoluteRotationFromRelative(double relative) {
+    // TODO: this
+    private double absoluteRotationFromRelative(
+        Translation2d toTarget,
+        double relative
+    ) {
         return 0;
     }
 
@@ -472,6 +476,18 @@ public class TurretSubsystem extends SubsystemBase {
                     isRequestingActive = true;
                     possessRotationSocket();
                 }
+
+                rotationRequest = rotationSocket.new RelativeRotationRequest(
+                    absoluteRotationFromRelative(
+                        toTarget.toTranslation2d(),
+                        (optimalYaw > 180
+                            ? (TurretConstants.Yaw.ANGLE_MAX - optimalYaw)
+                                - TurretConstants.Yaw.ASSIST_MARGIN 
+                            : TurretConstants.Yaw.ASSIST_MARGIN 
+                                - (optimalYaw -TurretConstants.Yaw.ANGLE_MIN)
+                        ) 
+                    )
+                );
 
                 if (rotationSocket.isActive()) {
                     yawControlStatus += "|RECIEVING ASSISTANCE";
