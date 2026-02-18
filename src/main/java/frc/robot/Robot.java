@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.DriveConstants.PIDs.Drive;
+import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveDrive;
 import choreo.Choreo;
 import choreo.auto.AutoFactory;
@@ -45,8 +46,9 @@ import choreo.auto.AutoFactory;
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
 
+
   private Command m_autonomousCommand;
-  private final Drive swerveDrive = new Drive();
+  private final SwerveSubsystem swerveDrive = new SwerveSubsystem();
   private final AutoFactory autoFactory;
   
   @Logged
@@ -65,15 +67,14 @@ public class Robot extends TimedRobot {
 
   public Robot() {
 
-    autoFactory = new AutoFactory(
-      swerveDrive::getPose,
-      swerveDrive::resetOdometry,
-      swerveDrive::followTrajectory,
-      true,
-      swerveDrive,
-      Choreo.TrajectoryLogger<ST>,
-      
-    );
+      autoFactory = new AutoFactory(
+          swerveDrive::getPose, // A function that returns the current robot pose
+          swerveDrive::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+          swerveDrive::followTrajectory, // The drive subsystem trajectory follower 
+          true, // If alliance flipping should be enabled 
+          swerveDrive // The drive subsystem
+      );
+
 
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
