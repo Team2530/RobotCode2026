@@ -422,10 +422,18 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Launcher/Target_velocity", 
                 optimalVelocity
             );
+            SmartDashboard.putNumber(
+                "Turret/Launcher/output", 
+                launcherOutput 
+            );
             // yaw
             SmartDashboard.putNumber(
                 "Turret/Yaw/Target_yaw",
                 optimalYaw
+            );
+            SmartDashboard.putNumber(
+                "Turret/Yaw/output",
+                yawOutput
             );
             // pitch
             SmartDashboard.putNumber(
@@ -433,6 +441,11 @@ public class TurretSubsystem extends SubsystemBase {
                 optimalPitch
             );
         }
+        // targeting
+        SmartDashboard.putString(
+            "Turret/Targeting/current_target_name",
+            target.toString()
+        );
         // launcher
         SmartDashboard.putNumber(
             "Turret/Launcher/Current_velocity",
@@ -444,12 +457,20 @@ public class TurretSubsystem extends SubsystemBase {
             getYaw() 
         );
         SmartDashboard.putNumber(
+            "Turret/Yaw/raw_yaw",
+            m_YawMotor.getPosition().getValueAsDouble()
+        );
+        SmartDashboard.putNumber(
             "Turret/Yaw/Current_velocity",
             getYawVelocity()
         );
         SmartDashboard.putBoolean(
             "Turret/Yaw/is_zeroed",
             yawIsZeroed
+        );
+        SmartDashboard.putNumber(
+            "Turret/Yaw/output_current", 
+            getYawCurrent()
         );
         // pitch
         SmartDashboard.putNumber(
@@ -480,6 +501,11 @@ public class TurretSubsystem extends SubsystemBase {
             m_YawMotor.getVelocity().getValueAsDouble() 
                 / TurretConstants.Yaw.GEAR_RATIO
         );
+    }
+
+    public double getYawCurrent() {
+        return m_YawMotor.getTorqueCurrent()
+            .getValueAsDouble();
     }
 
     // TODO: this
