@@ -456,12 +456,10 @@ public class TurretSubsystem extends SubsystemBase {
                     optimalYaw > TurretConstants.Yaw.ANGLE_MAX
                     || optimalYaw < TurretConstants.Yaw.ANGLE_MIN
                 ) {
-                    outputYaw = Math.max(
-                        TurretConstants.Yaw.ANGLE_MIN, 
-                        Math.min(
-                            optimalYaw, 
-                            TurretConstants.Yaw.ANGLE_MAX
-                        )
+                    outputYaw = MathUtil.clamp(
+                        optimalYaw,
+                        TurretConstants.Yaw.ANGLE_MIN,
+                        TurretConstants.Yaw.ANGLE_MAX
                     );
                     yawFeedforwardOutput = 0;
                 }
