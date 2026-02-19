@@ -51,8 +51,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
 
     private Command m_autonomousCommand;
-    private final Drive swerveDrive = new Drive();
-    private final AutoFactory autoFactory;
+    private final SwerveDrive swerveDrive;
+  
 
 
     enum SwerveGearing {
@@ -71,15 +71,6 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem() {
         // register gearshifter with smartdashboard
 
-        
-        autoFactory = new AutoFactory(
-            swerveDrive::getPose,
-            swerveDrive::resetOdometry,
-            swerveDrive::followTrajectory,
-            true,
-            swerveDrive,
-            
-        );
 
         headingController.enableContinuousInput(-Math.PI, Math.PI);
         gearChooser = new SendableChooser<>();
@@ -484,5 +475,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Field2d getField() {
         return swerveDrive.field;
+    }
+
+    public void setAutoStartingPose(Pose2d startPose) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setAutoStartingPose'");
     }
 }
