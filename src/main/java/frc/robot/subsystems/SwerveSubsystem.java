@@ -308,7 +308,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     driveConfiguration, 
                     controllerConfiguration,
                     DriveConstants.MAX_ROBOT_VELOCITY, 
-                    new Pose2d(new Translation2d(RobotContainer.getStartingX(), RobotContainer.getStartingY()), Rotation2d.fromDegrees(RobotContainer.getStartingHeading()))
+                    new Pose2d() // TODO: choreo's gonna need a different pose
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
