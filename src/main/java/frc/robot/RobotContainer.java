@@ -8,8 +8,11 @@ import java.util.function.Consumer;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import choreo.auto.AutoChooser;
+import choreo.auto.AutoRoutine;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,14 +24,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
+import factory.newRoutine;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.IntakeSubsystem;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -56,6 +62,7 @@ public class RobotContainer {
 
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+    public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
     // Autonomous chooser
     private final AutoChooser autoChooser = new AutoChooser();
@@ -79,7 +86,15 @@ public class RobotContainer {
         
 
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
+        NamedCommands.registerCommand("Intake", new IntakeCommand(intakeSubsystem));
 
+        newRoutine routine1 = new factory.newRoutine();
+
+
+
+        autoChooser.setDefaultOption("Routine 1", routine1.cmd());
+         SmartDashboard.putData("Auto Mode", autoChooser);
+        
         // NamedCommands.registerCommand(null, getAutonomousCommand());
     }
 
