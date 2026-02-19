@@ -6,14 +6,26 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RunLoaderCommand extends Command {
     private final LoaderSubsystem loaderSubsystem;
 
-    public RunLoaderCommand(LoaderSubsystem loaderSubsystem) {
+    private boolean m_Reversed;
+
+    public RunLoaderCommand(LoaderSubsystem loaderSubsystem, boolean Reversed) {
         this.loaderSubsystem = loaderSubsystem;
         addRequirements(loaderSubsystem);
+        m_Reversed = Reversed;
+    }
+
+    public RunLoaderCommand(LoaderSubsystem loaderSubsystem) {
+        this(loaderSubsystem, false);
     }
     
     @Override
     public void initialize() {
-        loaderSubsystem.run();
+        if (m_Reversed){
+            loaderSubsystem.runReverse();
+        }
+        else{
+            loaderSubsystem.run();
+        }
     }
 
     @Override
