@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -10,13 +14,22 @@ import frc.robot.Constants.LoaderConstants;
 
 public class LoaderSubsystem extends SubsystemBase {
 
-    private final SparkMax m_LoaderMotor;
+    private final TalonFX m_LoaderMotor;
 
     public LoaderSubsystem() {
-        m_LoaderMotor = new SparkMax(
-                LoaderConstants.CAN_ID,
-                MotorType.kBrushless
+        m_LoaderMotor = new TalonFX(
+            LoaderConstants.CAN_ID
         );
+        m_LoaderMotor.getConfigurator()
+            .apply(
+                new TalonFXConfiguration().withMotorOutput(
+                    new MotorOutputConfigs().withInverted(
+                        LoaderConstants.REVERSE
+                            ? InvertedValue.Clockwise_Positive    
+                            : InvertedValue.CounterClockwise_Positive        
+                    )
+                )
+            );
         run(0);
     }
 
@@ -24,7 +37,7 @@ public class LoaderSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber(
             "Loader/velocity",
-            m_LoaderMotor.getEncoder().getVelocity()
+            m_LoaderMotor.getVelocity().getValueAsDouble()
         );
     }
 

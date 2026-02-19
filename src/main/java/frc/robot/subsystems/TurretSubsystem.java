@@ -216,7 +216,6 @@ public class TurretSubsystem extends SubsystemBase {
 
         setTarget(TurretTargets.HUB);
 
-        startYawZeroing();
 
         TargetPositionPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Turret/Targeting/Target_position", Pose3d.struct)
@@ -585,10 +584,6 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Launcher/Target_velocity", 
                 optimalVelocity
             );
-            SmartDashboard.putNumber(
-                "Turret/Launcher/Current_velocity",
-                getLauncherVelocity()
-            );
             // yaw
             SmartDashboard.putNumber(
                 "Turret/Yaw/Target_yaw",
@@ -604,9 +599,41 @@ public class TurretSubsystem extends SubsystemBase {
             );
             SmartDashboard.putString(
                 "Turret/Yaw/control_status",
-                yawControlStatus
+                yawControlStatus + "|"
+            );
+            // pitch
+            SmartDashboard.putNumber(
+                "Turret/Pitch/Target_pitch",
+                optimalPitch
             );
         }
+        // launcher
+        SmartDashboard.putNumber(
+            "Turret/Launcher/Current_velocity",
+            getLauncherVelocity()
+        );
+        // yaw
+        SmartDashboard.putNumber(
+            "Turret/Yaw/Current_yaw",
+            getYaw() 
+        );
+        SmartDashboard.putNumber(
+            "Turret/Yaw/Current_velocity",
+            getYawVelocity()
+        );
+        SmartDashboard.putBoolean(
+            "Turret/Yaw/is_zeroed",
+            yawIsZeroed
+        );
+        // pitch
+        SmartDashboard.putNumber(
+            "Turret/Pitch/Current_pitch",
+            getPitch()   
+        );
+        SmartDashboard.putNumber(
+            "Turret/Pitch/Current_velocity",
+            getPitchVelocity()   
+        );
     }
     
 
@@ -662,9 +689,7 @@ public class TurretSubsystem extends SubsystemBase {
         return 1;
     }
     
-    public void startYawZeroing() {
-        yawIsZeroed = false;
-
+    public Command zeroYawCommand() {
         class zeroingPassCommand extends Command{
             private Debouncer hardLimitDebouncer;
             private double passVoltage;
@@ -697,7 +722,12 @@ public class TurretSubsystem extends SubsystemBase {
             }
         };
 
-        CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
+        return new SequentialCommandGroup(
+            new InstantCommand(
+                () -> {
+                    yawIsZeroed = false;
+                }
+            ),
             // move to zero, rough pass
             new zeroingPassCommand(5),
             // back it up a little
@@ -707,13 +737,14 @@ public class TurretSubsystem extends SubsystemBase {
             new WaitCommand(0.5),
             // move to zero, fine pass
             new zeroingPassCommand(1),
-            new InstantCommand(() -> {
-                yawIsZeroed = true;
-                yawOffset = m_YawMotor.getPosition()
-                    .getValueAsDouble();
-            })
-        ));
-        
+            new InstantCommand(
+                () -> {
+                    yawIsZeroed = true;
+                    yawOffset = m_YawMotor.getPosition()
+                        .getValueAsDouble();
+                }
+            )
+        );
     }
 
     public void setTarget(TurretTargets target) {

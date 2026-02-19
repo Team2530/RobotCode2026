@@ -12,6 +12,8 @@ import frc.robot.util.swerve.RotationSocket;
 import frc.robot.util.swerve.TranslationSocket;
 import frc.robot.util.swerve.RotationSocket.RotationRequest;
 import frc.robot.util.swerve.TranslationSocket.TranslationRequest;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.ControlConstants;
 
@@ -152,6 +154,10 @@ public class DriveCommand extends Command {
         }
         
         isRequestingActive = trigger > 0;
+        SmartDashboard.putNumber(
+            "Swerve/DriveCommand/drive_multiplier",
+            driveMultiplier
+        );
     }
 
     @Override

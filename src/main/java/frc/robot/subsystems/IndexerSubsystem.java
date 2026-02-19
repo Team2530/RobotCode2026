@@ -4,6 +4,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
 import frc.robot.Constants.IndexerConstants;
@@ -16,6 +21,17 @@ public class IndexerSubsystem extends SubsystemBase {
         m_IndexerMotor = new SparkMax(
             IndexerConstants.CAN_ID,
             MotorType.kBrushless
+        );
+
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.inverted(
+            IndexerConstants.REVERSE
+        );
+        
+        m_IndexerMotor.configure(
+            config,
+            ResetMode.kNoResetSafeParameters,
+            PersistMode.kNoPersistParameters
         );
 
         stop();

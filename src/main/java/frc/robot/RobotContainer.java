@@ -67,6 +67,11 @@ public class RobotContainer {
             driverXbox.getHID()
     );
 
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+    private final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
+    private final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
+
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -124,5 +129,11 @@ public class RobotContainer {
 
     public CommandXboxController getOperatorXbox() {
         return operatorXbox;
+    }
+
+    public Command getInitCommand() {
+        return new ParallelCommandGroup(
+            turretSubsystem.zeroYawCommand()
+        );
     }
 }
