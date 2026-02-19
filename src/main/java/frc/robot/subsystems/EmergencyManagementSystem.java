@@ -5,11 +5,7 @@
 
 package frc.robot.subsystems;
 
-import java.util.EmptyStackException;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class EmergencyManagementSystem extends SubsystemBase {
@@ -22,6 +18,7 @@ public class EmergencyManagementSystem extends SubsystemBase {
 
     }
 
+    @SuppressWarnings("static-access")
     public void runEMS() { //Executer
         if (EMSIntake) {
             emergencyManagementSystem.setEMSoutput(EMSoutput.INTAKETRIGGER);
@@ -31,6 +28,7 @@ public class EmergencyManagementSystem extends SubsystemBase {
         }
     }
     
+    @SuppressWarnings("static-access")
     public void setEMSoutput(EMSoutput active){
         this.EMSoutput = active;
 
