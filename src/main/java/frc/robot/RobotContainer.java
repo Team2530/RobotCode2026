@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,7 +28,10 @@ import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.subsystems.SwerveSubsystem.TranslationSockets;
 import frc.robot.subsystems.SwerveSubsystem.RotationSockets;
 import frc.robot.util.LimelightContainer;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.LoaderSubsystem;
 
 import com.ctre.phoenix6.Orchestra;
 import frc.robot.Robot;
@@ -75,7 +79,10 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     private final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    private final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
+    private final TurretSubsystem turretSubsystem = new TurretSubsystem(
+        swerveDriveSubsystem,
+        swerveDriveSubsystem.getRotationSocket(RotationSockets.TURRET)
+    );
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     /*
