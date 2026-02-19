@@ -349,12 +349,17 @@ public class TurretSubsystem extends SubsystemBase {
             // i don't think we need time?
 
             // calculate voltages and send to motors
-            m_LauncherMotor.setVoltage(
-                launcherPID.calculate(
-                    getLauncherVelocity(), 
-                    calculateExitToLauncherVelocity(optimalVelocity)
-                )
-            );
+            double launcherOutput;
+            if (Math.abs(getLauncherVelocity() - targetVelocity) > TurretConstants.Launcher.VELOCITY_DEADBAND) {
+                launcherOutput = Math.signum(getLauncherVelocity() - targetVelocity);
+            } else {
+                // fine control
+                launcherOutput = launcherPID.calculate(
+                    getLauncherVelocity(),
+                    targetVelocity
+                );
+            }
+            m_LauncherMotor.set(launcherOutput);
 
             m_YawMotor.setVoltage(
                 yawPID.calculate(

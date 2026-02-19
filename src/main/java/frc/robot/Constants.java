@@ -318,7 +318,7 @@ public final class Constants {
         public static final boolean REVERSE = false;
 
         public static final class PID {
-            public static final double P = 1;
+            public static final double P = 0.1;
             public static final double I = 0;
             public static final double D = 0;
         }
