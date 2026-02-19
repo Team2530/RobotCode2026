@@ -58,53 +58,88 @@ public class RobotContainer {
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
 
     // Autonomous chooser
-    private final AutoChooser autoChooser = new AutoChooser();
-    // private final LimeLightSubsystem limeLightSubsystem = new
-    // LimeLightSubsystem();
-    @Logged
-    private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
-
-    /*
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-
-        
-        // Configure the trigger bindings
-        configureBindings();
-
-        DataLogManager.logNetworkTables(true);
-        DataLogManager.start();
-
-        
-
-        swerveDriveSubsystem.setDefaultCommand(normalDrive);
-
-        // NamedCommands.registerCommand(null, getAutonomousCommand());
-    }
-
+    private final static AutoChooser autoChooser = new AutoChooser();
+        // private final LimeLightSubsystem limeLightSubsystem = new
+        // LimeLightSubsystem();
+        @Logged
+        private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
     
-
-
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-     * {@link
-     * CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
-    private void configureBindings() {
-       //This is ment for operator controls
-       
+        /*
+         * The container for the robot. Contains subsystems, OI devices, and commands.
+         */
+        public RobotContainer() {
+    
+    
+    
+    
+    
+            
+            
+            // Configure the trigger bindings
+            configureBindings();
+    
+            DataLogManager.logNetworkTables(true);
+            DataLogManager.start();
+    
+            
+    
+            swerveDriveSubsystem.setDefaultCommand(normalDrive);
+    
+            // NamedCommands.registerCommand(null, getAutonomousCommand());
+        }
+    
+        
+    
+    
+        /**
+         * Use this method to define your trigger->command mappings. Triggers can be
+         * created via the
+         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+         * an arbitrary
+         * predicate, or via the named factories in {@link
+         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+         * {@link
+         * CommandXboxController
+         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+         * PS4} controllers or
+         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+         * joysticks}.
+         */
+        private void configureBindings() {
+           //This is ment for operator controls
+           
+        }
+    public static double getStartingX() {
+        Command command = autoChooser.selectedCommand();
+        if (command instanceof PathPlannerAuto) {
+            Pose2d startPose = ((PathPlannerAuto) command).getStartingPose();
+            if (startPose != null) {
+                return startPose.getX();
+            }
+        }
+        return 0.0;
     }
-
+    
+    public static double getStartingY() {
+        Command command = autoChooser.selectedCommand();
+        if (command instanceof PathPlannerAuto) {
+            Pose2d startPose = ((PathPlannerAuto) command).getStartingPose();
+            if (startPose != null) {
+                return startPose.getY();
+            }
+        }
+        return 0.0;
+    }
+    public static double getStartingHeading() {
+        Command command = autoChooser.selectedCommand();
+        if (command instanceof PathPlannerAuto) {
+            Pose2d startPose = ((PathPlannerAuto) command).getStartingPose();
+            if (startPose != null) {
+                return startPose.getRotation().getRadians();
+            }
+        }
+        return 0.0;
+    }
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
@@ -115,7 +150,7 @@ public class RobotContainer {
         if (command instanceof PathPlannerAuto) {
             Pose2d startPose = ((PathPlannerAuto) command).getStartingPose();
             if (startPose != null) {
-                swerveDriveSubsystem.setAutoStartingPose(startPose);
+                swerveDriveSubsystem.resetOdometry(startPose);
             }
         }
 
