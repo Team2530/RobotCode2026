@@ -484,15 +484,16 @@ public class TurretSubsystem extends SubsystemBase {
     }
     
 
+    /*
+     * RADIANS
+     */
     public double getYaw() {
-        return MathUtil.angleModulus(
-            Units.rotationsToRadians(
-                (m_YawMotor.getPosition().getValueAsDouble() 
-                    + Units.degreesToRotations(
-                        TurretConstants.Yaw.ANGLE_MIN
-                    ) - yawOffset
-                ) / TurretConstants.Yaw.GEAR_RATIO
-            )
+        return Units.rotationsToRadians(
+            (m_YawMotor.getPosition().getValueAsDouble() 
+                + Units.degreesToRotations(
+                    TurretConstants.Yaw.ANGLE_MIN
+                ) - yawOffset
+            ) / TurretConstants.Yaw.GEAR_RATIO
         );
     }
 
@@ -544,16 +545,20 @@ public class TurretSubsystem extends SubsystemBase {
     
     public Command zeroYawCommand() {
         class zeroingPassCommand extends Command{
-            private Debouncer hardLimitDebouncer;
-            private double passVoltage;
+            private final Debouncer hardLimitDebouncer;
+            private final double passVoltage;
+            private final double currentLimit;
             
-            public zeroingPassCommand(double voltage) {
+            public zeroingPassCommand(
+                double passVoltage,
+                double currentLimit
+            ) {
                 hardLimitDebouncer = new Debouncer(
                     TurretConstants.Yaw.Zeroing.DEBOUNCE_TIME,
                     DebounceType.kRising
             );
-
-                passVoltage = voltage;
+                this.passVoltage = passVoltage;
+                this.currentLimit = currentLimit;
             }
 
             @Override
@@ -564,8 +569,9 @@ public class TurretSubsystem extends SubsystemBase {
             @Override
             public boolean isFinished() {
                 return hardLimitDebouncer.calculate(
-                    m_YawMotor.getSupplyCurrent().getValueAsDouble() 
-                        > TurretConstants.Yaw.Zeroing.CURRENT_LIMIT
+                    Math.abs(
+                        getYawCurrent() 
+                    ) > currentLimit
                 );
             };
 
@@ -579,22 +585,33 @@ public class TurretSubsystem extends SubsystemBase {
             new InstantCommand(
                 () -> {
                     yawIsZeroed = false;
+                    yawOffset = 0;
                 }
             ),
             // move to zero, rough pass
-            new zeroingPassCommand(5),
+            new zeroingPassCommand(
+                TurretConstants.Yaw.Zeroing.ROUGHPASS_VOLTAGE,
+                TurretConstants.Yaw.Zeroing.ROUGHPASS_CURRENT_LIMIT
+            ),
             // back it up a little
             new InstantCommand(() -> {
-                m_YawMotor.setVoltage(-5);
+                m_YawMotor.setVoltage(3);
             }),
-            new WaitCommand(0.5),
+            new WaitCommand(0.2),
             // move to zero, fine pass
-            new zeroingPassCommand(1),
+            new zeroingPassCommand(
+                TurretConstants.Yaw.Zeroing.FINEPASS_VOLTAGE,
+                TurretConstants.Yaw.Zeroing.FINEPASS_CURRENT_LIMIT
+            ),
             new InstantCommand(
                 () -> {
                     yawIsZeroed = true;
                     yawOffset = m_YawMotor.getPosition()
                         .getValueAsDouble();
+                    SmartDashboard.putNumber(
+                        "Turret/Yaw/Zeroing/rotation_offset",
+                        yawOffset
+                    );
                 }
             )
         );
