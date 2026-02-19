@@ -12,18 +12,26 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.RunIndexerCommand;
+import frc.robot.commands.RunLoaderCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.LoaderSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -96,8 +104,60 @@ public class RobotContainer {
      * joysticks}.
      */
     private void configureBindings() {
+        driverXbox.start()
+            .onTrue(
+                new InstantCommand(() -> {
+                    swerveDriveSubsystem.resetOdometry();
+                })
+            );
 
+        operatorXbox.leftTrigger(0.1)
+            .whileTrue(
+                new IntakeCommand(intakeSubsystem, IntakePreset.INTAKING, IntakePreset.OUT)
+            );
+        operatorXbox.rightTrigger(0.9)
+            .whileTrue(
+                new RunLoaderCommand(loaderSubsystem)
+            ).whileTrue(
+                new RunIndexerCommand(indexerSubsystem)
+            );
+
+        operatorXbox.leftBumper()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                        intakeSubsystem.setPreset(
+                            IntakePreset.STOWED
+                        );
+                    }
+                )
+            );
         
+        operatorXbox.start()
+            .onTrue(
+                turretSubsystem.zeroYawCommand()
+            );
+
+        operatorXbox.povDown()
+                        .onTrue(
+                            new InstantCommand(()
+                            -> {
+                                turretSubsystem.setTargetVelocity(
+                                    turretSubsystem.getTargetVelocity() - 1
+                                );
+                            })
+                        );
+        operatorXbox.povUp()
+                        .onTrue(
+                            new InstantCommand(()
+                            -> {
+                                turretSubsystem.setTargetVelocity(
+                                    turretSubsystem.getTargetVelocity() + 1
+                                );
+                            })
+                        );
+        operatorXbox.back()
+            .whileTrue(new RunLoaderCommand(loaderSubsystem, true));
     }
 
     /**
