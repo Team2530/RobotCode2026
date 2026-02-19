@@ -4,21 +4,15 @@
 
 package frc.robot;
 
-import java.util.Optional;
-
 import org.littletonrobotics.urcl.URCL;
 
 import com.ctre.phoenix6.SignalLogger;
 
-import choreo.Choreo;
-import choreo.trajectory.SwerveSample;
-import choreo.trajectory.Trajectory;
 import edu.wpi.first.epilogue.EpilogueConfiguration;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -26,6 +20,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -34,7 +29,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.DriveConstants.PIDs.Drive;
-import frc.robot.Constants.choreoConstants;
+import frc.robot.subsystems.SwerveSubsystem;
+import swervelib.SwerveDrive;
+import choreo.Choreo;
+import choreo.auto.AutoFactory;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -48,10 +46,12 @@ import frc.robot.Constants.choreoConstants;
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
 
-  private Command m_autonomousCommand;
 
+  private Command m_autonomousCommand;
+  private final SwerveSubsystem swerveDrive = new SwerveSubsystem();
+  private final AutoFactory autoFactory;
   
-  
+  @Logged
   private RobotContainer m_robotContainer;
 
   double lastLoopTime = Timer.getFPGATimestamp();
@@ -66,6 +66,16 @@ public class Robot extends TimedRobot {
       .getDoubleTopic("commandSchedulerTime").publish();
 
   public Robot() {
+
+      autoFactory = new AutoFactory(
+          swerveDrive::getPose, // A function that returns the current robot pose
+          swerveDrive::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+          swerveDrive::followTrajectory, // The drive subsystem trajectory follower 
+          true, // If alliance flipping should be enabled 
+          swerveDrive // The drive subsystem
+      );
+
+
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
 
