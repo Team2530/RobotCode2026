@@ -2,12 +2,11 @@ package frc.robot.util.swerve;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Map;
 
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -17,9 +16,10 @@ public abstract class SocketController<
 > {
     private final Constructor<SocketType> socketConstructor;
     private final Class<SocketType> socketType;
+    private final Class<SocketNamerator> socketNames;
 
     private final SwerveSubsystem swerve;
-    private final SortedMap<
+    private final Map<
         SocketNamerator,
         SocketType
     > socketInstances;
@@ -33,6 +33,7 @@ public abstract class SocketController<
         this.swerve = swerve;
 
         this.socketType = socketType;
+        this.socketNames = socketNames;
         try {
             this.socketConstructor = socketType.getDeclaredConstructor(
                 this.getClass(),
@@ -45,7 +46,41 @@ public abstract class SocketController<
             );
         }
 
-        this.socketInstances = new TreeMap<>(
+        this.socketInstances = new HashMap<>();
+
+        this.acknowledgements = new HashSet<>();
+        for (SocketNamerator name : socketNames.getEnumConstants()) {
+            SocketType newSocket = newSocketInstance();
+            socketInstances.put(
+                name,
+                newSocket
+            );
+            acknowledgements.add(newSocket);
+        }
+    }
+
+    public abstract SocketType getActiveSocket();
+
+    private SocketType newSocketInstance() {
+        try {
+            return socketConstructor.newInstance(
+                this,
+                swerve
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "failed to instantiate genericified constructor: \n"
+                + e
+            );
+        }
+    }
+    // prioritize the highest ranking and actively requesting socket; if
+    // theres no requesting socket, prioritize the highest possesed socket.
+    public SocketType[] getSortedSockets() {
+        SocketNamerator[] names = socketNames.getEnumConstants();
+
+        Arrays.sort(
+            names,
             new Comparator<SocketNamerator>() {
                 @Override
                 public int compare(
@@ -76,42 +111,19 @@ public abstract class SocketController<
                 }
             }
         );
-        this.acknowledgements = new HashSet<>();
-        for (SocketNamerator name : socketNames.getEnumConstants()) {
-            SocketType newSocket = newSocketInstance();
-            socketInstances.put(
-                name,
-                newSocket
-            );
-            acknowledgements.add(newSocket);
-        }
-    }
-
-    public abstract SocketType getActiveSocket();
-
-    private SocketType newSocketInstance() {
-        try {
-            return socketConstructor.newInstance(
-                this,
-                swerve
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(
-                "failed to instantiate genericified constructor: \n"
-                + e
-            );
-        }
-    }
-    // prioritize the highest ranking and actively requesting socket; if
-    // theres no requesting socket, prioritize the highest possesed socket.
-    public SocketType[] getSortedSockets() {
+        
         // fuck it
         // unchecked cast
         SocketType[] sockets = (SocketType[]) Array.newInstance(
             socketType,
             socketInstances.size()
         );
-        socketInstances.values().toArray(sockets);
+
+        for (int i = 0; i < sockets.length; i++) {
+            sockets[i] = socketInstances.get(
+                    names[i]
+            );
+        }
 
         acknowledgements.clear();
 
