@@ -296,7 +296,7 @@ public class TurretSubsystem extends SubsystemBase {
                 // Start optimizer at current position to reduce optimization 
                 // time.
                 getYaw(),               
-                TurretConstants.Pitch.CONSTANT_ANGLE,
+                TurretConstants.Pitch.ANGLE_CONSTANT,
                 getLauncherVelocity(),
                 0
             };
@@ -311,7 +311,7 @@ public class TurretSubsystem extends SubsystemBase {
             // wont matter
             double [] lowerBounds = {
                 TurretConstants.Yaw.ANGLE_MIN,
-                TurretConstants.Pitch.CONSTANT_ANGLE,
+                TurretConstants.Pitch.ANGLE_CONSTANT,
                 // WARNING: overridden for constant pitch
                 /*TurretConstants.Pitch.ANGLE_MIN(
                     Units.radiansToDegrees(
@@ -326,7 +326,7 @@ public class TurretSubsystem extends SubsystemBase {
             };
             double [] upperBounds = {
                 TurretConstants.Yaw.ANGLE_MAX,
-                TurretConstants.Pitch.CONSTANT_ANGLE,
+                TurretConstants.Pitch.ANGLE_CONSTANT,
                 /*TurretConstants.Pitch.ANGLE_MAX,*/
                 TurretConstants.TargetingOptimizer.MAXIMUM_VELOCITY,
                 TurretConstants.TargetingOptimizer.MAXIMUM_TIME
