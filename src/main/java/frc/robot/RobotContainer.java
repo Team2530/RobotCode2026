@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import choreo.auto.AutoChooser;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -110,7 +111,15 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.selectedCommand();
+        Command command = autoChooser.selectedCommand();
+        if (command instanceof PathPlannerAuto) {
+            Pose2d startPose = ((PathPlannerAuto) command).getStartingPose();
+            if (startPose != null) {
+                swerveDriveSubsystem.setAutoStartingPose(startPose);
+            }
+        }
+
+        return command;
     }
 
     public SwerveSubsystem getSwerveSubsystem() {

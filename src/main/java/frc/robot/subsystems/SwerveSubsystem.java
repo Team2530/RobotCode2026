@@ -364,7 +364,20 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        
+        try {
+            Pose2d pose = getPose();
+            Field2d field = getField();
+            if (field != null && pose != null) {
+                
+                field.setRobotPose(pose);
+                field.getObject("robot").setPose(pose);
+            }
+        } catch (Exception ignored) {
+            
+        }
+    }
 
     @Override
     public void simulationPeriodic() {}
@@ -457,5 +470,16 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Field2d getField() {
         return swerveDrive.field;
+    }
+
+    /**
+     * Helper used by the auto chooser to set the starting pose before autonomous.
+     * This delegates to the underlying swerve drive's odometry reset.
+     */
+    public void setAutoStartingPose(Pose2d pose) {
+        if (pose == null) {
+            return;
+        }
+        resetOdometry(pose);
     }
 }
