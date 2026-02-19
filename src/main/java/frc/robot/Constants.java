@@ -469,6 +469,14 @@ public final class Constants {
         public static final double MAXIMUM_VELOCITY = 10;
     }
 
+    public static final class ShooterRotatinalPosition {
+        // Position of the shooter origin relative to the rotation center of the Robot.
+        // Used for calculating the necessary rotational velocity to compensate for the robot's rotation when aiming. 
+        public static final double SHOOTER_BACK = Units.inchesToMeters(8.625);
+        public static final double SHOOTER_LEFT = Units.inchesToMeters(1.375);
+        public static final double SHOOTER_UP = Units.inchesToMeters(9.375);
+    }
+
   }
 
   public static final class IndexerConstants {

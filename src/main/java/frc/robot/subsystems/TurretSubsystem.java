@@ -306,7 +306,7 @@ public class TurretSubsystem extends SubsystemBase {
                         swerveSubsystem.getRotation().getX()
                     ) * swerveSubsystem.getXVelocity();
                     dbx += -swerveSubsystem.getAngularVelocity()
-                        * 0; // Offset from center of rotation to center of launcher.
+                        * TurretConstants.ShooterRotatinalPosition.SHOOTER_BACK; // Offset from center of rotation to center of launcher.
                     dbx *= time;
 
                     // Y component of the ball's position relative to the robot. 
@@ -317,7 +317,7 @@ public class TurretSubsystem extends SubsystemBase {
                             swerveSubsystem.getRotation().getX()
                     ) * swerveSubsystem.getXVelocity();
                     dby += swerveSubsystem.getAngularVelocity()
-                        * 0; // Offset from center of rotation to center of launcher.
+                        * TurretConstants.ShooterRotatinalPosition.SHOOTER_LEFT; // Offset from center of rotation to center of launcher.
                     dby *= time;
 
                     // Z (vertical) component of the ball's position relative to the robot. 
