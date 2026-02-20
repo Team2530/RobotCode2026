@@ -204,6 +204,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         setTarget(TurretTargets.HUB);
 
+        yawIsZeroed = false;
         TargetPositionPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Turret/Target_position", Pose3d.struct)
             .publish();
