@@ -295,10 +295,10 @@ public class TurretSubsystem extends SubsystemBase {
             double[] guess = {
                 // Start optimizer at current position to reduce optimization 
                 // time.
-                getYaw(),               
+                Units.degreesToRadians(getYaw()),               
                 TurretConstants.Pitch.ANGLE_CONSTANT,
                 getLauncherVelocity(),
-                0
+                1
             };
 
             // WARNING: the minimum pitch of the turret is dependent on the yaw, 
