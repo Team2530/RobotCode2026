@@ -149,7 +149,12 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-       CommandScheduler.getInstance().schedule(m_autonomousCommand);
+       CommandScheduler.getInstance().schedule(
+          new ParallelCommandGroup(
+            m_autonomousCommand,
+            m_robotContainer.getInitCommand() 
+          )
+        );
     }
 
     Elastic.selectTab("Autonomous");
