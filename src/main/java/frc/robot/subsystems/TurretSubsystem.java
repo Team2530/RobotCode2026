@@ -563,7 +563,8 @@ public class TurretSubsystem extends SubsystemBase {
 
     // TODO: this
     private double calculateExitToLauncherVelocity(double exitVelocity) {
-        return 1;
+        return (TurretConstants.Launcher.VelocityRegression.A * exitVelocity)
+            + TurretConstants.Launcher.VelocityRegression.B; 
     }
     
     public Command zeroYawCommand() {

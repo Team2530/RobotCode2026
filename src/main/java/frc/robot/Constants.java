@@ -327,6 +327,11 @@ public final class Constants {
             public static final double I = 0;
             public static final double D = 0;
         }
+
+        public static final class VelocityRegression {
+            public static final double A = 0.748916;
+            public static final double B = -0.678921;
+        }
     }
 
     public static final class Yaw {
