@@ -36,51 +36,55 @@ public class DriveCommand extends Command {
 
     @Override
     public void execute() {
-        // get input values and apply deadband
-        // these'll range form -1.0 to 1.0; we'll convert them to m/s later
-        // x,y translate to correspond to literal x,y translation; z corresponds 
-        // rotation
-        double x = MathUtil.applyDeadband(
-            driverXbox.getLeftY(),
-            ControlConstants.Deadband.X
-        );
-        double y = MathUtil.applyDeadband(
-            driverXbox.getLeftX(),
-            ControlConstants.Deadband.Y
-        );
-        double z = MathUtil.applyDeadband(
-            driverXbox.getRightX(),
-            ControlConstants.Deadband.Z
-        );
-        
-        // trigger-base slow / fast mode
-        double driveMultiplier = (
-            driveMultiplierSlewLimiter.calculate(
-                driverXbox.getRightTriggerAxis()
-            ) * (
-                ControlConstants.REGULAR_DRIVE_MULT 
-                - ControlConstants.TURTLE_DRIVE_MULT
-            )
-        ) + ControlConstants.TURTLE_DRIVE_MULT;
+        if (driverXbox.getRightBumperButtonPressed()) {
+            subsystem.xStance();
+        } else {
+            // get input values and apply deadband
+            // these'll range form -1.0 to 1.0; we'll convert them to m/s later
+            // x,y translate to correspond to literal x,y translation; z corresponds 
+            // rotation
+            double x = MathUtil.applyDeadband(
+                driverXbox.getLeftY(),
+                ControlConstants.Deadband.X
+            );
+            double y = MathUtil.applyDeadband(
+                driverXbox.getLeftX(),
+                ControlConstants.Deadband.Y
+            );
+            double z = MathUtil.applyDeadband(
+                driverXbox.getRightX(),
+                ControlConstants.Deadband.Z
+            );
+            
+            // trigger-base slow / fast mode
+            double driveMultiplier = (
+                driveMultiplierSlewLimiter.calculate(
+                    driverXbox.getRightTriggerAxis()
+                ) * (
+                    ControlConstants.REGULAR_DRIVE_MULT 
+                    - ControlConstants.TURTLE_DRIVE_MULT
+                )
+            ) + ControlConstants.TURTLE_DRIVE_MULT;
 
-        x *= driveMultiplier;
-        y *= driveMultiplier;
-        z *= driveMultiplier;
+            x *= driveMultiplier;
+            y *= driveMultiplier;
+            z *= driveMultiplier;
 
-        // convert to m / s
-        x *= DriveConstants.MAX_ROBOT_VELOCITY;
-        y *= DriveConstants.MAX_ROBOT_VELOCITY;
-        z *= DriveConstants.MAX_ROBOT_RAD_VELOCITY;
+            // convert to m / s
+            x *= DriveConstants.MAX_ROBOT_VELOCITY;
+            y *= DriveConstants.MAX_ROBOT_VELOCITY;
+            z *= DriveConstants.MAX_ROBOT_RAD_VELOCITY;
 
-        // send em off
-        subsystem.drive(
-            new Translation2d(x, y),
-            z
-        );
-        SmartDashboard.putNumber(
-            "Swerve/DriveCommand/drive_multiplier",
-            driveMultiplier
-        );
+            // send em off
+            subsystem.drive(
+                new Translation2d(x, y),
+                z
+            );
+            SmartDashboard.putNumber(
+                "Swerve/DriveCommand/drive_multiplier",
+                driveMultiplier
+            );
+        }
     }
 
     @Override
