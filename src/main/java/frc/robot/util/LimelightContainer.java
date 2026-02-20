@@ -153,4 +153,8 @@ public class LimelightContainer {
   private boolean doRotationRejection(Pigeon2 pigeon, int dps) {
     return Math.abs(pigeon.getAngularVelocityZWorld().getValueAsDouble()) > dps;
   }
+  private boolean doRotationRejection(SwerveIMU gyro, double maxDps) {
+    // TODO: Check if this is correct
+    return Math.abs(Units.radiansToDegrees(gyro.getYawAngularVelocity().magnitude())) > maxDps;
+  }
 }
