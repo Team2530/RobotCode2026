@@ -5,10 +5,21 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.LoaderConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -17,8 +28,9 @@ public class IntakeSubsystem extends SubsystemBase {
         // for the pivot angle, 0 is horizontal, increasing as the pivot raises.
         // i.e., 90 would be vertical
         STOWED(true, 0),
-        INTAKING(false, 1),
-        AGITATING(true, 1),
+        OUT(false, 0),
+        INTAKING(false, 0.5),
+        AGITATING(true, 0.5),
         CUSTOM(false, Double.MAX_VALUE);
 
         
@@ -34,8 +46,8 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
-    private final SparkFlex m_FeederMotor;
-    private final SparkFlex m_PivotMotor;
+    private final TalonFX m_FeederMotor;
+    private final SparkMax m_PivotMotor;
 
     private IntakePreset intakePreset;
     private boolean targetPivotRaised;
@@ -45,13 +57,33 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem() {
         //TODO: Change to ACTUAL motor type
-        m_FeederMotor = new SparkFlex(
-            IntakeConstants.Feeder.CAN_ID,
-            MotorType.kBrushless
+        m_FeederMotor = new TalonFX(
+            IntakeConstants.Feeder.CAN_ID
         );
-        m_PivotMotor = new SparkFlex(
+        m_PivotMotor = new SparkMax(
             IntakeConstants.Pivot.CAN_ID, 
             MotorType.kBrushless
+        );
+
+        TalonFXConfiguration feederConfig = 
+                new TalonFXConfiguration().withMotorOutput(
+                    new MotorOutputConfigs().withInverted(
+                        IntakeConstants.Feeder.REVERSE
+                            ? InvertedValue.Clockwise_Positive    
+                            : InvertedValue.CounterClockwise_Positive        
+                    )
+                );
+
+        m_FeederMotor.getConfigurator()
+            .apply(feederConfig);
+
+        SparkMaxConfig pivotConfig = new SparkMaxConfig();
+        pivotConfig.idleMode(IdleMode.kBrake);
+
+        m_PivotMotor.configure(
+            pivotConfig,
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters
         );
 
         setPreset(IntakePreset.STOWED);
@@ -69,8 +101,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
         if (!isHolding) {
             // if moving to deploy / stow
-            m_PivotMotor.setVoltage(
-                IntakeConstants.Pivot.DEPLOY_VOLTAGE
+            m_PivotMotor.set(
+                IntakeConstants.Pivot.DEPLOY_OUTPUT
                 * (targetPivotRaised
                     ? -1
                     : 1
@@ -78,8 +110,8 @@ public class IntakeSubsystem extends SubsystemBase {
             );
         } else {
             // if holding position
-            m_PivotMotor.setVoltage(
-                IntakeConstants.Pivot.HOLD_VOLTAGE
+            m_PivotMotor.set(
+                IntakeConstants.Pivot.HOLD_OUTPUT
                 * (targetPivotRaised
                     ? -1
                     : 1
@@ -94,11 +126,11 @@ public class IntakeSubsystem extends SubsystemBase {
         // TODO: i don't know what units this is in
         SmartDashboard.putNumber(
             "Intake/Feeder/velocity",
-            m_FeederMotor.getEncoder().getVelocity()
+            m_FeederMotor.getVelocity().getValueAsDouble()
         );
         SmartDashboard.putNumber(
             "Intake/Feeder/voltage",
-            m_FeederMotor.getBusVoltage()
+            m_FeederMotor.getMotorVoltage().getValueAsDouble()
         );
 
         SmartDashboard.putBoolean(
@@ -110,8 +142,8 @@ public class IntakeSubsystem extends SubsystemBase {
             isHolding 
         );
         SmartDashboard.putNumber(
-            "Intake/Pivot/voltage",
-            m_PivotMotor.getBusVoltage()
+            "Intake/Pivot/output",
+            m_PivotMotor.getAppliedOutput()
         );
     }
     
