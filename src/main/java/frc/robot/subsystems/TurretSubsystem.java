@@ -496,13 +496,17 @@ public class TurretSubsystem extends SubsystemBase {
      * RADIANS
      */
     public double getYaw() {
-        return Units.rotationsToRadians(
-            (m_YawMotor.getPosition().getValueAsDouble() 
-                + Units.degreesToRotations(
-                    TurretConstants.Yaw.ANGLE_MIN
-                ) - yawOffset
-            ) / TurretConstants.Yaw.GEAR_RATIO
-        );
+        if (yawIsZeroed) {
+            return Units.rotationsToRadians(
+                (m_YawMotor.getPosition().getValueAsDouble() 
+                    + Units.degreesToRotations(
+                        TurretConstants.Yaw.ANGLE_MIN
+                    ) - yawOffset
+                ) / TurretConstants.Yaw.GEAR_RATIO
+            );
+        } else {
+            return 0;
+        }
     }
 
     public double getYawVelocity() {
