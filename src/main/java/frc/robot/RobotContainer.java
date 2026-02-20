@@ -123,7 +123,7 @@ public class RobotContainer {
 
         operatorXbox.leftTrigger(0.1)
             .whileTrue(
-                new IntakeCommand(intakeSubsystem, IntakePreset.INTAKING, IntakePreset.INTAKING)
+                new IntakeCommand(intakeSubsystem, IntakePreset.INTAKING, IntakePreset.OUT)
             );
         operatorXbox.leftBumper()
             .onTrue(
