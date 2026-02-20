@@ -610,7 +610,7 @@ public class TurretSubsystem extends SubsystemBase {
                 () -> {
                     yawIsZeroed = false;
                     yawOffset = 0;
-                    yawPID.reset(TurretConstants.Yaw.ANGLE_MIN);
+                    yawPID.reset();
                 }
             ),
             // move to zero, rough pass
