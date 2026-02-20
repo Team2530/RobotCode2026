@@ -112,7 +112,7 @@ public final class Constants {
           // output applied when the pivot is moving between stowed / deployed
           public static final double DEPLOY_OUTPUT = 0.2;
           // voltaged applied when the pivot is holding it's position\
-          public static final double HOLD_OUTPUT = 0.1;
+          public static final double HOLD_OUTPUT = 0.05;
 
           public static final class Zeroing {
               // amps ocourse
