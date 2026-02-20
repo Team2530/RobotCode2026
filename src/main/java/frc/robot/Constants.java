@@ -315,35 +315,41 @@ public final class Constants {
     public static final class Launcher {
         // inches
         public static final double WHEEL_DIAMETER = 4;
-        public static final boolean REVERSE = false;
+        public static final boolean REVERSE = true;
+
+        public static final double VELOCITY_DEADBAND = 10;
 
         public static final class PID {
-            public static final double P = 0.1;
+            public static final double P = 0.3;
             public static final double I = 0;
             public static final double D = 0;
         }
     }
 
     public static final class Yaw {
-        public static final double GEAR_RATIO = 9;
+        public static final double GEAR_RATIO = 45;
         public static final boolean REVERSE = false;
 
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
-        //
-        // WARNING: as of writing, we have a 360 turret
-        public static final double ANGLE_MIN = Double.MIN_VALUE;
-        public static final double ANGLE_MAX = Double.MAX_VALUE;
+        // public static final double ANGLE_MIN = 1.2;
+        public static final double ANGLE_MIN = 0;
+        public static final double ANGLE_MAX = 340;
+
+        public static final double VELOCITY_MAX = 0.1;
 
         public static final class Zeroing {
             // amps
-            public static final double CURRENT_LIMIT = 35;
+            public static final double ROUGHPASS_CURRENT_LIMIT = 45;
+            public static final double ROUGHPASS_VOLTAGE = -2;
+            public static final double FINEPASS_CURRENT_LIMIT = 35;
+            public static final double FINEPASS_VOLTAGE = -1;
             // time above current limit to register as hitting the hard limit
-            public static final double DEBOUNCE_TIME = 0.25;
+            public static final double DEBOUNCE_TIME = 0.1;
         }
 
         public static final class PID {
-            public static final double P = 1;
+            public static final double P = 2;
             public static final double I = 0;
             public static final double D = 0;
         }
