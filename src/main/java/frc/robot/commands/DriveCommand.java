@@ -16,6 +16,7 @@ public class DriveCommand extends Command {
     private final SwerveSubsystem subsystem;
     private final XboxController driverXbox;
 
+    /** Limit the speed of change */
     private SlewRateLimiter driveMultiplierSlewLimiter = new SlewRateLimiter(
             ControlConstants.DRIVE_MULTIPLIER_SLEW_RATE
     );

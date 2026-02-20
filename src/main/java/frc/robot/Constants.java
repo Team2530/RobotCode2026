@@ -6,7 +6,6 @@ import java.util.HashMap;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -54,7 +53,7 @@ public final class Constants {
     public static final double robotLengthMeters = Units.inchesToMeters(29.5);
 
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
-    public static final double TOTAL_MASS_KG = 74.088;
+    public static final double TOTAL_MASS_KG = 120.0;
     public static final double MOMENT_OF_INERTIA = 6.883;
   }
 
@@ -150,7 +149,7 @@ public final class Constants {
 
         public static class Deadband {
             public static final double X = 0.1;
-            public static final double Y = X; // WARNING: can i do this?
+            public static final double Y = X; // WARNING: can i do this? probably
             public static final double Z = 0.08;
 
             // the radius from 0 to 1 after which the angle-based heading 
@@ -184,8 +183,8 @@ public final class Constants {
 
         // for the steer motors on the modules
         public static final class Angle {
-            public static final double P = 100;
-            public static final double I = 0;
+            public static final double P = 100; // 100
+            public static final double I = 0; // 0
             public static final double D = 0;
             public static final double F = 0;
             public static final double IZ = 0;
@@ -193,7 +192,7 @@ public final class Constants {
 
         // for angle-based heading control
         public static final class Heading {
-            public static final double P = 0.01;
+            public static final double P = 0.01; // 0.01 
             public static final double I = 0;
             public static final double D = 0;
             public static final double F = 0;
@@ -231,7 +230,7 @@ public final class Constants {
         public static final double STEER_FRICTION_VOLTAGE = 0.19;
 
         public static final double DRIVE_GEARING = 6.03;
-        public static final double ANGLE_GEARING = 26.09;
+        public static final double ANGLE_GEARING = 26.09; // 26.09
 
         public static final class CanIDs {
             public static final int FL_DRIVE = 1;
