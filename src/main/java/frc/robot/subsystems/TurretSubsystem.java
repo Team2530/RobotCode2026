@@ -15,6 +15,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -450,6 +451,10 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putString(
             "Turret/Targeting/current_target_name",
             target.toString()
+        );
+        SmartDashboard.putNumber(
+            "Turret/Targeting/time_cost",
+            Timer.getTimestamp() - startTime
         );
         // launcher
         SmartDashboard.putNumber(
