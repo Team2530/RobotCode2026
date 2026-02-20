@@ -351,12 +351,16 @@ public class TurretSubsystem extends SubsystemBase {
             // calculate voltages and send to motors
             double launcherOutput;
             if (Math.abs(getLauncherVelocity() - targetVelocity) > TurretConstants.Launcher.VELOCITY_DEADBAND) {
-                launcherOutput = Math.signum(getLauncherVelocity() - targetVelocity);
+                launcherOutput = -1 * Math.signum(getLauncherVelocity() - targetVelocity);
             } else {
                 // fine control
-                launcherOutput = launcherPID.calculate(
-                    getLauncherVelocity(),
-                    targetVelocity
+                launcherOutput = MathUtil.clamp(
+                    launcherPID.calculate(
+                        getLauncherVelocity(),
+                        targetVelocity
+                    ),
+                    -1,
+                    1
                 );
             }
             m_LauncherMotor.set(launcherOutput);
