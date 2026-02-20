@@ -5,16 +5,28 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class RunIndexerCommand extends Command {
     private final IndexerSubsystem indexerSubsystem;
+    private final boolean isReversed;
 
-    public RunIndexerCommand(IndexerSubsystem indexerSubsystem) {
+    public RunIndexerCommand(
+        IndexerSubsystem indexerSubsystem,
+        boolean isReversed
+    ) {
         this.indexerSubsystem = indexerSubsystem;
+        this.isReversed = isReversed;
         // Require the subsystem to prevent other commands from running on it concurrently
         addRequirements(indexerSubsystem);
+    }
+
+    public RunIndexerCommand(IndexerSubsystem indexerSubsystem) {
+        this(
+            indexerSubsystem,
+            false
+        );
     }
     
     @Override
     public void initialize() {
-        indexerSubsystem.run();
+        indexerSubsystem.run(isReversed);
     }
 
     @Override
