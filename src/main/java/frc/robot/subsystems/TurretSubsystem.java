@@ -299,7 +299,11 @@ public class TurretSubsystem extends SubsystemBase {
                 // time.
                 Units.degreesToRadians(getYaw()),               
                 TurretConstants.Pitch.ANGLE_CONSTANT,
-                getLauncherVelocity(),
+                MathUtil.clamp(
+                    getLauncherVelocity(),
+                    TurretConstants.Launcher.MINIMUM_VELOCITY,
+                    TurretConstants.Launcher.MAXIMUM_VELOCITY
+                ),
                 1
             };
 
@@ -323,14 +327,14 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     )
                 ),*/
-                -1 * TurretConstants.TargetingOptimizer.MAXIMUM_VELOCITY,
+                TurretConstants.Launcher.MINIMUM_VELOCITY,
                 0
             };
             double [] upperBounds = {
                 TurretConstants.Yaw.ANGLE_MAX,
                 TurretConstants.Pitch.ANGLE_CONSTANT,
                 /*TurretConstants.Pitch.ANGLE_MAX,*/
-                TurretConstants.TargetingOptimizer.MAXIMUM_VELOCITY,
+                TurretConstants.Launcher.MAXIMUM_VELOCITY,
                 TurretConstants.TargetingOptimizer.MAXIMUM_TIME
             };
 

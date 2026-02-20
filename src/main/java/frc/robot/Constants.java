@@ -318,6 +318,10 @@ public final class Constants {
 
         public static final double VELOCITY_DEADBAND = 10;
 
+        // in rotations/s
+        public static final double MAXIMUM_VELOCITY = 500;
+        public static final double MINIMUM_VELOCITY = 25;
+
         public static final class PID {
             public static final double P = 0.3;
             public static final double I = 0;
@@ -436,8 +440,6 @@ public final class Constants {
         public static final int MAX_EVALUATIONS = 1000;
         
         public static final double MAXIMUM_TIME = 5;
-        // meters per second
-        public static final double MAXIMUM_VELOCITY = 10;
     }
 
   }
