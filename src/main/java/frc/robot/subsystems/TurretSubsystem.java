@@ -455,6 +455,10 @@ public class TurretSubsystem extends SubsystemBase {
             "Turret/Launcher/Current_velocity",
             getLauncherVelocity()
         );
+        SmartDashboard.putNumber(
+                "Turret/Launcher/voltage",
+                m_LauncherMotor.getMotorVoltage().getValueAsDouble()
+        );
         // yaw
         SmartDashboard.putNumber(
             "Turret/Yaw/Current_yaw",
