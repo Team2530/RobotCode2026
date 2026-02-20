@@ -227,6 +227,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        double startTime = Timer.getTimestamp();
         if (yawIsZeroed) {
             // get difference to target
             Translation3d toTarget;
