@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -25,8 +26,10 @@ import frc.robot.commands.RunLoaderCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.IntakeSubsystem.IntakePreset;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
+import frc.robot.subsystems.TurretSubsystem.TurretTargets;
 import frc.robot.util.LimelightContainer;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -82,6 +85,7 @@ public class RobotContainer {
         DataLogManager.start();
 
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
+        //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
     }
@@ -113,15 +117,8 @@ public class RobotContainer {
 
         operatorXbox.leftTrigger(0.1)
             .whileTrue(
-                new IntakeCommand(intakeSubsystem, IntakePreset.INTAKING, IntakePreset.OUT)
+                new IntakeCommand(intakeSubsystem, IntakePreset.INTAKING, IntakePreset.INTAKING)
             );
-        operatorXbox.rightTrigger(0.9)
-            .whileTrue(
-                new RunLoaderCommand(loaderSubsystem)
-            ).whileTrue(
-                new RunIndexerCommand(indexerSubsystem)
-            );
-
         operatorXbox.leftBumper()
             .onTrue(
                 new InstantCommand(
@@ -132,6 +129,14 @@ public class RobotContainer {
                     }
                 )
             );
+
+        operatorXbox.rightTrigger(0.3)
+            .whileTrue(
+                new RunLoaderCommand(loaderSubsystem)
+            ).whileTrue(
+                new RunIndexerCommand(indexerSubsystem)
+            );
+
         
         operatorXbox.start()
             .onTrue(
@@ -139,25 +144,71 @@ public class RobotContainer {
             );
 
         operatorXbox.povDown()
-                        .onTrue(
-                            new InstantCommand(()
-                            -> {
-                                turretSubsystem.setTargetVelocity(
-                                    turretSubsystem.getTargetVelocity() - 1
-                                );
-                            })
-                        );
+            .onTrue(
+                new InstantCommand(()
+                -> {
+                    turretSubsystem.setTargetVelocity(
+                        turretSubsystem.getTargetVelocity() - 1
+                    );
+                })
+            );
         operatorXbox.povUp()
-                        .onTrue(
-                            new InstantCommand(()
-                            -> {
-                                turretSubsystem.setTargetVelocity(
-                                    turretSubsystem.getTargetVelocity() + 1
-                                );
-                            })
-                        );
+            .onTrue(
+                new InstantCommand(()
+                -> {
+                    turretSubsystem.setTargetVelocity(
+                        turretSubsystem.getTargetVelocity() + 1
+                    );
+                })
+            );
         operatorXbox.back()
-            .whileTrue(new RunLoaderCommand(loaderSubsystem, true));
+            .whileTrue(
+                new RunLoaderCommand(
+                    loaderSubsystem, 
+                    true
+                )
+            ).whileTrue(
+                new RunIndexerCommand(
+                    indexerSubsystem, 
+                    true
+                )
+            ).whileTrue(
+                new IntakeCommand(
+                    intakeSubsystem,
+                    IntakePreset.SPITTING
+                )
+            );
+        
+        operatorXbox.x()
+            .onTrue(
+                new InstantCommand( 
+                    () -> {
+                        turretSubsystem.setTarget(
+                            TurretTargets.SHUTTLE_LEFT
+                        );
+                    }
+                )
+            );
+        operatorXbox.b()
+            .onTrue(
+                new InstantCommand( 
+                    () -> {
+                        turretSubsystem.setTarget(
+                            TurretTargets.SHUTTLE_RIGHT
+                        );
+                    }
+                )
+            );
+        operatorXbox.a()
+            .onTrue(
+                new InstantCommand( 
+                    () -> {
+                        turretSubsystem.setTarget(
+                            TurretTargets.HUB
+                        );
+                    }
+                )
+            );
     }
 
     /**
@@ -182,8 +233,6 @@ public class RobotContainer {
     }
 
     public Command getInitCommand() {
-        return new ParallelCommandGroup(
-            turretSubsystem.zeroYawCommand()
-        );
+        return turretSubsystem.zeroYawCommand();
     }
 }
