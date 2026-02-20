@@ -120,6 +120,10 @@ public class RobotContainer {
                     swerveDriveSubsystem.resetOdometry();
                 })
             );
+        driverXbox.back()
+            .onTrue(
+                getResetCommand()
+            );
 
         operatorXbox.leftTrigger(0.1)
             .whileTrue(
@@ -240,5 +244,11 @@ public class RobotContainer {
 
     public Command getInitCommand() {
         return turretSubsystem.zeroYawCommand();
+    }
+
+    public Command getResetCommand() {
+        return new ParallelCommandGroup(
+            turretSubsystem.resetCommand()
+        );
     }
 }
