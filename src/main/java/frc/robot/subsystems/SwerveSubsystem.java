@@ -13,7 +13,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -31,12 +32,22 @@ import swervelib.parser.json.modules.DriveConversionFactorsJson;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+import swervelib.imu.Pigeon2Swerve;
+
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.util.LimelightContainer;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 
 public class SwerveSubsystem extends SubsystemBase {
 
     private final SwerveDrive swerveDrive;
+
+    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Odometry Pose", Pose2d.struct).publish();
+    
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
@@ -53,6 +64,9 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public SwerveSubsystem() {
+
+        
+
         // register gearshifter with smartdashboard
         gearChooser = new SendableChooser<>();
 
@@ -71,21 +85,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
         gearChooser.onChange(gearing -> changeGearing(gearing));
 
-        SmartDashboard.putData(
-            "Swerve Drive Gearing",
-            gearChooser
-        );
+        SmartDashboard.putData("Swerve Drive Gearing", gearChooser);
 
         // register sysId commands with smartdashboard
-        SmartDashboard.putData(
-            "SysId Drive Motors",
-            sysIdDriveCommand()
-        );  
-        SmartDashboard.putData(
-            "SysId Angle Motors",
-            sysIdAngleCommand()
-        );
-
+        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
+        SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
 
         // instantiate yagsl library classes
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -96,14 +100,12 @@ public class SwerveSubsystem extends SubsystemBase {
                 new ConversionFactorsJson(){{
                     angle = new AngleConversionFactorsJson() {{
                         gearRatio = DriveConstants.SwerveModules.ANGLE_GEARING;
-
                         calculate();
                     }};
 
                     drive = new DriveConversionFactorsJson() {{
                         gearRatio = DriveConstants.SwerveModules.DRIVE_GEARING;
                         diameter = DriveConstants.SwerveModules.WHEEL_DIAMETER;
-
                         calculate();
                     }};
                 }};
@@ -122,7 +124,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 DriveConstants.PIDs.Angle.F,
                 DriveConstants.PIDs.Angle.IZ
             );
-
             SwerveModulePhysicalCharacteristics physicalCharacteristics = 
                 new SwerveModulePhysicalCharacteristics(
                         conversionFactors, 
@@ -153,17 +154,11 @@ public class SwerveSubsystem extends SubsystemBase {
                         DCMotor.getKrakenX44(1)
                     ), 
                     conversionFactors,
-                    new CANCoderSwerve(
-                        DriveConstants.SwerveModules.CanIDs.FL_CANCODER
-                    ), 
-                    Units.rotationsToDegrees(
-                        DriveConstants.SwerveModules.Offsets.FL_ANGLE
-                    ),
+                    new CANCoderSwerve(DriveConstants.SwerveModules.CanIDs.FL_CANCODER), 
+                    Units.rotationsToDegrees(DriveConstants.SwerveModules.Offsets.FL_ANGLE),
                     DriveConstants.SwerveModules.Offsets.FL_X,
                     DriveConstants.SwerveModules.Offsets.FL_Y,
-                    anglePID, 
-                    drivePID, 
-                    physicalCharacteristics, 
+                    anglePID, drivePID, physicalCharacteristics, 
                     DriveConstants.SwerveModules.Offsets.FL_ENCODER_INVERTED,
                     DriveConstants.SwerveModules.Offsets.FL_DRIVE_INVERTED,
                     DriveConstants.SwerveModules.Offsets.FL_ANGLE_INVERTED, 
@@ -307,12 +302,20 @@ public class SwerveSubsystem extends SubsystemBase {
         // Enable if you want to resynchronize your absolute encoders and motor 
         // encoders periodically when they are not moving.
         //
-        // idk this seems find
+        // TODO: idk this seems find
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
     };
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        if (Robot.isSimulation()) {
+            LimelightContainer.estimateSimOdometry();
+        } else {
+            RobotContainer.LLContainer.estimateMT2Odometry(swerveDrive);
+
+            posePublisher.set(swerveDrive.getPose());
+        }
+    }
 
     @Override
     public void simulationPeriodic() {}
