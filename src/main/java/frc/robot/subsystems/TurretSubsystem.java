@@ -719,4 +719,21 @@ public class TurretSubsystem extends SubsystemBase {
             )
         );
     }
+
+    public void setTargetVelocity(double target) {
+        targetVelocity = MathUtil.clamp(target, 0, 500);
+    }
+
+    public double getTargetVelocity() {
+        return targetVelocity;
+    }
+
+    public void setManualControl(
+        double yaw,
+        double velocity
+    ) {
+        this.targetingMode = TargetingMode.MANUAL;
+        this.targetVelocity = velocity;
+        this.targetYaw = yaw;
+    }
 }
