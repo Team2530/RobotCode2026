@@ -301,7 +301,9 @@ public class TurretSubsystem extends SubsystemBase {
                 // Start optimizer at current position to reduce optimization 
                 // time.
                 Units.degreesToRadians(getYaw()),               
-                TurretConstants.Pitch.ANGLE_CONSTANT,
+                Units.degreesToRadians(
+                    TurretConstants.Pitch.ANGLE_CONSTANT
+                ),
                 MathUtil.clamp(
                     getLauncherVelocity(),
                     TurretConstants.Launcher.MINIMUM_VELOCITY,
