@@ -141,6 +141,14 @@ public class RobotContainer {
             );
 
         operatorXbox.rightTrigger(0.3)
+        .and(
+            new BooleanSupplier() {
+                @Override
+                public boolean getAsBoolean() {
+                    return turretSubsystem.isAtVelocity();
+                }
+            }
+        )
             .whileTrue(
                 new RunLoaderCommand(loaderSubsystem)
             ).whileTrue(

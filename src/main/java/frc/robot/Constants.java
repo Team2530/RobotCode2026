@@ -125,7 +125,7 @@ public final class Constants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
     public static final double MAX_ROBOT_VELOCITY = 4.2;
-    public static final double MAX_ROBOT_RAD_VELOCITY = 1;
+    public static final double MAX_ROBOT_RAD_VELOCITY = 0.25;
 
 
     // (((((65kg×1(m/s^2))/4)×(4in/2))/6.75)/(0.0194Nm/A))×(0.033ohm)

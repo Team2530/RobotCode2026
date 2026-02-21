@@ -441,6 +441,10 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             );
 
+            atVelocity = Math.abs( 
+                getLauncherVelocity() - setYaw
+            ) < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR;
+
             double yawOutput = yawPID.calculate(
                 getYaw(),
                 setYaw
@@ -508,6 +512,10 @@ public class TurretSubsystem extends SubsystemBase {
             SmartDashboard.putNumber(
                 "Turret/Launcher/output", 
                 launcherOutput 
+            );
+            SmartDashboard.putBoolean(
+                "Turret/Launcher/at_velocity",
+                atVelocity
             );
             // yaw
             SmartDashboard.putNumber(
@@ -798,5 +806,9 @@ public class TurretSubsystem extends SubsystemBase {
         this.targetingMode = TargetingMode.MANUAL;
         this.targetVelocity = velocity;
         this.targetYaw = yaw;
+    }
+    
+    public boolean isAtVelocity() {
+        return atVelocity;
     }
 }
