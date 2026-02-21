@@ -199,9 +199,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setTarget(
-                            TurretTargets.SHUTTLE_LEFT
-                        );
+                        turretSubsystem.setManualControl(52, 43);
                     }
                 )
             );
@@ -209,9 +207,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setTarget(
-                            TurretTargets.SHUTTLE_RIGHT
-                        );
+                        turretSubsystem.setManualControl(329, 42);
                     }
                 )
             );
@@ -219,13 +215,20 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setTarget(
-                            TurretTargets.HUB
-                        );
+                        turretSubsystem.setManualControl(0, 42);
+                    }
+                )
+            );
+        operatorXbox.leftStick()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setManualControl(0, 0);
                     }
                 )
             );
     }
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

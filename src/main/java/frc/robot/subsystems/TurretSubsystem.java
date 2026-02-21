@@ -209,7 +209,7 @@ public class TurretSubsystem extends SubsystemBase {
             TurretConstants.TargetingOptimizer.INTERPOLATION_POINTS
         );
 
-        setTarget(TurretTargets.HUB);
+        setManualControl(0, 0);
 
         yawIsZeroed = false;
         TargetPositionPublisher = NetworkTableInstance.getDefault()
