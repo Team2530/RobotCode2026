@@ -376,11 +376,18 @@ public class TurretSubsystem extends SubsystemBase {
             }
             m_LauncherMotor.set(launcherOutput);
 
-            m_YawMotor.setVoltage(
-                yawPID.calculate(
-                    getYaw(),
-                    optimalYaw
-                ) 
+            double setYaw = MathUtil.clamp(
+                optimalYaw,
+                TurretConstants.Yaw.ANGLE_MIN,
+                TurretConstants.Yaw.ANGLE_MAX
+            );
+
+            double yawOutput = yawPID.calculate(
+                getYaw(),
+                setYaw
+            );
+            m_YawMotor.set(
+                yawOutput
                 // WARNING: dogshit code
                 //
                 // compensate for drivebase movement
