@@ -353,11 +353,9 @@ public class SwerveSubsystem extends SubsystemBase {
         tmp = speeds.omegaRadiansPerSecond;
         speeds.omegaRadiansPerSecond *= -1;
         
-        swerveDrive.drive(
+        this.drive(
             new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
-            speeds.omegaRadiansPerSecond,
-            true,  
-            false
+            speeds.omegaRadiansPerSecond
         );
         
     }

@@ -20,19 +20,12 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants.DriveConstants.PIDs.Drive;
-import frc.robot.subsystems.SwerveSubsystem;
-import swervelib.SwerveDrive;
-import choreo.Choreo;
-import choreo.auto.AutoFactory;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -47,7 +40,11 @@ import choreo.auto.AutoFactory;
 public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
-  private final SwerveSubsystem swerveDrive = new SwerveSubsystem();
+  //private final SwerveSubsystem swerveDrive = new SwerveSubsystem();
+  //private final AutoFactory autoFactory;
+  /** This is one auto. */
+  //private final Trajectory trajectory;
+  
   @Logged
   private RobotContainer m_robotContainer;
 
@@ -61,6 +58,7 @@ public class Robot extends TimedRobot {
       .getDoubleTopic("loopTime").publish();
   DoublePublisher csTimePublisher = NetworkTableInstance.getDefault()
       .getDoubleTopic("commandSchedulerTime").publish();
+  
 
   public Robot() {
 
@@ -83,6 +81,7 @@ public class Robot extends TimedRobot {
     config.backend = new FileBackend(DataLogManager.getLog());
 
     // Epilogue.bind(this);
+    
   }
 
   /**
@@ -102,6 +101,8 @@ public class Robot extends TimedRobot {
     versionTable.putValue("DIRTY", NetworkTableValue.makeBoolean(BuildConstants.DIRTY != 0));
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+
+
   }
 
   /**
@@ -126,7 +127,11 @@ public class Robot extends TimedRobot {
 
     loopPub.set(loopTime);
     csTimePublisher.set(commandSchedulerTime);
+
+    
+
   }
+
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
@@ -147,7 +152,7 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-       CommandScheduler.getInstance().schedule(m_autonomousCommand);
+      CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
   }
 
