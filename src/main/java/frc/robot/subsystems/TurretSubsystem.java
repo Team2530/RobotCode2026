@@ -402,25 +402,28 @@ public class TurretSubsystem extends SubsystemBase {
             }
 
             // calculate voltages and send to motors
-            double launcherOutput;
+            double launcherOutput = 0;
             double setVelocity = MathUtil.clamp(
                 targetVelocity,
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
-            if (Math.abs(getLauncherVelocity() - setVelocity) > TurretConstants.Launcher.VELOCITY_DEADBAND) {
-                launcherOutput = -1 * Math.signum(getLauncherVelocity() - setVelocity);
-            } else {
-                // fine control
-                launcherOutput = MathUtil.clamp(
-                    launcherPID.calculate(
-                        getLauncherVelocity(),
-                        setVelocity
-                    ),
-                    -1,
-                    1
-                );
+            if (targetVelocity >= TurretConstants.Launcher.MINIMUM_VELOCITY) {
+                if (Math.abs(getLauncherVelocity() - setVelocity) > TurretConstants.Launcher.VELOCITY_DEADBAND) {
+                    launcherOutput = -1 * Math.signum(getLauncherVelocity() - setVelocity);
+                } else {
+                    // fine control
+                    launcherOutput = MathUtil.clamp(
+                        launcherPID.calculate(
+                            getLauncherVelocity(),
+                            setVelocity
+                        ),
+                        -1,
+                        1
+                    );
+                }
             }
+            
             m_LauncherMotor.set(launcherOutput);
 
             double setYaw = MathUtil.clamp(
