@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -120,7 +121,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // motor control
     private final PIDController launcherPID;
-    private final PIDController yawPID;
+    private final ProfiledPIDController yawPID;
     private final PIDController pitchPID;
 
     private final SimpleMotorFeedforward yawFeedforward;
@@ -193,7 +194,11 @@ public class TurretSubsystem extends SubsystemBase {
         yawPID = new PIDController(
             TurretConstants.Yaw.PID.P,
             TurretConstants.Yaw.PID.I,
-            TurretConstants.Yaw.PID.D
+            TurretConstants.Yaw.PID.D,
+            new Constraints(
+                TurretConstants.Yaw.PID.MAX_VELOCITY,
+                TurretConstants.Yaw.PID.MAX_ACCELERATION
+            )   
         );
         pitchPID = new PIDController(
             TurretConstants.Pitch.PID.P,
@@ -692,7 +697,7 @@ public class TurretSubsystem extends SubsystemBase {
                 () -> {
                     yawIsZeroed = false;
                     yawOffset = 0;
-                    yawPID.reset();
+                    yawPID.reset(0);
                 }
             ),
             // move to zero, rough pass

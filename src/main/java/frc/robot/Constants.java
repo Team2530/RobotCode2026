@@ -360,6 +360,9 @@ public final class Constants {
             public static final double P = 0.7;
             public static final double I = 0;
             public static final double D = 0;
+
+            public static final double MAX_VELOCITY = 6;
+            public static final double MAX_ACCELERATION = 2;
         }
 
         public static final class Feedforward {
