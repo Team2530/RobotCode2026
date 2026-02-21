@@ -520,11 +520,9 @@ public class TurretSubsystem extends SubsystemBase {
     public double getYaw() {
         if (yawIsZeroed) {
             return Units.rotationsToRadians(
-                (m_YawMotor.getPosition().getValueAsDouble() 
-                    + Units.degreesToRotations(
-                        TurretConstants.Yaw.ANGLE_MIN
-                    ) - yawOffset
-                ) / TurretConstants.Yaw.GEAR_RATIO
+                (m_YawMotor.getPosition().getValueAsDouble() - yawOffset) 
+                / TurretConstants.Yaw.GEAR_RATIO
+                + Units.degreesToRotations(TurretConstants.Yaw.ANGLE_MIN)
             );
         } else {
             return 0;

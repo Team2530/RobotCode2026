@@ -340,8 +340,8 @@ public final class Constants {
 
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
-        // public static final double ANGLE_MIN = 1.2;
-        public static final double ANGLE_MIN = 0;
+        public static final double ANGLE_MIN = 1.2;
+        // public static final double ANGLE_MIN = 0;
         public static final double ANGLE_MAX = 340;
 
         public static final double VELOCITY_MAX = 0.1;
