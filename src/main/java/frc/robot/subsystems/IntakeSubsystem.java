@@ -28,8 +28,8 @@ public class IntakeSubsystem extends SubsystemBase {
         // i.e., 90 would be vertical
         STOWED(true, 0),
         OUT(false, 0),
-        INTAKING(false, 0.8),
-        AGITATING(true, 0.8),
+        INTAKING(false, 0.6), //intake speed
+        AGITATING(true, 0.6),
         SPITTING(false, -1),
         CUSTOM(false, Double.MAX_VALUE);
 

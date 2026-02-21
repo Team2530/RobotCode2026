@@ -72,11 +72,11 @@ public class ManualTurretCommand extends Command {
     }
 
     public void increaseVelocity() {
-        changeVelocity(10);        
+        changeVelocity(1);        
     }
 
     public void decreaseVelocity() {
-        changeVelocity(-10);        
+        changeVelocity(-1);        
     }
 
     public void changeVelocity(double amount) {

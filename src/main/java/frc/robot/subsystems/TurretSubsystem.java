@@ -126,8 +126,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final SimpleMotorFeedforward yawFeedforward;
 
     // targets
-    private TurretTargets target;
-    private TargetingMode targetingMode;
+    private TurretTargets target = TurretTargets.HUB;
+    private TargetingMode targetingMode = TargetingMode.MANUAL;
     private Pose3d targetPosition;
 
     private double targetVelocity;
@@ -143,6 +143,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final StructPublisher<Pose3d> TargetPositionPublisher;
 
     public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
+
+        
         this.swerveSubsystem = swerveSubsystem;
         // Initialize Motors and Encoders
         m_LauncherMotor = new TalonFX(
@@ -235,6 +237,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        SmartDashboard.putNumber("shooter_target", targetVelocity);
+        //SmartDashboard.putNumber("shooter_velocity", m_LauncherMotor)
         double startTime = Timer.getTimestamp();
         if (yawIsZeroed) {
             // get difference to target
