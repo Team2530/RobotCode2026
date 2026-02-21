@@ -102,8 +102,10 @@ public class TurretSubsystem extends SubsystemBase {
         // like field relative
         ABSOLUTE,
         // robot absolute
-        RELATIVE
+        RELATIVE,
+        MANUAL
     }
+
 
     private final SwerveSubsystem swerveSubsystem; 
 
@@ -128,6 +130,8 @@ public class TurretSubsystem extends SubsystemBase {
     private TargetingMode targetingMode;
     private Pose3d targetPosition;
 
+    private double targetVelocity;
+    private double targetYaw;
 
     // yaw logic
     private boolean yawIsZeroed;
@@ -211,6 +215,8 @@ public class TurretSubsystem extends SubsystemBase {
         TargetPositionPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Turret/Target_position", Pose3d.struct)
             .publish();
+
+        targetVelocity = 0;
     }
 
     private double relativeAngularVelocityFromLinear(
@@ -235,6 +241,10 @@ public class TurretSubsystem extends SubsystemBase {
             Translation3d toTarget;
             // TODO: i'm not sure about these poses and rotations
             switch (targetingMode) {
+                case MANUAL:
+                    // we don't need calculations                
+                    toTarget = new Translation3d();
+                    break;
                 case ABSOLUTE:
                     toTarget = targetPosition
                         .minus(getLauncherPosition())
@@ -300,7 +310,16 @@ public class TurretSubsystem extends SubsystemBase {
             double[] guess = {
                 // Start optimizer at current position to reduce optimization 
                 // time.
-                Units.degreesToRadians(getYaw()),               
+                MathUtil.clamp(
+                    getYaw(),
+                    Units.degreesToRadians(
+                        TurretConstants.Yaw.ANGLE_MIN
+
+                    ),
+                    Units.degreesToRadians(
+                        TurretConstants.Yaw.ANGLE_MAX
+                    )
+                ),               
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
@@ -321,8 +340,12 @@ public class TurretSubsystem extends SubsystemBase {
             // optimizer will be rerun at a frequency that the discrepancies 
             // wont matter
             double [] lowerBounds = {
-                TurretConstants.Yaw.ANGLE_MIN,
-                TurretConstants.Pitch.ANGLE_CONSTANT,
+                Units.degreesToRadians(
+                    TurretConstants.Yaw.ANGLE_MIN
+                ),
+                Units.degreesToRadians(
+                    TurretConstants.Pitch.ANGLE_CONSTANT
+                ),
                 // WARNING: overridden for constant pitch
                 /*TurretConstants.Pitch.ANGLE_MIN(
                     Units.radiansToDegrees(
@@ -336,39 +359,63 @@ public class TurretSubsystem extends SubsystemBase {
                 0
             };
             double [] upperBounds = {
-                TurretConstants.Yaw.ANGLE_MAX,
-                TurretConstants.Pitch.ANGLE_CONSTANT,
+                Units.degreesToRadians(
+                    TurretConstants.Yaw.ANGLE_MAX
+                ),
+                Units.degreesToRadians(
+                    TurretConstants.Pitch.ANGLE_CONSTANT
+                ),
                 /*TurretConstants.Pitch.ANGLE_MAX,*/
                 TurretConstants.Launcher.MAXIMUM_VELOCITY,
                 TurretConstants.TargetingOptimizer.MAXIMUM_TIME
             };
 
-            double[] targetOptimum = targetingOptimizer.optimize(
-                new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
-                new ObjectiveFunction(optimizerFunction),
-                GoalType.MINIMIZE,
-                new InitialGuess(guess),
-                new SimpleBounds(
-                    lowerBounds,
-                    upperBounds
-                )
-            ).getPoint();
+            double optimalYaw;
+            double optimalPitch;
+            double optimalVelocity;
+            double optimalTime;
 
-            double optimalYaw = targetOptimum[0];
-            double optimalPitch = targetOptimum[1];
-            double optimalVelocity = targetOptimum[2];
-            // i don't think we need time?
+            if (targetingMode != targetingMode.MANUAL) {
+                double[] targetOptimum = targetingOptimizer.optimize(
+                    new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
+                    new ObjectiveFunction(optimizerFunction),
+                    GoalType.MINIMIZE,
+                    new InitialGuess(guess),
+                    new SimpleBounds(
+                        lowerBounds,
+                        upperBounds
+                    )
+                ).getPoint();
+
+                // double[] targetOptimum = guess;            
+
+                optimalYaw = targetOptimum[0];
+                optimalPitch = targetOptimum[1];
+                // double optimalVelocity = targetOptimum[2];
+                optimalVelocity = targetVelocity;
+                optimalTime = targetOptimum[3];
+            } else {
+                optimalYaw = Units.degreesToRadians(targetYaw);
+                optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
+                optimalVelocity = targetVelocity;
+                optimalTime = 0;
+            }
 
             // calculate voltages and send to motors
             double launcherOutput;
-            if (Math.abs(getLauncherVelocity() - targetVelocity) > TurretConstants.Launcher.VELOCITY_DEADBAND) {
-                launcherOutput = -1 * Math.signum(getLauncherVelocity() - targetVelocity);
+            double setVelocity = MathUtil.clamp(
+                targetVelocity,
+                TurretConstants.Launcher.MINIMUM_VELOCITY,
+                TurretConstants.Launcher.MAXIMUM_VELOCITY
+            );
+            if (Math.abs(getLauncherVelocity() - setVelocity) > TurretConstants.Launcher.VELOCITY_DEADBAND) {
+                launcherOutput = -1 * Math.signum(getLauncherVelocity() - setVelocity);
             } else {
                 // fine control
                 launcherOutput = MathUtil.clamp(
                     launcherPID.calculate(
                         getLauncherVelocity(),
-                        targetVelocity
+                        setVelocity
                     ),
                     -1,
                     1
@@ -378,8 +425,12 @@ public class TurretSubsystem extends SubsystemBase {
 
             double setYaw = MathUtil.clamp(
                 optimalYaw,
-                TurretConstants.Yaw.ANGLE_MIN,
-                TurretConstants.Yaw.ANGLE_MAX
+                Units.degreesToRadians(
+                    TurretConstants.Yaw.ANGLE_MIN
+                ),
+                Units.degreesToRadians(
+                    TurretConstants.Yaw.ANGLE_MAX
+                )
             );
 
             double yawOutput = yawPID.calculate(
@@ -393,6 +444,7 @@ public class TurretSubsystem extends SubsystemBase {
                 // compensate for drivebase movement
                 // essentially, find the change in yaw because of translation,
                 // then offset by the actual yaw velocity
+                /*
                 + yawFeedforward.calculateWithVelocities(
                     // translation-based yaw change
                     relativeAngularVelocityFromLinear(
@@ -418,6 +470,7 @@ public class TurretSubsystem extends SubsystemBase {
                             ).toPose2d().getTranslation()
                         )
                 )
+                        */
             );
 
             // TODO: this
@@ -471,6 +524,10 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putNumber(
             "Turret/Targeting/time_cost",
             Timer.getTimestamp() - startTime
+        );
+        SmartDashboard.putString(
+            "Turret/Targeting/targeting_mode",
+            targetingMode.toString()
         );
         // launcher
         SmartDashboard.putNumber(

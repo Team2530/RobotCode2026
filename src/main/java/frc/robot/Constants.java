@@ -357,7 +357,7 @@ public final class Constants {
         }
 
         public static final class PID {
-            public static final double P = 2;
+            public static final double P = 0.7;
             public static final double I = 0;
             public static final double D = 0;
         }
