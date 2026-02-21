@@ -72,10 +72,10 @@ public class ManualTurretCommand extends Command {
     }
 
     public void increaseVelocity() {
-        changeVelocity(1); //Dpad velocity    
+        changeVelocity(1); //Dpad velocity increase step (preset=10) for refrence
     }
 
-    public void decreaseVelocity() {
+    public void decreaseVelocity() { //Dpad velocity decrease step
         changeVelocity(-1);        
     }
 
