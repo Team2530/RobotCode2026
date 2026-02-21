@@ -53,7 +53,7 @@ public final class Constants {
     public static final double robotLengthMeters = Units.inchesToMeters(29.5);
 
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
-    public static final double TOTAL_MASS_KG = 120.0;
+    public static final double TOTAL_MASS_KG = Units.lbsToKilograms(107);
     public static final double MOMENT_OF_INERTIA = 6.883;
   }
 
