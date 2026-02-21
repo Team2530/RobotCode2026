@@ -25,7 +25,7 @@ import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.RunIndexerCommand;
 import frc.robot.commands.RunLoaderCommand;
-import frc.robot.commands.TurretCommand;
+import frc.robot.commands.ManualTurretCommand;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.IntakeSubsystem.IntakePreset;
@@ -153,24 +153,6 @@ public class RobotContainer {
                 turretSubsystem.zeroYawCommand()
             );
 
-        operatorXbox.povDown()
-            .onTrue(
-                new InstantCommand(()
-                -> {
-                    turretSubsystem.setTargetVelocity(
-                        turretSubsystem.getTargetVelocity() - 1
-                    );
-                })
-            );
-        operatorXbox.povUp()
-            .onTrue(
-                new InstantCommand(()
-                -> {
-                    turretSubsystem.setTargetVelocity(
-                        turretSubsystem.getTargetVelocity() + 1
-                    );
-                })
-            );
         operatorXbox.back()
             .whileTrue(
                 new RunLoaderCommand(
@@ -188,6 +170,30 @@ public class RobotContainer {
                     IntakePreset.SPITTING
                 )
             );
+        
+        
+        ManualTurretCommand turretCommand = new ManualTurretCommand(
+            turretSubsystem,
+            operatorXbox.getHID()
+        );
+        operatorXbox.y()
+                .onTrue(turretCommand);
+        operatorXbox.povUp()
+                .onTrue(
+                    new InstantCommand(
+                        () -> {
+                            turretCommand.increaseVelocity();
+                        }
+                    )
+                );
+        operatorXbox.povDown()
+                .onTrue(
+                    new InstantCommand(
+                        () -> {
+                            turretCommand.decreaseVelocity();
+                        }
+                    )
+                );
         
         operatorXbox.x()
             .onTrue(
