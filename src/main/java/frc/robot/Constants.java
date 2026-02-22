@@ -469,6 +469,7 @@ public final class Constants {
   public static final class LoaderConstants {
       public static final boolean REVERSE = true;
       public static final int CAN_ID = 16;
-      public static final double SPEED = 0.80;
+      // TODO: get a better number
+      public static final double MAXIMUM_VELOCITY = 100;
   }
 }
