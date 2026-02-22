@@ -154,6 +154,8 @@ public final class Constants {
             public static final double Y = X; // WARNING: can i do this? probably
             public static final double Z = 0.08;
 
+            public static final double TRIGGER = 0.1;
+
             // the radius from 0 to 1 after which the angle-based heading 
             // control activates
             public static final double HEADING = 0;
@@ -285,8 +287,23 @@ public final class Constants {
             public static final boolean BR_DRIVE_INVERTED = false;
             public static final boolean BR_ANGLE_INVERTED = true;
         };
+
     }
 
+    public static final class Sockets {
+        public static final class Rotation {
+            public static final class HeadingPID {
+                // TODO: tune
+                public static final double P = 1;
+                public static final double I = 0;
+                public static final double D = 0;
+            }
+        }   
+
+        public static final class Translation {
+
+        }   
+    };
   }
 
   public static class CommonConstants {
@@ -355,6 +372,16 @@ public final class Constants {
         public static final double VELOCITY_MAX = 6;
         public static final double ACCELERATION_MAX = 2;
 
+        // the angular margin from the hard stop after which the turret
+        // subsystem begins to request assistance from the drivebase.
+        //
+        // i.e., if the yaw is at 29, the min angle is 10, and the margin is at
+        // 20, the turret subsystem will request that the drivebase rotate the
+        // remaining 1 degree.
+        public static final double ASSIST_MARGIN = 20;
+        // the extra degrees beyond the midpoint (0) that the turret goes for a
+        // full rotation the other direction to aim
+        public static final double FULLSPIN_DEADBAND = 5;
 
         public static final class Zeroing {
             // amps
@@ -453,8 +480,23 @@ public final class Constants {
     public static final class TargetingOptimizer {
         public static final int INTERPOLATION_POINTS = 9;
         public static final int MAX_EVALUATIONS = 1000;
+
+        // micah says error should only be zero, but i don't think its always
+        // gonna work that way
+        public static final double MAX_ERROR = 0.1;
+        // the largest error the real launcher can have before it self-enables
+        // firing
+        public static final double MAX_REAL_ERROR = 0.5;
         
         public static final double MAXIMUM_TIME = 5;
+    }
+
+    public static final class ShooterRotatinalPosition {
+        // Position of the shooter origin relative to the rotation center of the Robot.
+        // Used for calculating the necessary rotational velocity to compensate for the robot's rotation when aiming. 
+        public static final double SHOOTER_BACK = Units.inchesToMeters(8.625);
+        public static final double SHOOTER_LEFT = Units.inchesToMeters(1.375);
+        public static final double SHOOTER_UP = Units.inchesToMeters(9.375);
     }
 
   }

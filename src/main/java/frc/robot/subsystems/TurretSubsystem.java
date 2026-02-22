@@ -53,10 +53,14 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.LoaderConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.swerve.Requester;
+import frc.robot.util.swerve.RotationSocket;
+import frc.robot.util.swerve.RotationSocket.RotationRequest;
 
 public class TurretSubsystem extends SubsystemBase {
     
@@ -112,8 +116,11 @@ public class TurretSubsystem extends SubsystemBase {
         MANUAL
     }
 
+    private final SwerveSubsystem swerveSubsystem;
+    private final RotationSocket rotationSocket;
 
-    private final SwerveSubsystem swerveSubsystem; 
+    private boolean isRequestingActive;
+    private RotationRequest rotationRequest;
 
     private final TalonFX m_LauncherMotor;
     private final TalonFX m_YawMotor;
@@ -135,13 +142,21 @@ public class TurretSubsystem extends SubsystemBase {
     // yaw logic
     private boolean yawIsZeroed;
 
+    // optimizing
     private final BOBYQAOptimizer targetingOptimizer;
+    private double solutionError;
+    private double realError;
+
 
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
 
-    public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
+    public TurretSubsystem(
+        SwerveSubsystem swerveSubsystem,
+        RotationSocket rotationSocket
+    ) {
         this.swerveSubsystem = swerveSubsystem;
+        this.rotationSocket = rotationSocket;
         // Initialize Motors and Encoders
         m_LauncherMotor = new TalonFX(
             TurretConstants.CanIDs.LAUNCHER_MOTOR
@@ -149,6 +164,7 @@ public class TurretSubsystem extends SubsystemBase {
         m_YawMotor = new TalonFX(
             TurretConstants.CanIDs.YAW_MOTOR
         );
+
         // TODO: this
         /*
         m_PitchMotor = new SparkMax(
@@ -213,7 +229,6 @@ public class TurretSubsystem extends SubsystemBase {
         // TODO: this
         // e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
 
-
         targetingOptimizer = new BOBYQAOptimizer(
             TurretConstants.TargetingOptimizer.INTERPOLATION_POINTS
         );
@@ -223,10 +238,30 @@ public class TurretSubsystem extends SubsystemBase {
         yawIsZeroed = false;
 
         TargetPositionPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Turret/Target_position", Pose3d.struct)
+            .getStructTopic("Turret/Targeting/Target_position", Pose3d.struct)
             .publish();
 
         targetVelocity = 0;
+    }
+
+    private void possessRotationSocket() {
+        rotationSocket.possess(
+            this,
+            new Requester<RotationRequest>() {
+                @Override
+                public boolean isRequestingActive() {
+                    return isRequestingActive;
+                }
+
+                public RotationRequest getRequest() {
+                    return rotationRequest;
+                };
+            } 
+        );
+    }
+
+    private void depossessRotationSocket() {
+        rotationSocket.depossess();
     }
 
     private double relativeAngularVelocityFromLinear(
@@ -241,6 +276,14 @@ public class TurretSubsystem extends SubsystemBase {
                     * toTarget.plus(velocity).getNorm()
             )
         );
+    }
+
+    // TODO: this
+    private double absoluteRotationFromRelative(
+        Translation2d toTarget,
+        double relative
+    ) {
+        return 0;
     }
 
     @Override
@@ -271,7 +314,10 @@ public class TurretSubsystem extends SubsystemBase {
 
             MultivariateFunction optimizerFunction = new MultivariateFunction() {
                 @Override
-                // TODO: constant yaw
+                // WARNING: constant pitch 
+                // if we just set the guess pitch and limits to the constant we
+                // should be able to minimize the amount we have to change 
+                // later
                 public double value(double[] point) {
                     double yaw = point[0];
                     double pitch = point[1];
@@ -281,15 +327,25 @@ public class TurretSubsystem extends SubsystemBase {
                     // X component of the ball's position relative to the robot. 
                     double dbx = speed 
                         * Math.cos(pitch) 
-                        * Math.cos(yaw) 
-                        * time;
-                    dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
+                        * Math.cos(yaw);
+                    dbx += Math.cos(
+                        swerveSubsystem.getRotation().getX()
+                    ) * swerveSubsystem.getXVelocity();
+                    dbx += -swerveSubsystem.getAngularVelocity()
+                        * TurretConstants.ShooterRotatinalPosition.SHOOTER_BACK; // Offset from center of rotation to center of launcher.
+                    dbx *= time;
+
                     // Y component of the ball's position relative to the robot. 
                     double dby = speed 
                         * Math.cos(pitch) 
-                        * Math.sin(yaw) 
-                        * time;
-                    dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
+                        * Math.sin(yaw);
+                    dby += Math.sin(
+                            swerveSubsystem.getRotation().getX()
+                    ) * swerveSubsystem.getXVelocity();
+                    dby += swerveSubsystem.getAngularVelocity()
+                        * TurretConstants.ShooterRotatinalPosition.SHOOTER_LEFT; // Offset from center of rotation to center of launcher.
+                    dby *= time;
+
                     // Z (vertical) component of the ball's position relative to the robot. 
                     double dbz = (
                         -0.5 
@@ -387,7 +443,9 @@ public class TurretSubsystem extends SubsystemBase {
 
             if (targetingMode != targetingMode.MANUAL) {
                 double[] targetOptimum = targetingOptimizer.optimize(
-                    new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
+                    new MaxEval(
+                        TurretConstants.TargetingOptimizer.MAX_EVALUATIONS
+                    ),
                     new ObjectiveFunction(optimizerFunction),
                     GoalType.MINIMIZE,
                     new InitialGuess(guess),
@@ -397,13 +455,144 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 ).getPoint();
 
-                // double[] targetOptimum = guess;            
+                // WARNING: the minimum pitch of the turret is dependent on the yaw, 
+                // which presents a problem: we can't update the bounds once they're 
+                // sent to the optimizer.
+                //
+                // my solution to this is to just get the theoretical minimum pitch 
+                // at a straightline to the target; my assumption is that the 
+                // optimizer will be rerun at a frequency that the discrepancies 
+                // wont matter
+                //
+                // WARNING: as of writing, we have a 360 turret, so the optimizer is 
+                // unbounded on yaw
+                // store the error values for later use
+                solutionError = optimizerFunction.value(targetOptimum);
+                // calculate the error of current position
+                realError = optimizerFunction.value(new double[] {
+                    getYaw(),
+                    getPitch(),
+                    getLauncherVelocity(),
+                    // just steal the optimum time
+                    targetOptimum[3]
+                });
 
-                optimalYaw = targetOptimum[0];
+
+                // modulo by 360 because of the infinite yaw limits
+                optimalYaw = targetOptimum[0] % 360;
                 optimalPitch = targetOptimum[1];
-                // double optimalVelocity = targetOptimum[2];
-                optimalVelocity = targetVelocity;
+                optimalVelocity = targetOptimum[2];
                 optimalTime = targetOptimum[3];
+                // i don't think we need time?
+
+                // WARNING: dogshit code
+                //
+                // compensate for drivebase movement
+                // essentially, find the change in yaw because of translation,
+                // then offset by the actual yaw velocity
+                double yawFeedforwardOutput =
+                    yawFeedforward.calculateWithVelocities(
+                        // translation-based yaw change
+                        relativeAngularVelocityFromLinear(
+                            toTarget.toTranslation2d(),
+                            new Translation2d(
+                                swerveSubsystem.getXVelocity(),
+                                swerveSubsystem.getYVelocity()
+                            )
+                        ),
+                        // turret + swerve rotation based yaw change
+                        m_YawMotor.getVelocity().getValueAsDouble()
+                            + relativeAngularVelocityFromLinear(
+                                toTarget.toTranslation2d(),
+                                // TODO: check the polarity of this difference
+                                getLauncherPosition().relativeTo(
+                                    getLauncherPosition().rotateBy(
+                                        new Rotation3d(
+                                            0,
+                                            0,
+                                            swerveSubsystem.getAngularVelocity()
+                                        )
+                                    )
+                                ).toPose2d().getTranslation()
+                            )
+                    );
+                double outputYaw = optimalYaw;
+                // WARNING: doggier shittier code
+                //
+                // if within the drivebase assist margin
+                String yawControlStatus = "";
+                if (
+                    optimalYaw - TurretConstants.Yaw.ANGLE_MIN
+                        < TurretConstants.Yaw.ASSIST_MARGIN
+                    || TurretConstants.Yaw.ANGLE_MAX - optimalYaw
+                        < TurretConstants.Yaw.ASSIST_MARGIN
+                ) {
+                    // start requesting assistance
+                    if (!isRequestingActive) {
+                        isRequestingActive = true;
+                        possessRotationSocket();
+                    }
+
+                    rotationRequest = rotationSocket.new RelativeRotationRequest(
+                        absoluteRotationFromRelative(
+                            toTarget.toTranslation2d(),
+                            (optimalYaw > 180
+                                ? (TurretConstants.Yaw.ANGLE_MAX - optimalYaw)
+                                    - TurretConstants.Yaw.ASSIST_MARGIN 
+                                : TurretConstants.Yaw.ASSIST_MARGIN 
+                                    - (optimalYaw -TurretConstants.Yaw.ANGLE_MIN)
+                            ) 
+                        )
+                    );
+
+                    if (rotationSocket.isActive()) {
+                        yawControlStatus += "|RECIEVING ASSISTANCE";
+                    } else {
+                        yawControlStatus += "|ASSISTANCE DENIED";
+                    }
+                    
+                    if (
+                        optimalYaw > TurretConstants.Yaw.ANGLE_MAX
+                        || optimalYaw < TurretConstants.Yaw.ANGLE_MIN
+                    ) {
+                        outputYaw = MathUtil.clamp(
+                            optimalYaw,
+                            TurretConstants.Yaw.ANGLE_MIN,
+                            TurretConstants.Yaw.ANGLE_MAX
+                        );
+                        yawFeedforwardOutput = 0;
+                    }
+
+                    // fullspin if the optimal and actual yaw are on different sides
+                    // of the dead middlepoint and if the optimal angle is beyond
+                    // the dead middlepoint by the deadband amount
+                    if (
+                        (
+                            (optimalYaw < 180)
+                            != (getYaw() < 180)
+                        ) && (
+                            Math.abs(optimalYaw - 180)
+                            < (180 - TurretConstants.Yaw.FULLSPIN_DEADBAND)
+                        )
+                    ) {
+                        yawControlStatus = "FULLSPIN";
+                        if (optimalYaw > 180) {
+                            outputYaw = TurretConstants.Yaw.ANGLE_MAX;
+                        } else {
+                            outputYaw = TurretConstants.Yaw.ANGLE_MIN;
+                        }
+                    }
+            } else if (isRequestingActive) {
+                isRequestingActive = false;
+                depossessRotationSocket();
+            }
+
+            m_YawMotor.setVoltage(
+                yawPID.calculate(
+                    getYaw(),
+                    outputYaw
+                ) + yawFeedforwardOutput
+            );
             } else {
                 optimalYaw = Units.degreesToRadians(targetYaw);
                 optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
@@ -438,6 +627,7 @@ public class TurretSubsystem extends SubsystemBase {
                         setYaw * TurretConstants.Yaw.GEAR_RATIO
                     )
             );
+
             
             // TODO: this
             /*
@@ -449,6 +639,9 @@ public class TurretSubsystem extends SubsystemBase {
             );
             */
 
+            // optimizer
+            //
+            // this publishes to "Turret/Targeting/Target_position"
             TargetPositionPublisher.set(
                 swerveSubsystem.get3dPose()
                     .plus(
@@ -457,6 +650,26 @@ public class TurretSubsystem extends SubsystemBase {
                             new Rotation3d()
                         )
                     )
+            );
+            SmartDashboard.putBoolean(
+                "Turret/Targeting/has_valid_solution",
+                hasValidSolution()
+            );
+            SmartDashboard.putBoolean(
+                "Turret/Targeting/at_solution",
+                isAtSolution()
+            );
+            SmartDashboard.putString(
+                "Turret/Targeting/target_name",
+                getTargetName().toString()
+            );
+            SmartDashboard.putString(
+                "Turret/Targeting/targeting_type",
+                getTargetingMode().toString()
+            );
+            SmartDashboard.putNumber(
+                "Turret/Targeting/time_to_kill",
+                optimalTime
             );
             // launcher
             SmartDashboard.putNumber(
@@ -471,6 +684,18 @@ public class TurretSubsystem extends SubsystemBase {
             SmartDashboard.putNumber(
                 "Turret/Yaw/Target_yaw",
                 optimalYaw
+            );
+            SmartDashboard.putNumber(
+                "Turret/Yaw/Current_yaw",
+                getYaw() 
+            );
+            SmartDashboard.putNumber(
+                "Turret/Yaw/Current_velocity",
+                getYawVelocity()
+            );
+            SmartDashboard.putString(
+                "Turret/Yaw/control_status",
+                yawControlStatus + "|"
             );
             // pitch
             SmartDashboard.putNumber(
@@ -562,7 +787,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // TODO: this
     public double getPitch() {
-        return 0;
+        return TurretConstants.Pitch.ANGLE_CONSTANT;
         /*
         return MathUtil.angleModulus(
             Units.rotationsToRadians(
@@ -583,7 +808,6 @@ public class TurretSubsystem extends SubsystemBase {
         );
         */
     }
-
 
     public double getLauncherVelocity() {
         return m_LauncherMotor.getVelocity().getValueAsDouble();
@@ -745,5 +969,25 @@ public class TurretSubsystem extends SubsystemBase {
         this.targetingMode = TargetingMode.MANUAL;
         this.targetVelocity = velocity;
         this.targetYaw = yaw;
+    }
+    /*
+     * @return boolean - true if the turret subsystem was able to generate a
+     * **theoretical** valid solution to the given target
+     */
+    public boolean hasValidSolution() {
+        return solutionError
+            > TurretConstants.TargetingOptimizer.MAX_ERROR;
+    }
+    
+    /*
+     * @return boolean - true if the turret subsystem **is at** a valid solution 
+     * to the given target
+     */
+    public boolean isAtSolution() {
+        return hasValidSolution()
+            && (
+                realError
+                < TurretConstants.TargetingOptimizer.MAX_REAL_ERROR
+            );
     }
 }

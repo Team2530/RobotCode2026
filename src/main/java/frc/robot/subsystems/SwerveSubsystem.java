@@ -9,8 +9,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -40,19 +47,12 @@ import swervelib.imu.Pigeon2Swerve;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
-import frc.robot.util.LimelightContainer;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
+import frc.robot.util.swerve.RotationSocket;
+import frc.robot.util.swerve.SocketController;
+import frc.robot.util.swerve.TranslationSocket;
+import frc.robot.util.swerve.Socket;
 
 public class SwerveSubsystem extends SubsystemBase {
-
-    private final SwerveDrive swerveDrive;
-
-    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Odometry Pose", Pose2d.struct).publish();
-    
-
-    private final SendableChooser<SwerveGearing> gearChooser;
 
     enum SwerveGearing {
         LIGHT(7.03f),
@@ -65,6 +65,58 @@ public class SwerveSubsystem extends SubsystemBase {
             this.gearRatio = gearRatio;
         }
     }
+
+    /*
+     * Control mode of the drivebase rotation
+     */
+    public enum SteerMode {
+        RELATIVE,
+        ABSOLUTE,
+        TO_POINT
+    }
+
+    /*
+     * Control mode of the drivebase translation
+     */
+    public enum DriveMode {
+        RELATIVE,
+        ABSOLUTE,
+        TO_POINT
+    }
+
+    private final SwerveDrive swerveDrive;
+
+    private final SendableChooser<SwerveGearing> gearChooser;
+
+    // sockets stuff
+    // just the names for the sockets
+    // 
+    // the order here determines the priority of the sockets later
+    public enum TranslationSockets {
+        DRIVE
+    }
+
+    public enum RotationSockets {
+        DRIVE,
+        TURRET
+    }
+    
+    // le controlelrs
+    //
+    // god this naming sucks here
+    private final SocketController<
+        TranslationSockets,
+        TranslationSocket
+    > translationSocketController;
+    
+    private final SocketController<
+        RotationSockets,
+        RotationSocket
+    > rotationSocketController;
+
+    private TranslationSocket activeTranslationSocket;
+    private RotationSocket activeRotationSocket;
+
 
     public SwerveSubsystem() {
 
@@ -307,10 +359,36 @@ public class SwerveSubsystem extends SubsystemBase {
         //
         // TODO: idk this seems find
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
+
+        // ok so:
+        // pass swervedrive,
+        // pass naming enum
+        // pass socket class
+        //
+        // and it'll infer the rest :3
+        translationSocketController = new SocketController<>(
+            this,
+            TranslationSockets.class,
+            TranslationSocket.class
+        ) {
+            public TranslationSocket getActiveSocket() {
+                return activeTranslationSocket;
+            }
+        };
+        rotationSocketController = new SocketController<>(
+            this,
+            RotationSockets.class,
+            RotationSocket.class
+        ) {
+            public RotationSocket getActiveSocket() {
+                return activeRotationSocket;
+            }
+        };
     };
 
     @Override
     public void periodic() {
+<<<<<<< HEAD
         if (Robot.isSimulation()) {
             LimelightContainer.estimateSimOdometry();
         } else {
@@ -318,6 +396,23 @@ public class SwerveSubsystem extends SubsystemBase {
 
             posePublisher.set(swerveDrive.getPose());
         }
+=======
+        TranslationSocket[] sortedTranslationSockets =
+            translationSocketController.getSortedSockets();
+        RotationSocket[] sortedRotationSockets =
+            rotationSocketController.getSortedSockets();
+
+        // for now, just take the top priority socket from both
+        TranslationSocket topTranslationSocket = sortedTranslationSockets[0];
+        RotationSocket topRotationSocket = sortedRotationSockets[0];
+
+        // SEND IT
+        drive(
+            topTranslationSocket.getRequest().getUsableValue(),
+            topRotationSocket.getRequest().getUsableValue()
+        );
+
+>>>>>>> origin/CLEANUPCLEANUPEVERYBODYCLEANUP
     }
 
     @Override
@@ -328,12 +423,24 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param translation field-oriented translation; m / s
      * @param rotation angular rate; rads / s
      */
-    public void drive(Translation2d translation, double rotation) {
+    private void drive(Translation2d translation, double rotation) {
         swerveDrive.drive(
             translation,
             rotation,
             true,
             false
+        );
+    }
+    
+    /**
+     * drive field-oriented
+     * @param translation field-oriented translation; m / s
+     * @param rotation angular rate; rads / s
+     */
+    private void drive(Translation2d translation, Rotation2d rotation) {
+        drive(
+            translation,
+            rotation.getRadians()
         );
     }
 
@@ -342,8 +449,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param translation robot-oriented translation; m / s
      * @param rotation angular rate; rads / s
      */
-    public void driveRobotRelative(
-        Translation2d translation, 
+    private void driveRobotRelative(
+        Translation2d translation,
         double rotation
     ) {
         swerveDrive.drive(
@@ -390,6 +497,7 @@ public class SwerveSubsystem extends SubsystemBase {
         return getVelocity().omegaRadiansPerSecond;
     }
 
+    // WARNING: dunno what units these're in               
     public Rotation3d getRotation() {
         return swerveDrive.getGyroRotation3d();
     }
@@ -398,7 +506,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setMotorIdleMode(isBraking);
     }
 
-    public void xStance() {
+    private void xStance() {
         swerveDrive.lockPose();
     }
 
@@ -443,5 +551,13 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Field2d getField() {
         return swerveDrive.field;
+    }
+
+    public TranslationSocket getTranslationSocket(TranslationSockets name) {
+        return translationSocketController.getSocket(name);
+    }
+
+    public RotationSocket getRotationSocket(RotationSockets name) {
+        return rotationSocketController.getSocket(name);
     }
 }
