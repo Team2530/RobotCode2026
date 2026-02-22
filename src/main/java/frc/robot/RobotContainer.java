@@ -105,7 +105,7 @@ public class RobotContainer {
                 return routine;
             });
         }
-        
+        SmartDashboard.putData(autoChooser);
     }
 
     
