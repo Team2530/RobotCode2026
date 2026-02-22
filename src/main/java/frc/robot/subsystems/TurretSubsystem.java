@@ -43,6 +43,7 @@ import com.revrobotics.spark.SparkMax;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -169,6 +170,17 @@ public class TurretSubsystem extends SubsystemBase {
                             .withKP(TurretConstants.Launcher.PID.P)
                             .withKI(TurretConstants.Launcher.PID.I)
                             .withKD(TurretConstants.Launcher.PID.D)
+                            .withKS(TurretConstants.Launcher.Feedforward.kS)
+                            .withKV(TurretConstants.Launcher.Feedforward.kV)
+                            .withKA(TurretConstants.Launcher.Feedforward.kA)
+                    ).withMotionMagic(
+                        new MotionMagicConfigs()
+                            .withMotionMagicExpo_kV(
+                                TurretConstants.Launcher.Feedforward.kV
+                            )
+                            .withMotionMagicExpo_kA(
+                                TurretConstants.Launcher.Feedforward.kA
+                            )
                     )
             );
         m_YawMotor.getConfigurator()
@@ -187,6 +199,13 @@ public class TurretSubsystem extends SubsystemBase {
                         .withKS(TurretConstants.Yaw.Feedforward.kS)
                         .withKV(TurretConstants.Yaw.Feedforward.kV)
                         .withKA(TurretConstants.Yaw.Feedforward.kA)
+                ).withMotionMagic(
+                    new MotionMagicConfigs()
+                        .withMotionMagicCruiseVelocity(
+                            TurretConstants.Yaw.VELOCITY_MAX
+                        ).withMotionMagicAcceleration(
+                            TurretConstants.Yaw.ACCELERATION_MAX
+                        )
                 )
             );
 

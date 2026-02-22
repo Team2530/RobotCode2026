@@ -328,6 +328,12 @@ public final class Constants {
             public static final double D = 0;
         }
 
+        public static final class Feedforward {
+            public static final double kS = 0;
+            public static final double kV = 0;
+            public static final double kA = 0;
+        }
+
         public static final class VelocityRegression {
             public static final double A = 0.748916;
             public static final double B = -0.678921;
@@ -343,8 +349,10 @@ public final class Constants {
         public static final double ANGLE_MIN = 1.2;
         // public static final double ANGLE_MIN = 0;
         public static final double ANGLE_MAX = 340;
+        
+        public static final double VELOCITY_MAX = 6;
+        public static final double ACCELERATION_MAX = 2;
 
-        public static final double VELOCITY_MAX = 0.1;
 
         public static final class Zeroing {
             // amps
