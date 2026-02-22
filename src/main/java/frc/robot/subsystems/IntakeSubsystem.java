@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -7,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.PersistMode;
@@ -19,7 +21,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.LoaderConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -39,7 +40,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         private IntakePreset(
                 boolean pivotRaised,
-                double feederSpeed
+                double feederSpeed 
         ) {
             this.pivotRaised = pivotRaised;
             this.feederSpeed = feederSpeed;
@@ -51,12 +52,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private IntakePreset intakePreset;
     private boolean targetPivotRaised;
-    private double targetFeederSpeed;
+    private double targetFeederVelocity;
 
     private Debouncer pivotDebouncer;
 
     public IntakeSubsystem() {
-        //TODO: Change to ACTUAL motor type
         m_FeederMotor = new TalonFX(
             IntakeConstants.Feeder.CAN_ID
         );
@@ -65,17 +65,16 @@ public class IntakeSubsystem extends SubsystemBase {
             MotorType.kBrushless
         );
 
-        TalonFXConfiguration feederConfig = 
+        m_FeederMotor.getConfigurator()
+            .apply(
                 new TalonFXConfiguration().withMotorOutput(
                     new MotorOutputConfigs().withInverted(
                         IntakeConstants.Feeder.REVERSE
                             ? InvertedValue.Clockwise_Positive    
                             : InvertedValue.CounterClockwise_Positive        
                     )
-                );
-
-        m_FeederMotor.getConfigurator()
-            .apply(feederConfig);
+                )
+            );
 
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
         pivotConfig.idleMode(IdleMode.kBrake);
@@ -91,7 +90,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        m_FeederMotor.set(targetFeederSpeed);
+        m_FeederMotor.setControl(
+            new VelocityTorqueCurrentFOC(
+                targetFeederVelocity
+            )
+        );
 
         // WARNING: i'm not sure what the motor behavior will be while holding
         boolean isHolding = pivotDebouncer.calculate(
@@ -120,8 +123,8 @@ public class IntakeSubsystem extends SubsystemBase {
         }
 
         SmartDashboard.putNumber(
-            "Intake/Feeder/target_speed",
-            targetFeederSpeed
+            "Intake/Feeder/target_velocity",
+            targetFeederVelocity
         );
         // TODO: i don't know what units this is in
         SmartDashboard.putNumber(
@@ -147,15 +150,39 @@ public class IntakeSubsystem extends SubsystemBase {
         );
     }
     
+   /*
+    * set the velocity of the feeder motor
+    * @ param velocity - the velocity of the feeder motor; a value in rps
+    */
+    public void setFeederVelocity(double velocity) {
+        this.intakePreset = IntakePreset.CUSTOM;
+
+        targetFeederVelocity = MathUtil.clamp(
+            velocity,
+            -IntakeConstants.Feeder.MAXIMUM_VELOCITY,
+            IntakeConstants.Feeder.MAXIMUM_VELOCITY
+        );
+    }
+
+    /*
+     * get velocity of the intake feeder motor
+     * @return speed - the velocity of the feeder motor; this can be a value 
+     * from -MAXIMUM_VELOCITY to MAXIMUM_VELOCITY
+     */
+    public double getFeederVelocity() {
+        return m_FeederMotor.getVelocity()
+            .getValueAsDouble();
+    }
+
     /*
      * set speed of the intake feeder motor
      * @param speed - the speed of the feeder motor; this can be a value from 
      * 1.0 to -1.0
      */
     public void setFeederSpeed(double speed) {
-        this.intakePreset = IntakePreset.CUSTOM;
-
-        targetFeederSpeed = speed;
+        setFeederVelocity(
+            speed * IntakeConstants.Feeder.MAXIMUM_VELOCITY
+        );
     }
 
     /*
@@ -164,7 +191,8 @@ public class IntakeSubsystem extends SubsystemBase {
      * 1.0 to -1.0
      */
     public double getTargetFeedSpeed() {
-        return targetFeederSpeed;
+        return getFeederVelocity()
+            / IntakeConstants.Feeder.MAXIMUM_VELOCITY;
     }
 
     public void setPivotIsRaised(boolean raised) {
@@ -179,7 +207,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setPreset(IntakePreset preset) {
         this.intakePreset = preset;
 
-        targetFeederSpeed = preset.feederSpeed;
+        targetFeederVelocity = preset.feederSpeed;
 
         if (preset.pivotRaised != targetPivotRaised) {
             targetPivotRaised = preset.pivotRaised;

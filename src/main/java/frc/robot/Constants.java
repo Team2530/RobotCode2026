@@ -101,6 +101,8 @@ public final class Constants {
       public static class Feeder {
         public static final boolean REVERSE = true;  
         public static final int CAN_ID = 13;
+        // WARNING: uh?
+        public static final double MAXIMUM_VELOCITY = 100;
       }
 
       // as in the motor that lifts the whole structure
