@@ -14,9 +14,20 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -42,26 +53,28 @@ public final class Constants {
   public static class GameConstants {
     public static class Fuel {
         // meters 
-        public static final double DIAMETER = Units.inchesToMeters(5.9);
-        public static final double RADIUS = DIAMETER / 2;
+        public static final Distance DIAMETER = Inches.of(5.9);
+        public static final Distance RADIUS =  DIAMETER.div(2);
     }
   }
 
   public static class RobotConstants {
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
-    public static final double robotWidthMeters = Units.inchesToMeters(29.5);
-    public static final double robotLengthMeters = Units.inchesToMeters(29.5);
+    public static final Distance robotWidthMeters = Inches.of(29.5);
+    public static final Distance robotLengthMeters = Inches.of(29.5);
 
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
-    public static final double TOTAL_MASS_KG = Units.lbsToKilograms(107);
-    public static final double MOMENT_OF_INERTIA = 6.883;
+    public static final Mass TOTAL_MASS_KG = Kilogram.of(107);
+    public static final MomentOfInertia MOMENT_OF_INERTIA =
+        KilogramSquareMeters.of(6.883);
   }
 
   public static final class FieldConstants {
-    public static final double GRAVITY = 9.81;
+    public static final LinearAcceleration GRAVITY =
+        MetersPerSecondPerSecond.of(9.81);
 
-    public static final double FIELD_LENGTH = Units.inchesToMeters(690.876);
-    public static final double FIELD_WIDTH = Units.inchesToMeters(317);
+    public static final Distance FIELD_LENGTH = Inches.of(690.876);
+    public static final Distance FIELD_WIDTH = Inches.of(317);
 
     public static Alliance getAlliance() {
       if (DriverStation.getAlliance().isPresent()) {
@@ -70,21 +83,6 @@ public final class Constants {
 
       return Alliance.Blue;
     }
-  }
-
-  public static class HopperConstants {
-      // TODO: update
-      
-      // allese in meters
-
-      // i only really need to know about the static face of the hopper
-      public static final double WIDTH = 1;
-      // distance to the top of the hopper, relative to the bottom 
-      // (like the bottom of the wheels) of the robot
-      public static final double ABSOLUTE_HEIGHT = 1;
-      // distance backwards from the center of the robot
-      public static final double OFFSET_Y = 1;
-      // assume the hopper is 
   }
 
   /*|-----------WARNING-----------------|
@@ -102,7 +100,8 @@ public final class Constants {
         public static final boolean REVERSE = true;  
         public static final int CAN_ID = 13;
         // WARNING: uh?
-        public static final double MAXIMUM_VELOCITY = 100;
+        public static final AngularVelocity MAXIMUM_VELOCITY =
+            RotationsPerSecond.of(100);
       }
 
       // as in the motor that lifts the whole structure
@@ -117,8 +116,8 @@ public final class Constants {
 
           public static final class Zeroing {
               // amps ocourse
-              public static final double CURRENT_LIMIT = 35;
-              public static final double DEBOUNCE_TIME = 0.15;
+              public static final Time CURRENT_LIMIT = Seconds.of(35);
+              public static final Time DEBOUNCE_TIME = Seconds.of(0.15);
           }
       }
   }
@@ -126,8 +125,10 @@ public final class Constants {
   public static final class DriveConstants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
-    public static final double MAX_ROBOT_VELOCITY = 4.2;
-    public static final double MAX_ROBOT_RAD_VELOCITY = 1;
+    public static final LinearVelocity MAX_ROBOT_VELOCITY =
+        MetersPerSecond.of(4.2);
+    public static final AngularVelocity MAX_ROBOT_RAD_VELOCITY =
+        RadiansPerSecond.of(1);
 
 
     // (((((65kg×1(m/s^2))/4)×(4in/2))/6.75)/(0.0194Nm/A))×(0.033ohm)
@@ -135,9 +136,9 @@ public final class Constants {
 
     
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
-    public static final double TRACK_WIDTH = Units.inchesToMeters(19.675);
-    public static final double WHEEL_BASE = Units.inchesToMeters(19.675);
-    public static final double FULL_ROBOT_WIDTH = Units.inchesToMeters(37.50);
+    public static final Distance TRACK_WIDTH = Inches.of(19.675);
+    public static final Distance WHEEL_BASE = Inches.of(19.675);
+    public static final Distance FULL_ROBOT_WIDTH = Inches.of(37.50);
 
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
     public static final PIDConstants TRANSLATION_ASSIST = new PIDConstants(8, 0, 0.01);
@@ -213,11 +214,10 @@ public final class Constants {
         // to the constants file with how much I have to duplicate the
         // values.
         
-        // in inches
-        public static final double WHEEL_DIAMETER = 4;
+        public static final Distance WHEEL_DIAMETER = Inches.of(4);
         public static final double WHEEL_FRICTION_COEFFICIENT = 1.19;
 
-        public static final double OPTIMAL_VOLTAGE = 12;
+        public static final Voltage OPTIMAL_VOLTAGE = Volts.of(12);
         // both in amps
         // TODO: check with someone who does electronics
         public static final int DRIVE_CURRENT_LIMIT = 70;
@@ -228,8 +228,8 @@ public final class Constants {
         public static final double STEER_RAMP_RATE = 0;
         // the minimum voltage it takes for the given motor to move
         // TODO: get real values
-        public static final double DRIVE_FRICTION_VOLTAGE = 0.23;
-        public static final double STEER_FRICTION_VOLTAGE = 0.19;
+        public static final Voltage DRIVE_FRICTION_VOLTAGE = Volts.of(0.23);
+        public static final Voltage STEER_FRICTION_VOLTAGE = Volts.of(0.19);
 
         public static final double DRIVE_GEARING = 6.03;
         public static final double ANGLE_GEARING = 26.09; // 26.09
@@ -315,14 +315,16 @@ public final class Constants {
     // TODO: UPDATE BASED ON REAL ROBOT
     public static final class Launcher {
         // inches
-        public static final double WHEEL_DIAMETER = 4;
+        public static final Distance WHEEL_DIAMETER = Inches.of(4);
         public static final boolean REVERSE = true;
 
         public static final double VELOCITY_DEADBAND = 10;
 
         // in rotations/s
-        public static final double MAXIMUM_VELOCITY = 500;
-        public static final double MINIMUM_VELOCITY = 25;
+        public static final AngularVelocity MAXIMUM_VELOCITY = 
+            RotationsPerSecond.of(500);
+        public static final AngularVelocity MINIMUM_VELOCITY = 
+            RotationsPerSecond.of(25);
 
         public static final class PID {
             public static final double P = 0.3;
@@ -348,9 +350,9 @@ public final class Constants {
 
         // angular limits on yaw movement
         // 180 is pointed directly out the turret side
-        public static final double ANGLE_MIN = 1.2;
+        public static final Angle ANGLE_MIN = Degrees.of(1.2);
         // public static final double ANGLE_MIN = 0;
-        public static final double ANGLE_MAX = 340;
+        public static final Angle ANGLE_MAX = Degrees.of(340);
         
         public static final double VELOCITY_MAX = 6;
         public static final double ACCELERATION_MAX = 2;
@@ -358,10 +360,10 @@ public final class Constants {
 
         public static final class Zeroing {
             // amps
-            public static final double ROUGHPASS_CURRENT_LIMIT = 45;
-            public static final double ROUGHPASS_VOLTAGE = -2;
-            public static final double FINEPASS_CURRENT_LIMIT = 35;
-            public static final double FINEPASS_VOLTAGE = -1;
+            public static final Current ROUGHPASS_CURRENT_LIMIT = Amps.of(45);
+            public static final Voltage ROUGHPASS_VOLTAGE = Volts.of(-2);
+            public static final Current FINEPASS_CURRENT_LIMIT = Amps.of(35);
+            public static final Voltage FINEPASS_VOLTAGE = Volts.of(-1);
             // time above current limit to register as hitting the hard limit
             public static final double DEBOUNCE_TIME = 0.1;
         }
@@ -439,10 +441,10 @@ public final class Constants {
 
         // TODO: update
         // position relative to the center of the robot, in meters
-        public static final double X = Units.inchesToMeters(10);
-        public static final double Y = Units.inchesToMeters(10);
+        public static final Distance X = Inches.of(10);
+        public static final Distance Y = Inches.of(10);
         // Height of Shooter from Ground, in meters
-        public static final double Z = Units.inchesToMeters(20); 
+        public static final Distance Z = Inches.of(20);
         public static final Translation3d TRANSLATION = new Translation3d(
             X,
             Y,
@@ -454,7 +456,7 @@ public final class Constants {
         public static final int INTERPOLATION_POINTS = 9;
         public static final int MAX_EVALUATIONS = 1000;
         
-        public static final double MAXIMUM_TIME = 5;
+        public static final Time MAXIMUM_TIME = Seconds.of(5);
     }
 
   }
@@ -470,6 +472,7 @@ public final class Constants {
       public static final boolean REVERSE = true;
       public static final int CAN_ID = 16;
       // TODO: get a better number
-      public static final double MAXIMUM_VELOCITY = 100;
+      public static final AngularVelocity MAXIMUM_VELOCITY =
+          RotationsPerSecond.of(100);
   }
 }

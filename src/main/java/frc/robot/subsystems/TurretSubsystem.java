@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -11,7 +12,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
@@ -64,33 +64,33 @@ public class TurretSubsystem extends SubsystemBase {
         // TODO: double check these positions
         HUB(
             new Pose3d(
-                Units.inchesToMeters(162.15), 
-                Units.inchesToMeters(182.1),
-                Units.inchesToMeters(72),
+                Inches.of(162.15), 
+                Inches.of(182.1),
+                Inches.of(72),
                 new Rotation3d()
             )
         ),
         SHUTTLE_LEFT(
             new Pose3d(
-                Units.inchesToMeters(79.3), 
-                Units.inchesToMeters(79.3),
-                Units.inchesToMeters(0),
+                Inches.of(79.3), 
+                Inches.of(79.3),
+                Inches.of(0),
                 new Rotation3d()
             )
         ),
         SHUTTLE_RIGHT(
             new Pose3d(
-                Units.inchesToMeters(238.4), 
-                Units.inchesToMeters(79.3),
-                Units.inchesToMeters(0),
+                Inches.of(238.4), 
+                Inches.of(79.3),
+                Inches.of(0),
                 new Rotation3d()
             )
         ),
         CUSTOM(
             new Pose3d(
-                Double.MAX_VALUE,
-                Double.MAX_VALUE,
-                Double.MAX_VALUE,
+                Inches.of(Double.MAX_VALUE),
+                Inches.of(Double.MAX_VALUE),
+                Inches.of(Double.MAX_VALUE),
                 new Rotation3d()
             )
         );
