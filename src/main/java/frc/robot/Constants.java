@@ -312,20 +312,26 @@ public final class Constants {
   public static final class TurretConstants {
     // TODO: UPDATE BASED ON REAL ROBOT
     public static final class Launcher {
-        // inches
+        /** In Inches */
         public static final double WHEEL_DIAMETER = 4;
         public static final boolean REVERSE = true;
 
         public static final double VELOCITY_DEADBAND = 10;
 
-        // in rotations/s
+        /** in rotations/s */
         public static final double MAXIMUM_VELOCITY = 500;
+        /** In Rotations/s */
         public static final double MINIMUM_VELOCITY = 25;
 
+        public static final double MAXIMUM_VELOCITY_ERROR = 10;
+
         public static final class PID {
-            public static final double P = 0.3;
+            public static final double P = 12;
             public static final double I = 0;
             public static final double D = 0;
+            /** Feedforwards Voltage */
+            public static final double kV = 0;
+            public static final double kA = 0;
         }
 
         public static final class VelocityRegression {

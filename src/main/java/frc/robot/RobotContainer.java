@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
@@ -150,9 +151,10 @@ public class RobotContainer {
             }
         )
             .whileTrue(
-                new RunLoaderCommand(loaderSubsystem)
-            ).whileTrue(
-                new RunIndexerCommand(indexerSubsystem)
+                new ParallelCommandGroup(
+                    new RunLoaderCommand(loaderSubsystem),
+                    new RunIndexerCommand(indexerSubsystem)
+                )
             );
 
         
@@ -207,7 +209,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(52, 43);
+                        turretSubsystem.setManualControl(52, 45);
                     }
                 )
             );
@@ -215,7 +217,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(329, 42);
+                        turretSubsystem.setManualControl(329, 42.5);
                     }
                 )
             );
@@ -223,7 +225,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(0, 50);
+                        turretSubsystem.setManualControl(0, 48.5);
                     }
                 )
             );

@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -44,8 +45,13 @@ import com.revrobotics.spark.SparkMax;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 
 import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.FieldConstants;
@@ -137,6 +143,7 @@ public class TurretSubsystem extends SubsystemBase {
     // yaw logic
     private boolean yawIsZeroed;
     private double yawOffset;
+    private boolean atVelocity;
 
     private final BOBYQAOptimizer targetingOptimizer;
 
@@ -170,6 +177,12 @@ public class TurretSubsystem extends SubsystemBase {
                             ? InvertedValue.Clockwise_Positive    
                             : InvertedValue.CounterClockwise_Positive        
                     )
+                ).withSlot0(new Slot0Configs()
+                    .withKP(TurretConstants.Launcher.PID.P)
+                    .withKI(TurretConstants.Launcher.PID.I)
+                    .withKD(TurretConstants.Launcher.PID.D)
+                    .withKA(TurretConstants.Launcher.PID.kA)
+                    .withKV(TurretConstants.Launcher.PID.kV)
                 )
             );
         m_YawMotor.getConfigurator()
@@ -191,7 +204,7 @@ public class TurretSubsystem extends SubsystemBase {
             TurretConstants.Launcher.PID.I,
             TurretConstants.Launcher.PID.D
         );
-        yawPID = new PIDController(
+        yawPID = new ProfiledPIDController(
             TurretConstants.Yaw.PID.P,
             TurretConstants.Yaw.PID.I,
             TurretConstants.Yaw.PID.D,
@@ -224,6 +237,8 @@ public class TurretSubsystem extends SubsystemBase {
             .publish();
 
         targetVelocity = 0;
+
+        atVelocity = false;
     }
 
     private double relativeAngularVelocityFromLinear(
@@ -413,28 +428,15 @@ public class TurretSubsystem extends SubsystemBase {
 
             // calculate voltages and send to motors
             double launcherOutput = 0;
+            /** targetVelocity Clamped in Rot/s */
             double setVelocity = MathUtil.clamp(
                 targetVelocity,
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
-            if (targetVelocity >= TurretConstants.Launcher.MINIMUM_VELOCITY) {
-                if (Math.abs(getLauncherVelocity() - setVelocity) > TurretConstants.Launcher.VELOCITY_DEADBAND) {
-                    launcherOutput = -1 * Math.signum(getLauncherVelocity() - setVelocity);
-                } else {
-                    // fine control
-                    launcherOutput = MathUtil.clamp(
-                        launcherPID.calculate(
-                            getLauncherVelocity(),
-                            setVelocity
-                        ),
-                        -1,
-                        1
-                    );
-                }
-            }
-            
-            m_LauncherMotor.set(launcherOutput);
+            m_LauncherMotor.setControl(
+                new VelocityTorqueCurrentFOC(setVelocity)
+            );
 
             double setYaw = MathUtil.clamp(
                 optimalYaw,
@@ -447,7 +449,7 @@ public class TurretSubsystem extends SubsystemBase {
             );
 
             atVelocity = Math.abs( 
-                getLauncherVelocity() - setYaw
+                getLauncherVelocity() - targetVelocity
             ) < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR;
 
             double yawOutput = yawPID.calculate(
@@ -516,7 +518,7 @@ public class TurretSubsystem extends SubsystemBase {
             );
             SmartDashboard.putNumber(
                 "Turret/Launcher/output", 
-                launcherOutput 
+                m_LauncherMotor.getMotorOutputStatus().getValueAsDouble()
             );
             SmartDashboard.putBoolean(
                 "Turret/Launcher/at_velocity",
@@ -536,6 +538,8 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Pitch/Target_pitch",
                 optimalPitch
             );
+
+            SmartDashboard.putNumber("test_shooter_targetV", setVelocity);
         }
         // targeting
         SmartDashboard.putString(
@@ -551,6 +555,10 @@ public class TurretSubsystem extends SubsystemBase {
             targetingMode.toString()
         );
         // launcher
+        SmartDashboard.putNumber(
+            "Turret/Launcher/Target_velocity",
+            targetVelocity
+        );
         SmartDashboard.putNumber(
             "Turret/Launcher/Current_velocity",
             getLauncherVelocity()
