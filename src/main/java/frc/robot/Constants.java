@@ -101,6 +101,8 @@ public final class Constants {
       public static class Feeder {
         public static final boolean REVERSE = true;  
         public static final int CAN_ID = 13;
+        // WARNING: uh?
+        public static final double MAXIMUM_VELOCITY = 100;
       }
 
       // as in the motor that lifts the whole structure
@@ -334,6 +336,12 @@ public final class Constants {
             public static final double kA = 0;
         }
 
+        public static final class Feedforward {
+            public static final double kS = 0;
+            public static final double kV = 0;
+            public static final double kA = 0;
+        }
+
         public static final class VelocityRegression {
             public static final double A = 0.748916;
             public static final double B = -0.678921;
@@ -349,8 +357,10 @@ public final class Constants {
         public static final double ANGLE_MIN = 1.2;
         // public static final double ANGLE_MIN = 0;
         public static final double ANGLE_MAX = 340;
+        
+        public static final double VELOCITY_MAX = 6;
+        public static final double ACCELERATION_MAX = 2;
 
-        public static final double VELOCITY_MAX = 0.1;
 
         public static final class Zeroing {
             // amps
@@ -468,6 +478,7 @@ public final class Constants {
   public static final class LoaderConstants {
       public static final boolean REVERSE = true;
       public static final int CAN_ID = 16;
-      public static final double SPEED = 0.80;
+      // TODO: get a better number
+      public static final double MAXIMUM_VELOCITY = 100;
   }
 }

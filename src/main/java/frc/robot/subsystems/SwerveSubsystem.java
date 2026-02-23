@@ -149,12 +149,12 @@ public class SwerveSubsystem extends SubsystemBase {
                     new TalonFXSwerve(
                         DriveConstants.SwerveModules.CanIDs.FL_DRIVE,
                         true, 
-                        DCMotor.getKrakenX60(1)
+                        DCMotor.getKrakenX60Foc(1)
                     ), 
                     new TalonFXSwerve(
                         DriveConstants.SwerveModules.CanIDs.FL_STEER,
                         false, 
-                        DCMotor.getKrakenX44(1)
+                        DCMotor.getKrakenX44Foc(1)
                     ), 
                     conversionFactors,
                     new CANCoderSwerve(DriveConstants.SwerveModules.CanIDs.FL_CANCODER), 
@@ -174,12 +174,12 @@ public class SwerveSubsystem extends SubsystemBase {
                     new TalonFXSwerve(
                         DriveConstants.SwerveModules.CanIDs.FR_DRIVE,
                         true, 
-                        DCMotor.getKrakenX60(1)
+                        DCMotor.getKrakenX44Foc(1)
                     ), 
                     new TalonFXSwerve(
                         DriveConstants.SwerveModules.CanIDs.FR_STEER,
                         false, 
-                        DCMotor.getKrakenX44(1)
+                        DCMotor.getKrakenX44Foc(1)
                     ), 
                     conversionFactors,
                     new CANCoderSwerve(
@@ -203,12 +203,12 @@ public class SwerveSubsystem extends SubsystemBase {
                     new TalonFXSwerve(
                         DriveConstants.SwerveModules.CanIDs.BL_DRIVE,
                         true, 
-                        DCMotor.getKrakenX60(1)
+                        DCMotor.getKrakenX44Foc(1)
                     ), 
                     new TalonFXSwerve(
                         DriveConstants.SwerveModules.CanIDs.BL_STEER,
                         false, 
-                        DCMotor.getKrakenX44(1)
+                        DCMotor.getKrakenX44Foc(1)
                     ), 
                     conversionFactors,
                     new CANCoderSwerve(
@@ -232,12 +232,12 @@ public class SwerveSubsystem extends SubsystemBase {
                     new TalonFXSwerve(
                         DriveConstants.SwerveModules.CanIDs.BR_DRIVE,
                         true, 
-                        DCMotor.getKrakenX60(1)
+                        DCMotor.getKrakenX44Foc(1)
                     ), 
                     new TalonFXSwerve(
                         DriveConstants.SwerveModules.CanIDs.BR_STEER,
                         false, 
-                        DCMotor.getKrakenX44(1)
+                        DCMotor.getKrakenX44Foc(1)
                     ), 
                     conversionFactors,
                     new CANCoderSwerve(

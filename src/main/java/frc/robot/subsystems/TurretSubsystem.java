@@ -51,6 +51,13 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 
 import frc.robot.Constants.TurretConstants;
@@ -124,14 +131,6 @@ public class TurretSubsystem extends SubsystemBase {
     // lets just pray its a cancoder
     // TODO: this
     // private final CANcoder e_PitchEncoder;
-
-    // motor control
-    private final PIDController launcherPID;
-    private final ProfiledPIDController yawPID;
-    private final PIDController pitchPID;
-
-    private final SimpleMotorFeedforward yawFeedforward;
-
     // targets
     private TurretTargets target = TurretTargets.HUB;
     private TargetingMode targetingMode = TargetingMode.MANUAL;
@@ -142,7 +141,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     // yaw logic
     private boolean yawIsZeroed;
-    private double yawOffset;
     private boolean atVelocity;
 
     private final BOBYQAOptimizer targetingOptimizer;
@@ -171,19 +169,30 @@ public class TurretSubsystem extends SubsystemBase {
 
         m_LauncherMotor.getConfigurator()
             .apply(
-                new TalonFXConfiguration().withMotorOutput(
-                    new MotorOutputConfigs().withInverted(
-                        TurretConstants.Launcher.REVERSE
-                            ? InvertedValue.Clockwise_Positive    
-                            : InvertedValue.CounterClockwise_Positive        
+                new TalonFXConfiguration()
+                    .withMotorOutput(
+                        new MotorOutputConfigs().withInverted(
+                            TurretConstants.Launcher.REVERSE
+                                ? InvertedValue.Clockwise_Positive    
+                                : InvertedValue.CounterClockwise_Positive        
+                        )
+                    ).withSlot0(
+                        new Slot0Configs()
+                            .withKP(TurretConstants.Launcher.PID.P)
+                            .withKI(TurretConstants.Launcher.PID.I)
+                            .withKD(TurretConstants.Launcher.PID.D)
+                            .withKS(TurretConstants.Launcher.Feedforward.kS)
+                            .withKV(TurretConstants.Launcher.Feedforward.kV)
+                            .withKA(TurretConstants.Launcher.Feedforward.kA)
+                    ).withMotionMagic(
+                        new MotionMagicConfigs()
+                            .withMotionMagicExpo_kV(
+                                TurretConstants.Launcher.Feedforward.kV
+                            )
+                            .withMotionMagicExpo_kA(
+                                TurretConstants.Launcher.Feedforward.kA
+                            )
                     )
-                ).withSlot0(new Slot0Configs()
-                    .withKP(TurretConstants.Launcher.PID.P)
-                    .withKI(TurretConstants.Launcher.PID.I)
-                    .withKD(TurretConstants.Launcher.PID.D)
-                    .withKA(TurretConstants.Launcher.PID.kA)
-                    .withKV(TurretConstants.Launcher.PID.kV)
-                )
             );
         m_YawMotor.getConfigurator()
             .apply(
@@ -193,37 +202,26 @@ public class TurretSubsystem extends SubsystemBase {
                             ? InvertedValue.Clockwise_Positive    
                             : InvertedValue.CounterClockwise_Positive        
                     )
+                ).withSlot0(
+                    new Slot0Configs()
+                        .withKP(TurretConstants.Yaw.PID.P)
+                        .withKI(TurretConstants.Yaw.PID.I)
+                        .withKD(TurretConstants.Yaw.PID.D)
+                        .withKS(TurretConstants.Yaw.Feedforward.kS)
+                        .withKV(TurretConstants.Yaw.Feedforward.kV)
+                        .withKA(TurretConstants.Yaw.Feedforward.kA)
+                ).withMotionMagic(
+                    new MotionMagicConfigs()
+                        .withMotionMagicCruiseVelocity(
+                            TurretConstants.Yaw.VELOCITY_MAX
+                        ).withMotionMagicAcceleration(
+                            TurretConstants.Yaw.ACCELERATION_MAX
+                        )
                 )
             );
 
         // TODO: this
         // e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
-
-        launcherPID = new PIDController(
-            TurretConstants.Launcher.PID.P,
-            TurretConstants.Launcher.PID.I,
-            TurretConstants.Launcher.PID.D
-        );
-        yawPID = new ProfiledPIDController(
-            TurretConstants.Yaw.PID.P,
-            TurretConstants.Yaw.PID.I,
-            TurretConstants.Yaw.PID.D,
-            new Constraints(
-                TurretConstants.Yaw.PID.MAX_VELOCITY,
-                TurretConstants.Yaw.PID.MAX_ACCELERATION
-            )   
-        );
-        pitchPID = new PIDController(
-            TurretConstants.Pitch.PID.P,
-            TurretConstants.Pitch.PID.I,
-            TurretConstants.Pitch.PID.D
-        );
-
-        yawFeedforward = new SimpleMotorFeedforward(
-            TurretConstants.Yaw.Feedforward.kS,
-            TurretConstants.Yaw.Feedforward.kV,
-            TurretConstants.Yaw.Feedforward.kA
-        );
 
         targetingOptimizer = new BOBYQAOptimizer(
             TurretConstants.TargetingOptimizer.INTERPOLATION_POINTS
@@ -232,6 +230,7 @@ public class TurretSubsystem extends SubsystemBase {
         setManualControl(0, 0);
 
         yawIsZeroed = false;
+
         TargetPositionPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Turret/Target_position", Pose3d.struct)
             .publish();
@@ -427,7 +426,6 @@ public class TurretSubsystem extends SubsystemBase {
             }
 
             // calculate voltages and send to motors
-            double launcherOutput = 0;
             /** targetVelocity Clamped in Rot/s */
             double setVelocity = MathUtil.clamp(
                 targetVelocity,
@@ -435,7 +433,7 @@ public class TurretSubsystem extends SubsystemBase {
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
             m_LauncherMotor.setControl(
-                new VelocityTorqueCurrentFOC(setVelocity)
+                new MotionMagicTorqueCurrentFOC(setVelocity)
             );
 
             double setYaw = MathUtil.clamp(
@@ -447,51 +445,14 @@ public class TurretSubsystem extends SubsystemBase {
                     TurretConstants.Yaw.ANGLE_MAX
                 )
             );
-
-            atVelocity = Math.abs( 
-                getLauncherVelocity() - targetVelocity
-            ) < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR;
-
-            double yawOutput = yawPID.calculate(
-                getYaw(),
-                setYaw
+            // TODO: dunno if this allows for motion magic
+            // WARNING: not too confident in this math
+            m_YawMotor.setControl(
+                    new PositionTorqueCurrentFOC(
+                        setYaw * TurretConstants.Yaw.GEAR_RATIO
+                    )
             );
-            m_YawMotor.set(
-                yawOutput
-                // WARNING: dogshit code
-                //
-                // compensate for drivebase movement
-                // essentially, find the change in yaw because of translation,
-                // then offset by the actual yaw velocity
-                /*
-                + yawFeedforward.calculateWithVelocities(
-                    // translation-based yaw change
-                    relativeAngularVelocityFromLinear(
-                        toTarget.toTranslation2d(),
-                        new Translation2d(
-                            swerveSubsystem.getXVelocity(),
-                            swerveSubsystem.getYVelocity()
-                        )
-                    ),
-                    // turret + swerve rotation based yaw change
-                    m_YawMotor.getVelocity().getValueAsDouble()
-                        + relativeAngularVelocityFromLinear(
-                            toTarget.toTranslation2d(),
-                            // TODO: check the polarity of this difference
-                            getLauncherPosition().relativeTo(
-                                getLauncherPosition().rotateBy(
-                                    new Rotation3d(
-                                        0,
-                                        0,
-                                        swerveSubsystem.getAngularVelocity()
-                                    )
-                                )
-                            ).toPose2d().getTranslation()
-                        )
-                )
-                        */
-            );
-
+            
             // TODO: this
             /*
             m_PitchMotor.setVoltage(
@@ -528,10 +489,6 @@ public class TurretSubsystem extends SubsystemBase {
             SmartDashboard.putNumber(
                 "Turret/Yaw/Target_yaw",
                 optimalYaw
-            );
-            SmartDashboard.putNumber(
-                "Turret/Yaw/output",
-                yawOutput
             );
             // pitch
             SmartDashboard.putNumber(
@@ -606,7 +563,7 @@ public class TurretSubsystem extends SubsystemBase {
     public double getYaw() {
         if (yawIsZeroed) {
             return Units.rotationsToRadians(
-                (m_YawMotor.getPosition().getValueAsDouble() - yawOffset) 
+                (m_YawMotor.getPosition().getValueAsDouble())
                 / TurretConstants.Yaw.GEAR_RATIO
                 + Units.degreesToRotations(TurretConstants.Yaw.ANGLE_MIN)
             );
@@ -704,8 +661,6 @@ public class TurretSubsystem extends SubsystemBase {
             new InstantCommand(
                 () -> {
                     yawIsZeroed = false;
-                    yawOffset = 0;
-                    yawPID.reset(0);
                 }
             ),
             // move to zero, rough pass
@@ -726,12 +681,7 @@ public class TurretSubsystem extends SubsystemBase {
             new InstantCommand(
                 () -> {
                     yawIsZeroed = true;
-                    yawOffset = m_YawMotor.getPosition()
-                        .getValueAsDouble();
-                    SmartDashboard.putNumber(
-                        "Turret/Yaw/Zeroing/rotation_offset",
-                        yawOffset
-                    );
+                    m_YawMotor.setPosition(0);
                 }
             )
         );

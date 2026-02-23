@@ -75,7 +75,7 @@ public class ManualTurretCommand extends Command {
         changeVelocity(1);        
     }
 
-    public void decreaseVelocity() {
+    public void decreaseVelocity() { //Dpad velocity decrease step
         changeVelocity(-1);        
     }
 
