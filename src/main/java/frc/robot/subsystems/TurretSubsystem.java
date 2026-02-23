@@ -56,6 +56,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -433,7 +434,7 @@ public class TurretSubsystem extends SubsystemBase {
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
             m_LauncherMotor.setControl(
-                new MotionMagicTorqueCurrentFOC(setVelocity)
+                new MotionMagicVelocityTorqueCurrentFOC(setVelocity)
             );
 
             double setYaw = MathUtil.clamp(
