@@ -21,10 +21,10 @@ public class RunLoaderCommand extends Command {
     @Override
     public void initialize() {
         if (m_Reversed){
-            loaderSubsystem.runReverse();
+            loaderSubsystem.runVelocity(-.6);
         }
         else{
-            loaderSubsystem.run();
+            loaderSubsystem.runVelocity(.6);
         }
     }
 
