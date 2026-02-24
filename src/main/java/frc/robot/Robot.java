@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import org.littletonrobotics.urcl.URCL;
@@ -26,6 +22,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.util.Elastic;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Limelight.LimelightType;
+import frc.robot.util.LimelightHelpers;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -102,7 +103,10 @@ public class Robot extends TimedRobot {
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
-
+    CommandScheduler.getInstance()
+      .schedule(
+        m_robotContainer.getInitCommand() 
+      );
   }
 
   /**
@@ -152,8 +156,16 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
+       CommandScheduler.getInstance().schedule(
+          new ParallelCommandGroup(
+            m_autonomousCommand,
+            m_robotContainer.getInitCommand() 
+          )
+        );
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
+
+    Elastic.selectTab("Autonomous");
   }
 
   /** This function is called periodically during autonomous. */
@@ -166,6 +178,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    Elastic.selectTab("Teleop");
   }
 
   /** This function is called periodically during operator control. */
@@ -177,6 +191,8 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    Elastic.selectTab("Debug");
   }
 
   /** This function is called periodically during test mode. */

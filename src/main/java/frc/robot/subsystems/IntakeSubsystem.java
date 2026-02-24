@@ -1,65 +1,228 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.commands.IntakeCommand;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-public class IntakeSubsystem extends SubsystemBase {// Cloned From MT (NOT FINALIZED)
+import frc.robot.Constants.IntakeConstants;
 
-    
+public class IntakeSubsystem extends SubsystemBase {
 
-    private final SparkFlex m_intakesubsystemMotor;
-    private IntakePresets intakePreset;
-    
+    public enum IntakePreset {
+        // for the pivot angle, 0 is horizontal, increasing as the pivot raises.
+        // i.e., 90 would be vertical
+        STOWED(true, 0),
+        OUT(false, 0),
+        INTAKING(false, 0.6), //intake speed
+        AGITATING(true, 0.6),
+        SPITTING(false, -1),
+        CUSTOM(false, Double.MAX_VALUE);
+
+        
+        public final boolean pivotRaised;
+        public final double feederSpeed;
+
+        private IntakePreset(
+                boolean pivotRaised,
+                double feederSpeed 
+        ) {
+            this.pivotRaised = pivotRaised;
+            this.feederSpeed = feederSpeed;
+        }
+    }
+
+    private final TalonFX m_FeederMotor;
+    private final SparkMax m_PivotMotor;
+
+    private IntakePreset intakePreset;
+    private boolean targetPivotRaised;
+    private double targetFeederVelocity;
+
+    private Debouncer pivotDebouncer;
+
     public IntakeSubsystem() {
-      m_intakesubsystemMotor = new SparkFlex(Constants.IntakeMotors.INTAKESUBSYSTEM_MOTOR, MotorType.kBrushless);//TODO: Change to ACTUAL motor type
-            
+        m_FeederMotor = new TalonFX(
+            IntakeConstants.Feeder.CAN_ID
+        );
+        m_PivotMotor = new SparkMax(
+            IntakeConstants.Pivot.CAN_ID, 
+            MotorType.kBrushless
+        );
+
+        m_FeederMotor.getConfigurator()
+            .apply(
+                new TalonFXConfiguration().withMotorOutput(
+                    new MotorOutputConfigs().withInverted(
+                        IntakeConstants.Feeder.REVERSE
+                            ? InvertedValue.Clockwise_Positive    
+                            : InvertedValue.CounterClockwise_Positive        
+                    )
+                )
+            );
+
+        SparkMaxConfig pivotConfig = new SparkMaxConfig();
+        pivotConfig.idleMode(IdleMode.kBrake);
+
+        m_PivotMotor.configure(
+            pivotConfig,
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters
+        );
+
+        setPreset(IntakePreset.STOWED);
     }
-    public void runIntake() {
-    m_intakesubsystemMotor.set(Constants.IntakeMotors.INTAKE_SPEED);
-        
-    }//TODO: Update m_intakeMotor when fixed
-      //After intake is touching the floor, activate the intake entry motor.
-      // When released, Lift Intake and reverse motor for 2 secs at x2 speed. (NOT DONE)
-          
-    public void setIntakePreset(IntakePresets intake) {
-      this.intakePreset = intake;
-      boolean intakeActive = intake == IntakePresets.INTAKE;
-      boolean intakeInactive = intake == IntakePresets.IDLE;
-      if (IntakePresets.INTAKE == intake) {
-        m_intakesubsystemMotor.set(Constants.IntakeMotors.INTAKE_SPEED);
-        SmartDashboard.putString("Intake Subsystem", "Begin");
-        
 
-        if (Robot.isSimulation()) {
-            SmartDashboard.putBoolean("[SIM] Intaking", true);
-        
-        }
-      }
-      if (IntakePresets.IDLE == intake) {
-        m_intakesubsystemMotor.set(0);
-        SmartDashboard.putString("Intake Subsystem", "Ended");
-        
+    @Override
+    public void periodic() {
+        m_FeederMotor.setControl(
+            new VelocityTorqueCurrentFOC(
+                targetFeederVelocity
+            )
+        );
 
-        if (Robot.isSimulation()) {
-            SmartDashboard.putBoolean("[SIM] Intaking", false);
-        
+        // WARNING: i'm not sure what the motor behavior will be while holding
+        boolean isHolding = pivotDebouncer.calculate(
+            m_PivotMotor.getOutputCurrent() 
+            > IntakeConstants.Pivot.Zeroing.CURRENT_LIMIT
+        );
+
+        if (!isHolding) {
+            // if moving to deploy / stow
+            m_PivotMotor.set(
+                IntakeConstants.Pivot.DEPLOY_OUTPUT
+                * (targetPivotRaised
+                    ? -1
+                    : 1
+                )
+            );
+        } else {
+            // if holding position
+            m_PivotMotor.set(
+                IntakeConstants.Pivot.HOLD_OUTPUT
+                * (targetPivotRaised
+                    ? -1
+                    : 1
+                )
+            );
         }
-      }
+
+        SmartDashboard.putNumber(
+            "Intake/Feeder/target_velocity",
+            targetFeederVelocity
+        );
+        // TODO: i don't know what units this is in
+        SmartDashboard.putNumber(
+            "Intake/Feeder/velocity",
+            m_FeederMotor.getVelocity().getValueAsDouble()
+        );
+        SmartDashboard.putNumber(
+            "Intake/Feeder/voltage",
+            m_FeederMotor.getMotorVoltage().getValueAsDouble()
+        );
+
+        SmartDashboard.putBoolean(
+            "Intake/Pivot/target_is_raised",
+            targetPivotRaised
+        );
+        SmartDashboard.putBoolean(
+            "Intake/Pivot/is_holding",
+            isHolding 
+        );
+        SmartDashboard.putNumber(
+            "Intake/Pivot/output",
+            m_PivotMotor.getAppliedOutput()
+        );
     }
     
-       
-    public IntakePresets getIntakePreset() {
-      return this.intakePreset;
+   /*
+    * set the velocity of the feeder motor
+    * @ param velocity - the velocity of the feeder motor; a value in rps
+    */
+    public void setFeederVelocity(double velocity) {
+        this.intakePreset = IntakePreset.CUSTOM;
+
+        targetFeederVelocity = MathUtil.clamp(
+            velocity,
+            -IntakeConstants.Feeder.MAXIMUM_VELOCITY,
+            IntakeConstants.Feeder.MAXIMUM_VELOCITY
+        );
     }
-    
-    public enum IntakePresets {
-      INTAKE,
-      IDLE,
-  }
+
+    /*
+     * get velocity of the intake feeder motor
+     * @return speed - the velocity of the feeder motor; this can be a value 
+     * from -MAXIMUM_VELOCITY to MAXIMUM_VELOCITY
+     */
+    public double getFeederVelocity() {
+        return m_FeederMotor.getVelocity()
+            .getValueAsDouble();
+    }
+
+    /*
+     * set speed of the intake feeder motor
+     * @param speed - the speed of the feeder motor; this can be a value from 
+     * 1.0 to -1.0
+     */
+    public void setFeederSpeed(double speed) {
+        setFeederVelocity(
+            speed * IntakeConstants.Feeder.MAXIMUM_VELOCITY
+        );
+    }
+
+    /*
+     * get speed of the intake feeder motor
+     * @return speed - the speed of the feeder motor; this can be a value from 
+     * 1.0 to -1.0
+     */
+    public double getTargetFeedSpeed() {
+        return getFeederVelocity()
+            / IntakeConstants.Feeder.MAXIMUM_VELOCITY;
+    }
+
+    public void setPivotIsRaised(boolean raised) {
+        this.intakePreset = IntakePreset.CUSTOM;
+
+        if (raised != targetPivotRaised) {
+            targetPivotRaised = raised;
+            resetPivotTracking();
+        }
+    }
+
+    public void setPreset(IntakePreset preset) {
+        this.intakePreset = preset;
+
+        targetFeederVelocity = preset.feederSpeed;
+
+        if (preset.pivotRaised != targetPivotRaised) {
+            targetPivotRaised = preset.pivotRaised;
+            resetPivotTracking();
+        }
+    }
+
+    private void resetPivotTracking() {
+        pivotDebouncer = new Debouncer(
+            IntakeConstants.Pivot.Zeroing.DEBOUNCE_TIME,
+            DebounceType.kRising
+        );
+    }
+
+    public IntakePreset getPreset() {
+        return this.intakePreset;
+    }
 }
-
