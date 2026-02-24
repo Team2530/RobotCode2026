@@ -171,7 +171,6 @@ public class Robot extends TimedRobot {
             m_robotContainer.getInitCommand() 
           )
         );
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
 
     Elastic.selectTab("Autonomous");

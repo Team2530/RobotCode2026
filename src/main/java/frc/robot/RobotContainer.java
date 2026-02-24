@@ -65,9 +65,6 @@ public class RobotContainer {
 
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-
-    // Autonomous chooser
-    private final AutoChooser autoChooser = new AutoChooser();
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     @Logged
@@ -76,7 +73,16 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     private final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    private final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
+    private final TurretSubsystem turretSubsystem = new TurretSubsystem(
+        swerveDriveSubsystem,
+        new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean() {
+                return operatorXbox.getHID()
+                    .getBackButtonPressed();
+            }
+        }
+    );
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     private final AutoFactory autoFactory = new AutoFactory(
