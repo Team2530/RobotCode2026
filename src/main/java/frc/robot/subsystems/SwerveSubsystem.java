@@ -41,18 +41,9 @@ import frc.robot.Constants.choreoConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
     //Choreo PID Controllers
-    private final PIDController xController = new PIDController(
-        choreoConstants.x_CONTROLLER_P, 
-        choreoConstants.x_CONTROLLER_I, 
-        choreoConstants.x_CONTROLLER_D);
-    private final PIDController yController = new PIDController(
-        choreoConstants.y_CONTROLLER_P, 
-        choreoConstants.y_CONTROLLER_I, 
-        choreoConstants.y_CONTROLLER_D);
-    private final PIDController headingController = new PIDController(
-        choreoConstants.heading_CONTROLLER_P, 
-        choreoConstants.heading_CONTROLLER_I, 
-        choreoConstants.heading_CONTROLLER_D);
+    private final PIDController xController = choreoConstants.x_CONTROLLER.getPIDController();
+    private final PIDController yController = choreoConstants.y_CONTROLLER.getPIDController();
+    private final PIDController headingController = choreoConstants.heading_CONTROLLER.getPIDController();
     
     private final SwerveDrive swerveDrive;
 
