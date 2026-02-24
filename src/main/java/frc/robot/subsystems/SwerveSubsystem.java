@@ -117,20 +117,8 @@ public class SwerveSubsystem extends SubsystemBase {
                     }};
                 }};
 
-            PIDFConfig drivePID = new PIDFConfig(
-                DriveConstants.PIDs.Drive.P,
-                DriveConstants.PIDs.Drive.I,
-                DriveConstants.PIDs.Drive.D,
-                DriveConstants.PIDs.Drive.F,
-                DriveConstants.PIDs.Drive.IZ
-            );
-            PIDFConfig anglePID = new PIDFConfig(
-                DriveConstants.PIDs.Angle.P,
-                DriveConstants.PIDs.Angle.I,
-                DriveConstants.PIDs.Angle.D,
-                DriveConstants.PIDs.Angle.F,
-                DriveConstants.PIDs.Angle.IZ
-            );
+            PIDFConfig drivePID = DriveConstants.PIDs.Drive.getPIDFConfig();
+            PIDFConfig anglePID = DriveConstants.PIDs.Angle.getPIDFConfig();
 
             SwerveModulePhysicalCharacteristics physicalCharacteristics = 
                 new SwerveModulePhysicalCharacteristics(
@@ -278,13 +266,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     physicalCharacteristics
             );
 
-            PIDFConfig headingPID = new PIDFConfig(
-                DriveConstants.PIDs.Heading.P,
-                DriveConstants.PIDs.Heading.I,
-                DriveConstants.PIDs.Heading.D,
-                DriveConstants.PIDs.Heading.F,
-                DriveConstants.PIDs.Heading.IZ
-            );
+            PIDFConfig headingPID = DriveConstants.PIDs.Heading.getPIDFConfig();
 
             SwerveControllerConfiguration controllerConfiguration = 
                 new SwerveControllerConfiguration(
