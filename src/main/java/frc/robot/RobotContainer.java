@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import choreo.auto.AutoChooser;
+import choreo.auto.*;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -79,6 +79,17 @@ public class RobotContainer {
     private final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
+    private final AutoFactory autoFactory = new AutoFactory(
+          swerveDriveSubsystem::getPose, // A function that returns the current robot pose
+          swerveDriveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+          swerveDriveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
+          true, // If alliance flipping should be enabled 
+          swerveDriveSubsystem // The drive subsystem
+    );
+
+    private final AutoChooser autoChooser = new AutoChooser();
+    private final String[] autos = {"NewAuto"};
+
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -95,6 +106,26 @@ public class RobotContainer {
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
+        for (String trajName : autos) {
+            autoChooser.addRoutine(trajName+"_routine", () -> {
+                AutoRoutine routine = autoFactory.newRoutine(trajName+"_routine");
+                AutoTrajectory trajectory = routine.trajectory(trajName);
+
+                routine.active().onTrue(
+                    Commands.sequence(
+                        trajectory.resetOdometry(),
+                        trajectory.cmd()
+                    )
+                );
+
+                // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
+
+                
+
+                return routine;
+            });
+        }
+        SmartDashboard.putData(autoChooser);
     }
 
     

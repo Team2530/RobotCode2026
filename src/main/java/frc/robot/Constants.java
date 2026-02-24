@@ -2,13 +2,18 @@ package frc.robot;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Optional;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 
+import choreo.Choreo;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -17,9 +22,14 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.DriveConstants.SwerveModules.Offsets;
+import swervelib.parser.PIDFConfig;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -34,6 +44,16 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  /** PID Constant that can set PID Values and get needed controllers and config. */
+  public static class PID {
+    public final double P, I, D, F, IZ;
+    /** PID Constants that can set PID Values and get needed controllers and config. */
+    public PID(double P, double I, double D) {this.P=P; this.I=I; this.D=D; this.F=0; this.IZ=0;}
+    /** PID Constants that can set PID Values and get needed controllers and config. */
+    public PID(double P, double I, double D, double F, double IZ) {this.P=P; this.I=I; this.D=D; this.F=F; this.IZ=IZ;}
+    public PIDController getPIDController() {return new PIDController(P, I, D);}
+    public PIDFConfig getPIDFConfig() {return new PIDFConfig(P,I,D,F,IZ);}
+  }
   public static class ControllerConstants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final int OPERATOR_CONTROLLER_PORT = 1;
@@ -129,6 +149,7 @@ public final class Constants {
     public static final double MAX_ROBOT_VELOCITY = 4.2;
     public static final double MAX_ROBOT_RAD_VELOCITY = 0.25;
 
+    
 
     // (((((65kg×1(m/s^2))/4)×(4in/2))/6.75)/(0.0194Nm/A))×(0.033ohm)
     public static final double GLOBAL_kA = 0.135; // V/(m/ss)
@@ -143,6 +164,13 @@ public final class Constants {
     public static final PIDConstants TRANSLATION_ASSIST = new PIDConstants(8, 0, 0.01);
     public static final PIDConstants ROTATION_ASSIST = new PIDConstants(7.0, 0, 0.02);
 
+    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
+    new Translation2d(Offsets.FL_X, Offsets.FL_Y), 
+    new Translation2d(Offsets.FR_X, Offsets.FR_Y), 
+    new Translation2d(Offsets.BL_X, Offsets.BL_Y), 
+    new Translation2d(Offsets.BR_X, Offsets.BR_Y)  
+);
+      
     public static final class ControlConstants {
         public static final double REGULAR_DRIVE_MULT = 1.0;
         public static final double TURTLE_DRIVE_MULT = 0.25;
@@ -151,7 +179,7 @@ public final class Constants {
 
         public static class Deadband {
             public static final double X = 0.1;
-            public static final double Y = X; // WARNING: can i do this? probably
+            public static final double Y = 0.1;
             public static final double Z = 0.08;
 
             // the radius from 0 to 1 after which the angle-based heading 
@@ -175,31 +203,11 @@ public final class Constants {
     public static final class PIDs {
         // TODO: tune all
 
-        public static final class Drive {
-            public static final double P = 5;
-            public static final double I = 0;
-            public static final double D = 0;
-            public static final double F = 0;
-            public static final double IZ = 0;
-        }
-
-        // for the steer motors on the modules
-        public static final class Angle {
-            public static final double P = 100; // 100
-            public static final double I = 0; // 0
-            public static final double D = 0;
-            public static final double F = 0;
-            public static final double IZ = 0;
-        }
-
-        // for angle-based heading control
-        public static final class Heading {
-            public static final double P = 0.01; // 0.01 
-            public static final double I = 0;
-            public static final double D = 0;
-            public static final double F = 0;
-            public static final double IZ = 0;
-        }
+        public static final PID Drive = new PID(5, 0, 0, 0, 0);
+        /** for the steer motors on the modules */
+        public static final PID Angle = new PID(100, 0, 0, 0, 0);
+        /** for angle-based heading control */
+        public static final PID Heading = new PID(0.01, 0, 0, 0, 0);
     };
 
     public static final class IMU {
@@ -288,7 +296,12 @@ public final class Constants {
     }
 
   }
-
+  public static final class choreoConstants {
+    public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
+    public static final PID x_CONTROLLER = new PID(10, 0, 0);
+    public static final PID y_CONTROLLER = new PID(10, 0, 0);
+    public static final PID heading_CONTROLLER = new PID(7.5, 0, 0);
+  }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
     public static final boolean LOG_TO_NETWORKTABLES = true;
