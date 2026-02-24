@@ -19,14 +19,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.util.Elastic;
-
-import com.ctre.phoenix6.Orchestra;
-import com.ctre.phoenix6.hardware.TalonFX;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Limelight.LimelightType;
+import frc.robot.util.LimelightHelpers;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -39,26 +39,14 @@ import com.ctre.phoenix6.hardware.TalonFX;
  */
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
-  // Declare Krakens for Music
-  TalonFX m_DriveFR = new TalonFX(4);
-  TalonFX m_DriveFL = new TalonFX(1);
-  TalonFX m_DriveBR = new TalonFX(10);
-  TalonFX m_DriveBL = new TalonFX(7);
-  
-  TalonFX m_SteerFR = new TalonFX(5);
-  TalonFX m_SteerFL = new TalonFX(2);
-  TalonFX m_SteerBR = new TalonFX(11);
-  TalonFX m_SteerBL = new TalonFX(8);
-
-  TalonFX m_Intake = new TalonFX(13);
-  TalonFX m_Turret = new TalonFX(14);
-  TalonFX m_Shooter = new TalonFX(15);
-  TalonFX m_Loader = new TalonFX(16);
-
-  public static Orchestra m_orchestra = new Orchestra();
 
   private Command m_autonomousCommand;
-
+  //private final SwerveSubsystem swerveDrive = new SwerveSubsystem();
+  //private final AutoFactory autoFactory;
+  /** This is one auto. */
+  //private final Trajectory trajectory;
+  
+  @Logged
   private RobotContainer m_robotContainer;
 
   double lastLoopTime = Timer.getFPGATimestamp();
@@ -71,8 +59,11 @@ public class Robot extends TimedRobot {
       .getDoubleTopic("loopTime").publish();
   DoublePublisher csTimePublisher = NetworkTableInstance.getDefault()
       .getDoubleTopic("commandSchedulerTime").publish();
+  
 
   public Robot() {
+
+
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
 
@@ -91,6 +82,7 @@ public class Robot extends TimedRobot {
     config.backend = new FileBackend(DataLogManager.getLog());
 
     // Epilogue.bind(this);
+    
   }
 
   /**
@@ -101,21 +93,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-
-    m_orchestra.addInstrument(m_DriveBL);
-    m_orchestra.addInstrument(m_DriveBR);
-    m_orchestra.addInstrument(m_DriveFL);
-    m_orchestra.addInstrument(m_DriveFR);
-    m_orchestra.addInstrument(m_SteerBL);
-    m_orchestra.addInstrument(m_SteerBR);
-    m_orchestra.addInstrument(m_SteerFL);
-    m_orchestra.addInstrument(m_SteerFR);
-    m_orchestra.addInstrument(m_Intake);
-    m_orchestra.addInstrument(m_Turret);
-    m_orchestra.addInstrument(m_Shooter);
-    m_orchestra.addInstrument(m_Loader);
-    m_orchestra.loadMusic("ClimbSuccess.chrp");
-
 
     // Put git/code version metadata on networktables
     NetworkTable versionTable = NetworkTableInstance.getDefault().getTable("Version");
@@ -154,7 +131,11 @@ public class Robot extends TimedRobot {
 
     loopPub.set(loopTime);
     csTimePublisher.set(commandSchedulerTime);
+
+    
+
   }
+
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
@@ -175,7 +156,12 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-       CommandScheduler.getInstance().schedule(m_autonomousCommand);
+       CommandScheduler.getInstance().schedule(
+          new ParallelCommandGroup(
+            m_autonomousCommand,
+            m_robotContainer.getInitCommand() 
+          )
+        );
     }
 
     Elastic.selectTab("Autonomous");
@@ -188,8 +174,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-
-
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
