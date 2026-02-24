@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import choreo.auto.AutoChooser;
+import choreo.auto.*;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -65,9 +65,6 @@ public class RobotContainer {
 
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-
-    // Autonomous chooser
-    private final AutoChooser autoChooser = new AutoChooser();
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     @Logged
@@ -88,6 +85,17 @@ public class RobotContainer {
     );
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
+    private final AutoFactory autoFactory = new AutoFactory(
+          swerveDriveSubsystem::getPose, // A function that returns the current robot pose
+          swerveDriveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+          swerveDriveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
+          true, // If alliance flipping should be enabled 
+          swerveDriveSubsystem // The drive subsystem
+    );
+
+    private final AutoChooser autoChooser = new AutoChooser();
+    private final String[] autos = {"NewAuto"};
+
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -104,6 +112,26 @@ public class RobotContainer {
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
+        for (String trajName : autos) {
+            autoChooser.addRoutine(trajName+"_routine", () -> {
+                AutoRoutine routine = autoFactory.newRoutine(trajName+"_routine");
+                AutoTrajectory trajectory = routine.trajectory(trajName);
+
+                routine.active().onTrue(
+                    Commands.sequence(
+                        trajectory.resetOdometry(),
+                        trajectory.cmd()
+                    )
+                );
+
+                // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
+
+                
+
+                return routine;
+            });
+        }
+        SmartDashboard.putData(autoChooser);
     }
 
     
@@ -151,10 +179,19 @@ public class RobotContainer {
             );
 
         operatorXbox.rightTrigger(0.3)
+        .and(
+            new BooleanSupplier() {
+                @Override
+                public boolean getAsBoolean() {
+                    return turretSubsystem.isAtVelocity();
+                }
+            }
+        )
             .whileTrue(
-                new RunLoaderCommand(loaderSubsystem)
-            ).whileTrue(
-                new RunIndexerCommand(indexerSubsystem)
+                new ParallelCommandGroup(
+                    new RunLoaderCommand(loaderSubsystem),
+                    new RunIndexerCommand(indexerSubsystem)
+                )
             );
 
         
@@ -209,7 +246,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(52, 43);
+                        turretSubsystem.setManualControl(52, 45);
                     }
                 )
             );
@@ -217,7 +254,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(329, 42);
+                        turretSubsystem.setManualControl(329, 42.5);
                     }
                 )
             );
@@ -225,7 +262,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(0, 50);
+                        turretSubsystem.setManualControl(0, 48.5);
                     }
                 )
             );

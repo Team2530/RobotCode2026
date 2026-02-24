@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -46,12 +48,19 @@ import com.revrobotics.spark.SparkMax;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -128,10 +137,9 @@ public class TurretSubsystem extends SubsystemBase {
     // lets just pray its a cancoder
     // TODO: this
     // private final CANcoder e_PitchEncoder;
-
     // targets
-    private TurretTargets target;
-    private TargetingMode targetingMode;
+    private TurretTargets target = TurretTargets.HUB;
+    private TargetingMode targetingMode = TargetingMode.MANUAL;
     private Pose3d targetPosition;
 
     private double targetVelocity;
@@ -139,6 +147,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // yaw logic
     private boolean yawIsZeroed;
+    private boolean atVelocity;
 
     private final BOBYQAOptimizer targetingOptimizer;
 
@@ -247,7 +256,6 @@ public class TurretSubsystem extends SubsystemBase {
         // TODO: this
         // e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
 
-
         targetingOptimizer = new BOBYQAOptimizer(
             TurretConstants.TargetingOptimizer.INTERPOLATION_POINTS
         );
@@ -261,6 +269,8 @@ public class TurretSubsystem extends SubsystemBase {
             .publish();
 
         targetVelocity = 0;
+
+        atVelocity = false;
     }
 
     private double relativeAngularVelocityFromLinear(
@@ -279,6 +289,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        SmartDashboard.putNumber("shooter_target", targetVelocity);
+        //SmartDashboard.putNumber("shooter_velocity", m_LauncherMotor)
         double startTime = Timer.getTimestamp();
         if (yawIsZeroed) {
             // get difference to target
@@ -446,18 +459,23 @@ public class TurretSubsystem extends SubsystemBase {
             }
 
             // calculate voltages and send to motors
+            /** targetVelocity Clamped in Rot/s */
             double setVelocity = MathUtil.clamp(
                 targetVelocity,
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
             m_LauncherMotor.setControl(
+<<<<<<< HEAD
                 new MotionMagicTorqueCurrentFOC(setVelocity)
                     .withSlot(
                         isLaunching.getAsBoolean()
                             ? 0
                             : 1 // use more sensitive profile while launching
                     )
+=======
+                new MotionMagicVelocityTorqueCurrentFOC(setVelocity)
+>>>>>>> origin/jammin
             );
 
             double setYaw = MathUtil.clamp(
@@ -469,7 +487,6 @@ public class TurretSubsystem extends SubsystemBase {
                     TurretConstants.Yaw.ANGLE_MAX
                 )
             );
-
             // TODO: dunno if this allows for motion magic
             // WARNING: not too confident in this math
             m_YawMotor.setControl(
@@ -504,7 +521,11 @@ public class TurretSubsystem extends SubsystemBase {
             );
             SmartDashboard.putNumber(
                 "Turret/Launcher/output", 
-                setVelocity 
+                m_LauncherMotor.getMotorOutputStatus().getValueAsDouble()
+            );
+            SmartDashboard.putBoolean(
+                "Turret/Launcher/at_velocity",
+                atVelocity
             );
             // yaw
             SmartDashboard.putNumber(
@@ -516,6 +537,8 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Pitch/Target_pitch",
                 optimalPitch
             );
+
+            SmartDashboard.putNumber("test_shooter_targetV", setVelocity);
         }
         // targeting
         SmartDashboard.putString(
@@ -531,6 +554,10 @@ public class TurretSubsystem extends SubsystemBase {
             targetingMode.toString()
         );
         // launcher
+        SmartDashboard.putNumber(
+            "Turret/Launcher/Target_velocity",
+            targetVelocity
+        );
         SmartDashboard.putNumber(
             "Turret/Launcher/Current_velocity",
             getLauncherVelocity()
@@ -784,5 +811,9 @@ public class TurretSubsystem extends SubsystemBase {
         this.targetingMode = TargetingMode.MANUAL;
         this.targetVelocity = velocity;
         this.targetYaw = yaw;
+    }
+    
+    public boolean isAtVelocity() {
+        return atVelocity;
     }
 }
