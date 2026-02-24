@@ -466,16 +466,12 @@ public class TurretSubsystem extends SubsystemBase {
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
             m_LauncherMotor.setControl(
-<<<<<<< HEAD
-                new MotionMagicTorqueCurrentFOC(setVelocity)
+                new MotionMagicVelocityTorqueCurrentFOC(setVelocity)
                     .withSlot(
                         isLaunching.getAsBoolean()
                             ? 0
                             : 1 // use more sensitive profile while launching
                     )
-=======
-                new MotionMagicVelocityTorqueCurrentFOC(setVelocity)
->>>>>>> origin/jammin
             );
 
             double setYaw = MathUtil.clamp(
