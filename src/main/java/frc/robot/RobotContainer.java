@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
@@ -75,7 +76,16 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     private final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    private final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
+    private final TurretSubsystem turretSubsystem = new TurretSubsystem(
+        swerveDriveSubsystem,
+        new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean() {
+                return operatorXbox.getHID()
+                    .getBackButtonPressed();
+            }
+        }
+    );
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     /*

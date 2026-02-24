@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +27,8 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+
+import java.util.function.BooleanSupplier;
 
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -46,6 +49,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
@@ -114,6 +118,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 
     private final SwerveSubsystem swerveSubsystem; 
+    private final BooleanSupplier isLaunching;
 
     private final TalonFX m_LauncherMotor;
     private final TalonFX m_YawMotor;
@@ -140,8 +145,12 @@ public class TurretSubsystem extends SubsystemBase {
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
 
-    public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
+    public TurretSubsystem(
+        SwerveSubsystem swerveSubsystem,
+        BooleanSupplier isLaunching
+    ) {
         this.swerveSubsystem = swerveSubsystem;
+        this.isLaunching = isLaunching;
         // Initialize Motors and Encoders
         m_LauncherMotor = new TalonFX(
             TurretConstants.CanIDs.LAUNCHER_MOTOR
@@ -168,19 +177,44 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     ).withSlot0(
                         new Slot0Configs()
-                            .withKP(TurretConstants.Launcher.PID.P)
-                            .withKI(TurretConstants.Launcher.PID.I)
-                            .withKD(TurretConstants.Launcher.PID.D)
-                            .withKS(TurretConstants.Launcher.Feedforward.kS)
-                            .withKV(TurretConstants.Launcher.Feedforward.kV)
-                            .withKA(TurretConstants.Launcher.Feedforward.kA)
+                            .withKP(TurretConstants.Launcher.PID.Holding.P)
+                            .withKI(TurretConstants.Launcher.PID.Holding.I)
+                            .withKD(TurretConstants.Launcher.PID.Holding.D)
+                            .withKS(
+                                TurretConstants.Launcher.Feedforward.Holding.kS
+                            )
+                            .withKV(
+                                TurretConstants.Launcher.Feedforward.Holding.kV
+                            )
+                            .withKA(
+                                TurretConstants.Launcher.Feedforward.Holding.kA
+                            )
+                    ).withSlot1(
+                        new Slot1Configs()
+                            .withKP(TurretConstants.Launcher.PID.Launching.P)
+                            .withKI(TurretConstants.Launcher.PID.Launching.I)
+                            .withKD(TurretConstants.Launcher.PID.Launching.D)
+                            .withKS(
+                                TurretConstants.Launcher.Feedforward.Launching
+                                .kS
+                            )
+                            .withKV(
+                                TurretConstants.Launcher.Feedforward.Launching
+                                .kV
+                            )
+                            .withKA(
+                                TurretConstants.Launcher.Feedforward.Launching
+                                .kA
+                            )
                     ).withMotionMagic(
                         new MotionMagicConfigs()
                             .withMotionMagicExpo_kV(
-                                TurretConstants.Launcher.Feedforward.kV
+                                TurretConstants.Launcher.Feedforward
+                                .Magic.kV
                             )
                             .withMotionMagicExpo_kA(
-                                TurretConstants.Launcher.Feedforward.kA
+                                TurretConstants.Launcher.Feedforward
+                                .Magic.kA
                             )
                     )
             );
@@ -419,6 +453,11 @@ public class TurretSubsystem extends SubsystemBase {
             );
             m_LauncherMotor.setControl(
                 new MotionMagicTorqueCurrentFOC(setVelocity)
+                    .withSlot(
+                        isLaunching.getAsBoolean()
+                            ? 0
+                            : 1 // use more sensitive profile while launching
+                    )
             );
 
             double setYaw = MathUtil.clamp(
