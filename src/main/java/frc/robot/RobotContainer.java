@@ -66,8 +66,6 @@ public class RobotContainer {
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
 
-    // Autonomous chooser
-    private final AutoChooser autoChooser = new AutoChooser();
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     @Logged

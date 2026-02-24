@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   /** This is one auto. */
   //private final Trajectory trajectory;
   
-  @Logged
+  //@Logged
   private RobotContainer m_robotContainer;
 
   double lastLoopTime = Timer.getFPGATimestamp();
@@ -162,7 +162,6 @@ public class Robot extends TimedRobot {
             m_robotContainer.getInitCommand() 
           )
         );
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
 
     Elastic.selectTab("Autonomous");
