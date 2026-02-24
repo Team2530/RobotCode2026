@@ -256,9 +256,9 @@ public final class Constants {
   }
   public static final class choreoConstants {
     public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
-    public static final PID x_CONTROLLER =  new PID(10, 0, 0);
-    public static final PID y_CONTROLLER =  new PID(10, 0, 0);
-    public static final PID heading_CONTROLLER =  new PID(7.5, 0, 0);
+    public static final PID x_CONTROLLER = new PID(10, 0, 0);
+    public static final PID y_CONTROLLER = new PID(10, 0, 0);
+    public static final PID heading_CONTROLLER = new PID(7.5, 0, 0);
   }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
