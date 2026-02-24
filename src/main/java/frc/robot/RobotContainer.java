@@ -93,7 +93,6 @@ public class RobotContainer {
           swerveDriveSubsystem // The drive subsystem
     );
 
-    private final AutoChooser autoChooser = new AutoChooser();
     private final String[] autos = {"NewAuto"};
 
     /*
