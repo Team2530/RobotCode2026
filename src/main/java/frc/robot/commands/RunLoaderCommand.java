@@ -24,7 +24,7 @@ public class RunLoaderCommand extends Command {
             loaderSubsystem.run(-1);
         }
         else{
-            loaderSubsystem.run(1);
+            loaderSubsystem.run(1); // is speed correct?
         }
     }
 
