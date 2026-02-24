@@ -47,6 +47,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Odometry Pose", Pose2d.struct).publish();
+    
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
