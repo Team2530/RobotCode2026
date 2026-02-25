@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -73,6 +74,11 @@ public class IntakeSubsystem extends SubsystemBase {
                             ? InvertedValue.Clockwise_Positive    
                             : InvertedValue.CounterClockwise_Positive        
                     )
+                ).withSlot0(
+                    new Slot0Configs()
+                        .withKP(IntakeConstants.Feeder.PID.P)
+                        .withKI(IntakeConstants.Feeder.PID.I)
+                        .withKD(IntakeConstants.Feeder.PID.D)
                 )
             );
 

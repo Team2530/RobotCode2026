@@ -123,6 +123,12 @@ public final class Constants {
         public static final int CAN_ID = 13;
         // WARNING: uh?
         public static final double MAXIMUM_VELOCITY = 100;
+
+        public static final class PID {
+            public static final double P = 1;
+            public static final double I = 0;
+            public static final double D = 0;
+        }
       }
 
       // as in the motor that lifts the whole structure
