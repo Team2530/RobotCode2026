@@ -158,6 +158,10 @@ public class RobotContainer {
             );
 
         
+        //operatorXbox.rightBumper()
+            //.whileTrue(
+                //aim at turret
+            //);
         operatorXbox.start()
             .onTrue(
                 turretSubsystem.zeroYawCommand()
