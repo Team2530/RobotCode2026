@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -30,6 +31,11 @@ public class LoaderSubsystem extends SubsystemBase {
                             ? InvertedValue.Clockwise_Positive    
                             : InvertedValue.CounterClockwise_Positive        
                     )
+                ).withSlot0(
+                    new Slot0Configs()
+                        .withKP(LoaderConstants.PID.P)
+                        .withKI(LoaderConstants.PID.I)
+                        .withKD(LoaderConstants.PID.D)
                 )
             );
 

@@ -511,5 +511,11 @@ public final class Constants {
       public static final int CAN_ID = 16;
       // TODO: get a better number
       public static final double MAXIMUM_VELOCITY = 100;
+
+      public static final class PID {
+        public static final double P = 1;
+        public static final double I = 1;
+        public static final double D = 1;
+      }
   }
 }
