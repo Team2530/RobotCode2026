@@ -30,21 +30,21 @@ public class IntakeSubsystem extends SubsystemBase {
         // i.e., 90 would be vertical
         STOWED(true, 0),
         OUT(false, 0),
-        INTAKING(false, 0.6), //intake speed
-        AGITATING(true, 0.6),
-        SPITTING(false, -1),
+        INTAKING(false, 50), //intake speed, in rps
+        AGITATING(true, 50),
+        SPITTING(false, -IntakeConstants.Feeder.MAXIMUM_VELOCITY),
         CUSTOM(false, Double.MAX_VALUE);
 
         
         public final boolean pivotRaised;
-        public final double feederSpeed;
+        public final double feederVelocity;
 
         private IntakePreset(
                 boolean pivotRaised,
-                double feederSpeed 
+                double feederVelocity
         ) {
             this.pivotRaised = pivotRaised;
-            this.feederSpeed = feederSpeed;
+            this.feederVelocity = feederVelocity;
         }
     }
 
@@ -213,7 +213,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setPreset(IntakePreset preset) {
         this.intakePreset = preset;
 
-        targetFeederVelocity = preset.feederSpeed;
+        targetFeederVelocity = preset.feederVelocity;
 
         if (preset.pivotRaised != targetPivotRaised) {
             targetPivotRaised = preset.pivotRaised;
