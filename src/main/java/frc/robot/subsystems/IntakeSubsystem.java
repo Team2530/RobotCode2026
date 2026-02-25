@@ -134,7 +134,6 @@ public class IntakeSubsystem extends SubsystemBase {
                 isHolding = true;
                 m_PivotMotor.getEncoder().setPosition(0);
             }
-            System.out.print("jdalksfjadlsjkl");
         }
 
         SmartDashboard.putNumber(
