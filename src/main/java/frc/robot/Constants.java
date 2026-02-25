@@ -134,17 +134,19 @@ public final class Constants {
       // as in the motor that lifts the whole structure
       public static class Pivot {
           public static final int CAN_ID = 23;
-
-          // both of these have values from 1.0 to -1.0
           // output applied when the pivot is moving between stowed / deployed
+          // value from -1.0 to 1.0
           public static final double DEPLOY_OUTPUT = 0.2;
-          // voltaged applied when the pivot is holding it's position\
-          public static final double HOLD_OUTPUT = 0.05;
-
           public static final class Zeroing {
               // amps ocourse
               public static final double CURRENT_LIMIT = 35;
               public static final double DEBOUNCE_TIME = 0.15;
+          }
+
+          public static final class PID {
+            public static final double P = 0.2;
+            public static final double I = 0;
+            public static final double D = 0;
           }
       }
   }
