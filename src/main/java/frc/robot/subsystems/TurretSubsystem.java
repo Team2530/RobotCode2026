@@ -191,7 +191,7 @@ public class TurretSubsystem extends SubsystemBase {
                             .withKD(TurretConstants.Launcher.PID.Holding.D)
                             .withKS(
                                 TurretConstants.Launcher.Feedforward.Holding.kS
-                            )
+                            )/*
                             .withKV(
                                 TurretConstants.Launcher.Feedforward.Holding.kV
                             )
@@ -246,9 +246,9 @@ public class TurretSubsystem extends SubsystemBase {
                 ).withMotionMagic(
                     new MotionMagicConfigs()
                         .withMotionMagicCruiseVelocity(
-                            TurretConstants.Yaw.VELOCITY_MAX
+                            TurretConstants.Yaw.MAX_VELOCITY
                         ).withMotionMagicAcceleration(
-                            TurretConstants.Yaw.ACCELERATION_MAX
+                            TurretConstants.Yaw.MAX_ACCELERATION
                         )
                 )
             );
@@ -289,8 +289,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        SmartDashboard.putNumber("shooter_target", targetVelocity);
         //SmartDashboard.putNumber("shooter_velocity", m_LauncherMotor)
         double startTime = Timer.getTimestamp();
         if (yawIsZeroed) {
@@ -452,7 +450,7 @@ public class TurretSubsystem extends SubsystemBase {
                 optimalVelocity = targetVelocity;
                 optimalTime = targetOptimum[3];
             } else {
-                optimalYaw = Units.degreesToRadians(targetYaw);
+                optimalYaw = Units.degreesToRotations(targetYaw);
                 optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
                 optimalVelocity = targetVelocity;
                 optimalTime = 0;
@@ -483,12 +481,11 @@ public class TurretSubsystem extends SubsystemBase {
                     TurretConstants.Yaw.ANGLE_MAX
                 )
             );
-            // TODO: dunno if this allows for motion magic
             // WARNING: not too confident in this math
             m_YawMotor.setControl(
-                    new PositionTorqueCurrentFOC(
-                        setYaw * TurretConstants.Yaw.GEAR_RATIO
-                    )
+                new MotionMagicTorqueCurrentFOC(
+                    setYaw * TurretConstants.Yaw.GEAR_RATIO
+                )
             );
             
             // TODO: this
@@ -527,6 +524,10 @@ public class TurretSubsystem extends SubsystemBase {
             SmartDashboard.putNumber(
                 "Turret/Yaw/Target_yaw",
                 optimalYaw
+            );
+            SmartDashboard.putNumber(
+                "Turret/Yaw/",
+                m_YawMotor.getMotorOutputStatus().getValueAsDouble() 
             );
             // pitch
             SmartDashboard.putNumber(
@@ -596,15 +597,14 @@ public class TurretSubsystem extends SubsystemBase {
     
 
     /*
-     * RADIANS
+     * rotations
      */
     public double getYaw() {
         if (yawIsZeroed) {
-            return Units.rotationsToRadians(
+            return
                 (m_YawMotor.getPosition().getValueAsDouble())
                 / TurretConstants.Yaw.GEAR_RATIO
-                + Units.degreesToRotations(TurretConstants.Yaw.ANGLE_MIN)
-            );
+                + Units.degreesToRotations(TurretConstants.Yaw.ANGLE_MIN);
         } else {
             return 0;
         }
