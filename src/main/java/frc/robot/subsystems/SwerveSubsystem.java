@@ -76,33 +76,6 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public SwerveSubsystem() {
-
-        
-
-        // register gearshifter with smartdashboard
-        gearChooser = new SendableChooser<>();
-
-        gearChooser.addOption(
-            SwerveGearing.LIGHT.toString(),
-            SwerveGearing.LIGHT
-        );
-        gearChooser.setDefaultOption(
-            SwerveGearing.RIDICULUS.toString(),
-            SwerveGearing.RIDICULUS
-        );
-        gearChooser.addOption(
-            SwerveGearing.LUDICRUS.toString(),
-            SwerveGearing.LUDICRUS
-        );
-
-        gearChooser.onChange(gearing -> changeGearing(gearing));
-
-        SmartDashboard.putData("Swerve Drive Gearing", gearChooser);
-
-        // register sysId commands with smartdashboard
-        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
-        SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
-
         // instantiate yagsl library classes
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -301,6 +274,31 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
 
         headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+        // register gearshifter with smartdashboard
+        gearChooser = new SendableChooser<>();
+
+        gearChooser.addOption(
+            SwerveGearing.LIGHT.toString(),
+            SwerveGearing.LIGHT
+        );
+        gearChooser.setDefaultOption(
+            SwerveGearing.RIDICULUS.toString(),
+            SwerveGearing.RIDICULUS
+        );
+        gearChooser.addOption(
+            SwerveGearing.LUDICRUS.toString(),
+            SwerveGearing.LUDICRUS
+        );
+
+        gearChooser.onChange(gearing -> changeGearing(gearing));
+
+        SmartDashboard.putData("Swerve Drive Gearing", gearChooser);
+
+        // register sysId commands with smartdashboard
+        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
+        SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
+
     };
 
      public void followTrajectory(SwerveSample sample) {
