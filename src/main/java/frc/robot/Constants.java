@@ -125,9 +125,14 @@ public final class Constants {
         public static final double MAXIMUM_VELOCITY = 100;
 
         public static final class PID {
-            public static final double P = 1;
+            public static final double P = 4;
             public static final double I = 0;
             public static final double D = 0;
+        }
+
+        public static final class Feedforward {
+            public static final double kS = 0.7;
+            public static final double kV = 1.04;
         }
       }
 
