@@ -23,9 +23,13 @@ public class EmergencyManagementSystem extends SubsystemBase {
         if (EMSIntake) {
             emergencyManagementSystem.setEMSoutput(EMSoutput.INTAKETRIGGER);
         }
+        if (EMSLauncher) {
+            emergencyManagementSystem.setEMSoutput(EMSoutput.LAUNCHERTRIGGER);
+        }
         else {
             emergencyManagementSystem.setEMSoutput(EMSoutput.INACTIVE);
         }
+
     }
     
     @SuppressWarnings("static-access")
@@ -35,6 +39,9 @@ public class EmergencyManagementSystem extends SubsystemBase {
         if (EMSoutput.INTAKETRIGGER == active) {
             SmartDashboard.putString("Emergency Management System", "Intake has triggered 'Emergency Mode'");
         }
+        if (EMSoutput.LAUNCHERTRIGGER == active) {
+            SmartDashboard.putString("Emergency Managment System","Launcher has triggered 'Emergency Mode");
+        }
         else {
             SmartDashboard.putString("Emergency Management System", "System Inactive, no emergencies being delt with");
         }
@@ -43,6 +50,8 @@ public class EmergencyManagementSystem extends SubsystemBase {
     public enum EMSoutput{ //Control panel, only intake has this system installed
         INACTIVE,
         INTAKETRIGGER,
+        LAUNCHERTRIGGER,
+        CLIMBERTRIGGER,
     }
 
     public static Boolean EMSIntake;
@@ -52,5 +61,13 @@ public class EmergencyManagementSystem extends SubsystemBase {
     } 
     public boolean getEMSIntake() {
         return EMSIntake;
+    }
+    public static Boolean EMSLauncher;
+    
+    public static void setEMSLauncher(Boolean emslauncher) {
+        EmergencyManagementSystem.EMSLauncher = emslauncher;
+    } 
+    public boolean getEMSLauncher() {
+        return EMSLauncher;
     }
 }   
