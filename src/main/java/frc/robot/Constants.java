@@ -355,13 +355,13 @@ public final class Constants {
 
         public static final class PID {
             public static final class Holding {
-                public static final double P = 0.3;
+                public static final double P = 10;
                 public static final double I = 0;
                 public static final double D = 0;
             }
 
             public static final class Launching {
-                public static final double P = 0.3;
+                public static final double P = 40;
                 public static final double I = 0;
                 public static final double D = 0;
             }
@@ -369,20 +369,13 @@ public final class Constants {
 
         public static final class Feedforward {
             public static final class Holding {
-                public static final double kS = 0;
-                public static final double kV = 0;
-                public static final double kA = 0;
+                public static final double kS = 0.44;
+                public static final double kV = 0.645;
             }
 
             public static final class Launching {
-                public static final double kS = 0;
-                public static final double kV = 0;
-                public static final double kA = 0;
-            }
-
-            public static final class Magic {
-                public static final double kV = 0;
-                public static final double kA = 0;
+                public static final double kS = Holding.kS;
+                public static final double kV = Holding.kV;
             }
         }
 

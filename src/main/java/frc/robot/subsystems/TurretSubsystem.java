@@ -195,9 +195,6 @@ public class TurretSubsystem extends SubsystemBase {
                             .withKV(
                                 TurretConstants.Launcher.Feedforward.Holding.kV
                             )
-                            .withKA(
-                                TurretConstants.Launcher.Feedforward.Holding.kA
-                            )
                     ).withSlot1(
                         new Slot1Configs()
                             .withKP(TurretConstants.Launcher.PID.Launching.P)
@@ -210,20 +207,6 @@ public class TurretSubsystem extends SubsystemBase {
                             .withKV(
                                 TurretConstants.Launcher.Feedforward.Launching
                                 .kV
-                            )
-                            .withKA(
-                                TurretConstants.Launcher.Feedforward.Launching
-                                .kA
-                            )
-                    ).withMotionMagic(
-                        new MotionMagicConfigs()
-                            .withMotionMagicExpo_kV(
-                                TurretConstants.Launcher.Feedforward
-                                .Magic.kV
-                            )
-                            .withMotionMagicExpo_kA(
-                                TurretConstants.Launcher.Feedforward
-                                .Magic.kA
                             )
                     )
             );
@@ -409,7 +392,7 @@ public class TurretSubsystem extends SubsystemBase {
                             toTarget.getX()
                         )
                     )
-                ),
+                ),*/
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 0
             };
@@ -464,11 +447,11 @@ public class TurretSubsystem extends SubsystemBase {
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
             m_LauncherMotor.setControl(
-                new MotionMagicVelocityTorqueCurrentFOC(setVelocity)
+                new VelocityTorqueCurrentFOC(setVelocity)
                     .withSlot(
                         isLaunching.getAsBoolean()
-                            ? 0
-                            : 1 // use more sensitive profile while launching
+                            ? 1
+                            : 0 // use more sensitive profile while launching
                     )
             );
 
@@ -514,11 +497,17 @@ public class TurretSubsystem extends SubsystemBase {
             );
             SmartDashboard.putNumber(
                 "Turret/Launcher/output", 
-                m_LauncherMotor.getMotorOutputStatus().getValueAsDouble()
+                m_LauncherMotor.getMotorVoltage().getValueAsDouble()
             );
             SmartDashboard.putBoolean(
                 "Turret/Launcher/at_velocity",
                 atVelocity
+            );
+            SmartDashboard.putNumber(
+                "Turret/Launchere/pid_profile",
+                isLaunching.getAsBoolean()
+                    ? 1
+                    : 0
             );
             // yaw
             SmartDashboard.putNumber(
