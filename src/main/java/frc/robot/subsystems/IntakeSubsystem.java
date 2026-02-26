@@ -32,8 +32,8 @@ public class IntakeSubsystem extends SubsystemBase {
         // i.e., 90 would be vertical
         STOWED(true, 0),
         OUT(false, 0),
-        INTAKING(false, 50), //intake speed, in rps
-        AGITATING(true, 50),
+        INTAKING(false, 45), //intake speed, in rps
+        AGITATING(true, 40),
         SPITTING(false, -IntakeConstants.Feeder.MAXIMUM_VELOCITY),
         CUSTOM(false, Double.MAX_VALUE);
 
@@ -79,6 +79,8 @@ public class IntakeSubsystem extends SubsystemBase {
                         .withKP(IntakeConstants.Feeder.PID.P)
                         .withKI(IntakeConstants.Feeder.PID.I)
                         .withKD(IntakeConstants.Feeder.PID.D)
+                        .withKS(IntakeConstants.Feeder.Feedforward.kS)
+                        .withKV(IntakeConstants.Feeder.Feedforward.kV)
                 )
             );
 
