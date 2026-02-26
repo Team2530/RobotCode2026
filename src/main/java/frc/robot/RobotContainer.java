@@ -85,8 +85,6 @@ public class RobotContainer {
         }
     );
 
-    private final AutoChooser autoChooser = new AutoChooser();
-
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     private final AutoFactory autoFactory = new AutoFactory(
           swerveDriveSubsystem::getPose, // A function that returns the current robot pose
