@@ -194,6 +194,30 @@ public class RobotContainer {
             );
 
         
+        operatorXbox.rightBumper()
+            .whileTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setTarget(TurretTargets.HUB);
+                    }
+                )
+            );
+        operatorXbox.x()
+            .whileTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setTarget(TurretTargets.SHUTTLE_LEFT);
+                    }
+                )
+            );
+        operatorXbox.b()
+            .whileTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setTarget(TurretTargets.SHUTTLE_RIGHT);
+                    }
+                )
+            );
         operatorXbox.start()
             .onTrue(
                 turretSubsystem.zeroYawCommand()
