@@ -28,6 +28,7 @@ import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightHelpers;
 
+import com.ctre.phoenix6.Orchestra;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -39,7 +40,7 @@ import frc.robot.util.LimelightHelpers;
  */
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
-
+  public static Orchestra m_orchestra = new Orchestra();
   private Command m_autonomousCommand;
   //private final SwerveSubsystem swerveDrive = new SwerveSubsystem();
   //private final AutoFactory autoFactory;
