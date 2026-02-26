@@ -7,11 +7,11 @@ package frc.robot.commands;
 import frc.robot.Robot;
 import frc.robot.subsystems.IntakeSubsystem.IntakePresets;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.EmergencyManagementSystem.EMSoutput;
+import frc.robot.subsystems.EmergencyManagementContainer.EmergencyManagementSystem.EMSoutput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 //import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.EmergencyManagementSystem;
+import frc.robot.subsystems.EmergencyManagementContainer.EmergencyManagementSystem;
 
 public class IntakeCommand extends Command {
     

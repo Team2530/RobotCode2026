@@ -3,7 +3,7 @@
  * when a specific button is press. (EMS's in act:1)
  */
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.EmergencyManagementContainer;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
