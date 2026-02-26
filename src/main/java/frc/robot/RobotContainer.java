@@ -66,6 +66,7 @@ public class RobotContainer {
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
     // private final LimeLightSubsystem limeLightSubsystem = new
+    public final AutoChooser autoChooser = new AutoChooser();
     // LimeLightSubsystem();
     @Logged
     private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
