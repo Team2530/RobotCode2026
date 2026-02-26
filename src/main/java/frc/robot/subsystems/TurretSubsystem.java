@@ -191,7 +191,7 @@ public class TurretSubsystem extends SubsystemBase {
                             .withKD(TurretConstants.Launcher.PID.Holding.D)
                             .withKS(
                                 TurretConstants.Launcher.Feedforward.Holding.kS
-                            )/*
+                            )
                             .withKV(
                                 TurretConstants.Launcher.Feedforward.Holding.kV
                             )
@@ -409,7 +409,7 @@ public class TurretSubsystem extends SubsystemBase {
                             toTarget.getX()
                         )
                     )
-                ),*/
+                ),
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 0
             };
