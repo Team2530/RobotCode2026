@@ -163,7 +163,7 @@ public class RobotContainer {
         }
 
     // Autonomous chooser
-    private final AutoChooser autoChooser = new AutoChooser();
+    //private final AutoChooser autoChooser = new AutoChooser();
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     /*
@@ -176,9 +176,9 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
-    public Command getAutonomousCommand() {
-        return autoChooser.selectedCommand();
-    }
+    // public Command getAutonomousCommand() {
+    //     return autoChooser.selectedCommand();
+    // }
 
     public SwerveSubsystem getSwerveSubsystem() {
         return swerveDriveSubsystem;
