@@ -15,6 +15,7 @@ public class DriveCommand extends Command {
     private final SwerveSubsystem subsystem;
     private final XboxController driverXbox;
 
+    /** Limit the speed of change */
     private SlewRateLimiter driveMultiplierSlewLimiter = new SlewRateLimiter(
             ControlConstants.DRIVE_MULTIPLIER_SLEW_RATE
     );
@@ -54,13 +55,9 @@ public class DriveCommand extends Command {
         
         // trigger-base slow / fast mode
         double driveMultiplier = (
-            driveMultiplierSlewLimiter.calculate(
-                driverXbox.getRightTriggerAxis()
-            ) * (
-                ControlConstants.REGULAR_DRIVE_MULT 
-                - ControlConstants.TURTLE_DRIVE_MULT
-            )
-        ) + ControlConstants.TURTLE_DRIVE_MULT;
+            driveMultiplierSlewLimiter.calculate(driverXbox.getRightTriggerAxis()) * 
+            (ControlConstants.REGULAR_DRIVE_MULT  - ControlConstants.TURTLE_DRIVE_MULT)
+            ) + ControlConstants.TURTLE_DRIVE_MULT;
 
         x *= driveMultiplier;
         y *= driveMultiplier;
@@ -69,13 +66,11 @@ public class DriveCommand extends Command {
         // convert to m / s
         x *= DriveConstants.MAX_ROBOT_VELOCITY;
         y *= DriveConstants.MAX_ROBOT_VELOCITY;
+        // convert to rad / s
         z *= DriveConstants.MAX_ROBOT_RAD_VELOCITY;
 
         // send em off
-        subsystem.drive(
-            new Translation2d(x, y),
-            z
-        );
+        subsystem.drive(new Translation2d(x, y), z);
     }
 
     @Override
