@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
@@ -19,11 +21,15 @@ import frc.robot.Constants.FieldConstants;
 public class AllianceFlipUtil {
 
   public static double applyX(double x) {
-    return shouldFlip() ? FieldConstants.FIELD_LENGTH - x : x;
+    return shouldFlip() 
+        ? FieldConstants.FIELD_LENGTH - x 
+        : x;
   }
 
   public static double applyY(double y) {
-    return shouldFlip() ? FieldConstants.FIELD_WIDTH - y : y;
+    return shouldFlip() 
+        ? FieldConstants.FIELD_WIDTH - y 
+        : y;
   }
 
   public static Translation2d apply(Translation2d translation) {
@@ -31,7 +37,20 @@ public class AllianceFlipUtil {
   }
 
   public static Rotation2d apply(Rotation2d rotation) {
-    return shouldFlip() ? rotation.rotateBy(Rotation2d.kPi) : rotation;
+    return shouldFlip() 
+        ? rotation.rotateBy(Rotation2d.kPi) 
+        : rotation;
+  }
+
+  // WARNING: i suck at rotation representation
+  public static Rotation3d apply(Rotation3d rotation) {
+    return shouldFlip() 
+        ? new Rotation3d(
+            -rotation.getX(),
+            -rotation.getY(),
+            -rotation.getZ()
+        )
+        : rotation;
   }
 
   public static Pose2d apply(Pose2d pose) {
@@ -40,18 +59,23 @@ public class AllianceFlipUtil {
         : pose;
   }
 
-  public static Pose2d flip(Pose2d pose) {
-    return new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()));
-  }
-
-  public static ArrayList<Pose2d> flip(List<Pose2d> poses) {
+  public static ArrayList<Pose2d> apply(List<Pose2d> poses) {
     ArrayList<Pose2d> flippedPoses = new ArrayList<Pose2d>();
 
     for (Pose2d pose : poses) {
-      flippedPoses.add(flip(pose));
+      flippedPoses.add(apply(pose));
     }
 
     return flippedPoses;
+  }
+
+  public static Pose3d apply(Pose3d pose) {
+      return new Pose3d(
+          applyX(pose.getX()),
+          applyY(pose.getY()),
+          pose.getZ(),
+          apply(pose.getRotation())
+      );
   }
 
   public static boolean shouldFlip() {

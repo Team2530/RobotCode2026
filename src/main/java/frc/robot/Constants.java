@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms                                                                                                                                                                
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import java.io.File;
@@ -11,7 +7,6 @@ import java.util.Optional;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
@@ -21,15 +16,18 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants.DriveConstants.PIDs.Drive;
 import frc.robot.Constants.DriveConstants.SwerveModules.Offsets;
+import swervelib.parser.PIDFConfig;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
@@ -46,9 +44,27 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  /** PID Constant that can set PID Values and get needed controllers and config. */
+  public static class PID {
+    public final double P, I, D, F, IZ;
+    /** PID Constants that can set PID Values and get needed controllers and config. */
+    public PID(double P, double I, double D) {this.P=P; this.I=I; this.D=D; this.F=0; this.IZ=0;}
+    /** PID Constants that can set PID Values and get needed controllers and config. */
+    public PID(double P, double I, double D, double F, double IZ) {this.P=P; this.I=I; this.D=D; this.F=F; this.IZ=IZ;}
+    public PIDController getPIDController() {return new PIDController(P, I, D);}
+    public PIDFConfig getPIDFConfig() {return new PIDFConfig(P,I,D,F,IZ);}
+  }
   public static class ControllerConstants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final int OPERATOR_CONTROLLER_PORT = 1;
+  }
+
+  public static class GameConstants {
+    public static class Fuel {
+        // meters 
+        public static final double DIAMETER = Units.inchesToMeters(5.9);
+        public static final double RADIUS = DIAMETER / 2;
+    }
   }
 
   public static class RobotConstants {
@@ -57,7 +73,7 @@ public final class Constants {
     public static final double robotLengthMeters = Units.inchesToMeters(29.5);
 
     // TODO: UPDATE BASED ON REAL ROBOT. DONE: FALSE
-    public static final double TOTAL_MASS_KG = 74.088;
+    public static final double TOTAL_MASS_KG = Units.lbsToKilograms(107);
     public static final double MOMENT_OF_INERTIA = 6.883;
   }
 
@@ -76,6 +92,21 @@ public final class Constants {
     }
   }
 
+  public static class HopperConstants {
+      // TODO: update
+      
+      // allese in meters
+
+      // i only really need to know about the static face of the hopper
+      public static final double WIDTH = 1;
+      // distance to the top of the hopper, relative to the bottom 
+      // (like the bottom of the wheels) of the robot
+      public static final double ABSOLUTE_HEIGHT = 1;
+      // distance backwards from the center of the robot
+      public static final double OFFSET_Y = 1;
+      // assume the hopper is 
+  }
+
   /*|-----------WARNING-----------------|
    *|edit with caution, used in all subs|
    *|-----------------------------------|
@@ -84,18 +115,39 @@ public final class Constants {
    *|edits can have catastafic falure---|
 *///|-----------WARNING-----------------|
   //---Intake Motors---\\
-  public static class IntakeMotors {
-    public static final int INTAKESUBSYSTEM_MOTOR = 4;//TODO: IDs and speeds need to be changed. DONE: FALSE
-    public static final double INTAKE_SPEED = 0.6;
-    public static final int INTAKE_MOTOR1 = 5;
-    public static final double INTAKE_SPEED1 = 0.6;
+  public static class IntakeConstants {
+      //TODO: IDs and speeds need to be changed. DONE: FALSE
+      // as in all the wheels on the front that grab the fuel
+      public static class Feeder {
+        public static final boolean REVERSE = true;  
+        public static final int CAN_ID = 13;
+        // WARNING: uh?
+        public static final double MAXIMUM_VELOCITY = 100;
+      }
+
+      // as in the motor that lifts the whole structure
+      public static class Pivot {
+          public static final int CAN_ID = 23;
+
+          // both of these have values from 1.0 to -1.0
+          // output applied when the pivot is moving between stowed / deployed
+          public static final double DEPLOY_OUTPUT = 0.2;
+          // voltaged applied when the pivot is holding it's position\
+          public static final double HOLD_OUTPUT = 0.05;
+
+          public static final class Zeroing {
+              // amps ocourse
+              public static final double CURRENT_LIMIT = 35;
+              public static final double DEBOUNCE_TIME = 0.15;
+          }
+      }
   }
 
   public static final class DriveConstants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
     public static final double MAX_ROBOT_VELOCITY = 4.2;
-    public static final double MAX_ROBOT_RAD_VELOCITY = 6.0;
+    public static final double MAX_ROBOT_RAD_VELOCITY = 0.25;
 
     
 
@@ -127,7 +179,7 @@ public final class Constants {
 
         public static class Deadband {
             public static final double X = 0.1;
-            public static final double Y = X; // WARNING: can i do this?
+            public static final double Y = 0.1;
             public static final double Z = 0.08;
 
             // the radius from 0 to 1 after which the angle-based heading 
@@ -151,31 +203,11 @@ public final class Constants {
     public static final class PIDs {
         // TODO: tune all
 
-        public static final class Drive {
-            public static final double P = 5;
-            public static final double I = 0;
-            public static final double D = 0;
-            public static final double F = 0;
-            public static final double IZ = 0;
-        }
-
-        // for the steer motors on the modules
-        public static final class Angle {
-            public static final double P = 100;
-            public static final double I = 0;
-            public static final double D = 0;
-            public static final double F = 0;
-            public static final double IZ = 0;
-        }
-
-        // for angle-based heading control
-        public static final class Heading {
-            public static final double P = 0.01;
-            public static final double I = 0;
-            public static final double D = 0;
-            public static final double F = 0;
-            public static final double IZ = 0;
-        }
+        public static final PID Drive = new PID(5, 0, 0, 0, 0);
+        /** for the steer motors on the modules */
+        public static final PID Angle = new PID(100, 0, 0, 0, 0);
+        /** for angle-based heading control */
+        public static final PID Heading = new PID(0.01, 0, 0, 0, 0);
     };
 
     public static final class IMU {
@@ -208,7 +240,7 @@ public final class Constants {
         public static final double STEER_FRICTION_VOLTAGE = 0.19;
 
         public static final double DRIVE_GEARING = 6.03;
-        public static final double ANGLE_GEARING = 26.09;
+        public static final double ANGLE_GEARING = 26.09; // 26.09
 
         public static final class CanIDs {
             public static final int FL_DRIVE = 1;
@@ -232,10 +264,10 @@ public final class Constants {
         public static final class Offsets {
             // inches left of the center of the robot
             public static final double FL_X = 9.75;
-            // inchest forward of the center of the robot
-            public static final double FL_Y = 12.263;
-            // as in absolute encoder offset in terms of a full rotation
-            public static final double FL_ANGLE = 0.245850;
+                // inchest forward of the center of the robot
+                public static final double FL_Y = 12.263;
+                // as in absolute encoder offset in terms of a full rotation
+                public static final double FL_ANGLE = 0.245850;
             public static final boolean FL_ENCODER_INVERTED = false;
             public static final boolean FL_DRIVE_INVERTED = false;
             public static final boolean FL_ANGLE_INVERTED = true;
@@ -249,7 +281,7 @@ public final class Constants {
 
             public static final double BL_X = -9.75;
             public static final double BL_Y = 12.263;
-            public static final double BL_ANGLE = 0.003906;
+            public static final double BL_ANGLE = 0.917969;
             public static final boolean BL_ENCODER_INVERTED = false;
             public static final boolean BL_DRIVE_INVERTED = false;
             public static final boolean BL_ANGLE_INVERTED = true;
@@ -266,15 +298,9 @@ public final class Constants {
   }
   public static final class choreoConstants {
     public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
-    public static final double x_CONTROLLER_P = 10.0;
-    public static final double x_CONTROLLER_I = 0.0;
-    public static final double x_CONTROLLER_D = 0.0;
-    public static final double y_CONTROLLER_P = 10.0;
-    public static final double y_CONTROLLER_I = 0.0;
-    public static final double y_CONTROLLER_D = 0.0;
-    public static final double heading_CONTROLLER_P = 7.5;
-    public static final double heading_CONTROLLER_I = 0.0;
-    public static final double heading_CONTROLLER_D = 0.0;
+    public static final PID x_CONTROLLER = new PID(10, 0, 0);
+    public static final PID y_CONTROLLER = new PID(10, 0, 0);
+    public static final PID heading_CONTROLLER = new PID(7.5, 0, 0);
   }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
@@ -297,6 +323,175 @@ public final class Constants {
             put(i, TAG_LAYOUT.getTagPose(i + 1).get().toPose2d());
         }
       }};
+  }
+  public static final class TurretConstants {
+    // TODO: UPDATE BASED ON REAL ROBOT
+    public static final class Launcher {
+        /** In Inches */
+        public static final double WHEEL_DIAMETER = 4;
+        public static final boolean REVERSE = true;
 
+        public static final double VELOCITY_DEADBAND = 10;
+
+        /** in rotations/s */
+        public static final double MAXIMUM_VELOCITY = 500;
+        /** In Rotations/s */
+        public static final double MINIMUM_VELOCITY = 25;
+
+        public static final double MAXIMUM_VELOCITY_ERROR = 10;
+
+        public static final class PID {
+            public static final double P = 12;
+            public static final double I = 0;
+            public static final double D = 0;
+            /** Feedforwards Voltage */
+            public static final double kV = 0;
+            public static final double kA = 0;
+        }
+
+        public static final class Feedforward {
+            public static final double kS = 0;
+            public static final double kV = 0;
+            public static final double kA = 0;
+        }
+
+        public static final class VelocityRegression {
+            public static final double A = 0.748916;
+            public static final double B = -0.678921;
+        }
+    }
+
+    public static final class Yaw {
+        public static final double GEAR_RATIO = 45;
+        public static final boolean REVERSE = false;
+
+        // angular limits on yaw movement
+        // 180 is pointed directly out the turret side
+        public static final double ANGLE_MIN = 1.2;
+        // public static final double ANGLE_MIN = 0;
+        public static final double ANGLE_MAX = 340;
+        
+        public static final double VELOCITY_MAX = 6;
+        public static final double ACCELERATION_MAX = 2;
+
+
+        public static final class Zeroing {
+            // amps
+            public static final double ROUGHPASS_CURRENT_LIMIT = 45;
+            public static final double ROUGHPASS_VOLTAGE = -2;
+            public static final double FINEPASS_CURRENT_LIMIT = 35;
+            public static final double FINEPASS_VOLTAGE = -1;
+            // time above current limit to register as hitting the hard limit
+            public static final double DEBOUNCE_TIME = 0.1;
+        }
+
+        public static final class PID {
+            public static final double P = 0.7;
+            public static final double I = 0;
+            public static final double D = 0;
+
+            public static final double MAX_VELOCITY = 6;
+            public static final double MAX_ACCELERATION = 2;
+        }
+
+        public static final class Feedforward {
+            public static final double kS = 0;
+            public static final double kV = 0;
+            public static final double kA = 0;
+        }
+    }
+
+    public static final class Pitch {
+        public static final double GEAR_RATIO = 1;
+
+        public static final double ANGLE_CONSTANT = 70.5;
+
+        // 90 would have the "face" of the turret as vertical
+        // 0 would have the "face" be horizontal (outputting up)
+        /* 
+         * the minimum angle is dependent on the yaw
+         * @param yaw - the angle of the turret yaw in degrees
+         */
+        public static double ANGLE_MIN(double yaw) {
+            if (
+                Math.abs(yaw - 180) > 0 
+            ) {
+                // dependent on the yaw so we can shoot over the hopper
+                return Math.atan(
+                    (
+                        HopperConstants.ABSOLUTE_HEIGHT 
+                        + GameConstants.Fuel.RADIUS
+                        - TurretConstants.Offsets.Z
+                    ) / (
+                        Math.tan(
+                            Units.degreesToRadians(yaw) 
+                        ) * (
+                            TurretConstants.Offsets.Y 
+                            - HopperConstants.OFFSET_Y
+                        )
+                    )
+                );
+            
+            } else {
+                // physical hardstop of the hood
+                return 90;
+            }
+        }
+        public static final double ANGLE_MAX = 180;
+
+        public static final class PID {
+            public static final double P = 1;
+            public static final double I = 0;
+            public static final double D = 0;
+        }
+    }
+
+    public static final class CanIDs {
+        public static final int LAUNCHER_MOTOR = 15;
+
+        public static final int YAW_MOTOR = 14;
+
+        public static final int PITCH_MOTOR = 41;
+        public static final int PITCH_ENCODER = 40;
+    }
+
+    public static final class Offsets {
+        public static final double YAW_ENCODER_ANGLE = 0;
+        public static final double PITCH_ENCODER_ANGLE = 0;
+
+        // TODO: update
+        // position relative to the center of the robot, in meters
+        public static final double X = Units.inchesToMeters(10);
+        public static final double Y = Units.inchesToMeters(10);
+        // Height of Shooter from Ground, in meters
+        public static final double Z = Units.inchesToMeters(20); 
+        public static final Translation3d TRANSLATION = new Translation3d(
+            X,
+            Y,
+            Z
+        );
+    }
+
+    public static final class TargetingOptimizer {
+        public static final int INTERPOLATION_POINTS = 9;
+        public static final int MAX_EVALUATIONS = 1000;
+        
+        public static final double MAXIMUM_TIME = 5;
+    }
+
+  }
+
+  public static final class IndexerConstants {
+      // TODO: UPDATE BASED ON REAL ROBOT
+      public static final boolean REVERSE = true;
+      public static final int CAN_ID = 24;
+      public static final double SPEED = 0.80;
+  }
+
+  public static final class LoaderConstants {
+      public static final boolean REVERSE = true;
+      public static final int CAN_ID = 16;
+      // TODO: get a better number
+      public static final double MAXIMUM_VELOCITY = 100;
   }
 }
