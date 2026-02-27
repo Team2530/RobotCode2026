@@ -397,9 +397,9 @@ public class TurretSubsystem extends SubsystemBase {
                 0
             };
             double [] upperBounds = {
-                (Units.degreesToRadians(
+                Units.degreesToRadians(
                     TurretConstants.Yaw.ANGLE_MAX
-                ) % (2*Math.PI)),
+                ),
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
@@ -427,12 +427,12 @@ public class TurretSubsystem extends SubsystemBase {
 
                 // double[] targetOptimum = guess;            
 
-                optimalYaw = targetOptimum[0];
-                optimalPitch = targetOptimum[1];
+                optimalYaw = Units.radiansToRotations(targetOptimum[0]);
+                optimalPitch = Units.radiansToRotations(targetOptimum[1]);
                 optimalVelocity = targetOptimum[2];
                 optimalTime = targetOptimum[3];
             } else {
-                optimalYaw = Units.radiansToRotations(targetYaw);
+                optimalYaw = targetYaw;
                 optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
                 optimalVelocity = targetVelocity;
                 optimalTime = 0;
@@ -802,7 +802,7 @@ public class TurretSubsystem extends SubsystemBase {
     ) {
         this.targetingMode = TargetingMode.MANUAL;
         this.targetVelocity = velocity;
-        this.targetYaw = yaw;
+        this.targetYaw = Units.degreesToRotations(yaw);
     }
     
     public boolean isAtVelocity() {
