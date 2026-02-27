@@ -11,6 +11,7 @@ package frc.robot;
 
 // import choreo.auto.AutoChooser;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 // import edu.wpi.first.wpilibj.XboxController;
 // import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -155,6 +156,8 @@ public class RobotContainer {
             }));
         }
 
+    // Autonomous chooser
+    private final AutoChooser autoChooser = new AutoChooser();
     // private final LimeLightSubsystem limeLightSubsystem = new
     // LimeLightSubsystem();
     /*
@@ -168,7 +171,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new Command() {};
+        return autoChooser.selectedCommand();
     }
 
     public SwerveSubsystem getSwerveSubsystem() {
