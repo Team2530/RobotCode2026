@@ -25,16 +25,14 @@ import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.subsystems.EmergencyManagementSystem;
 // import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.EmergencyManagementSystem.EMSoutput;
 // import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightContainer;
 import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.EmergencyManagementSystem;
+
 
 
 /**
@@ -154,14 +152,6 @@ public class RobotContainer {
           */// An auto system will be made to remove this for faster gameplay. (all you got to do is replace the check for down with start :>)
             operatorXbox.a().onTrue(new InstantCommand(() -> {
                 IntakeCommand.setDown(1);
-            }));
-
-            // EMS for Intake (Emergency Use, Reverses Intake to clear)
-            operatorXbox.y().whileTrue(new InstantCommand(() -> {
-                EmergencyManagementSystem.setEMSIntake(true);
-            }));
-            operatorXbox.y().whileFalse(new InstantCommand(() -> {
-                EmergencyManagementSystem.setEMSIntake(false);
             }));
         }
 
