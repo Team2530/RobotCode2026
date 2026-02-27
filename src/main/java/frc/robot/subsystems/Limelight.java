@@ -4,6 +4,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.RawFiducial;
@@ -42,6 +44,8 @@ public class Limelight extends SubsystemBase {
 
 
     public Limelight(LimelightType limelightType, String name, boolean isEnabled, boolean cropEnabled) {
+        double startTime = Timer.getMatchTime();
+
         this.limelightType = limelightType;
         this.name = name;
         this.isEnabled = isEnabled;
@@ -50,6 +54,11 @@ public class Limelight extends SubsystemBase {
         publisher = NetworkTableInstance.getDefault().getStructTopic(name+" Pose2d", Pose2d.struct).publish();
 
         LimelightHelpers.SetIMUMode(name, 1);
+
+        SmartDashboard.putNumber(
+            name + "/initialize_time",
+            startTime - Timer.getMatchTime()
+        );
     }
 
     @Override

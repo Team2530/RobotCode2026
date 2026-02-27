@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -66,6 +67,7 @@ public class IntakeSubsystem extends SubsystemBase {
         m_FeederMotor = new TalonFX(
             IntakeConstants.Feeder.CAN_ID
         );
+        double startTime = Timer.getTimestamp();
         m_FeederMotor.getConfigurator()
             .apply(
                 new TalonFXConfiguration().withMotorOutput(
@@ -106,6 +108,10 @@ public class IntakeSubsystem extends SubsystemBase {
         setPreset(IntakePreset.STOWED);
 
         isHolding = false;
+        SmartDashboard.putNumber(
+            "Intake/initialize_time",
+            Timer.getTimestamp() - startTime
+        );
     }
 
     @Override

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -18,6 +19,8 @@ public class IndexerSubsystem extends SubsystemBase {
     private final SparkMax m_IndexerMotor;
 
     public IndexerSubsystem() {
+        double startTime = Timer.getMatchTime();
+        
         m_IndexerMotor = new SparkMax(
             IndexerConstants.CAN_ID,
             MotorType.kBrushless
@@ -35,6 +38,11 @@ public class IndexerSubsystem extends SubsystemBase {
         );
 
         stop();
+
+        SmartDashboard.putNumber(
+            "Indexer/initialize_time",
+            startTime - Timer.getTimestamp()
+        );
     }
 
     @Override
