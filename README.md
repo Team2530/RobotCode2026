@@ -1,2 +1,2 @@
-The version was made by Levi L (or CNrailfaner4039 on YouTube ©)
-Other people assisted in the creation on this file (Located in the copyright and colaberators)
+**This is a system** [**NOT A SUBSYSTEM**] that make **error report** and/or **correction** for **driver/operator error** by **clicking a button.**
+This is assosiatied with a *pull request*, **further updates and comments can go there.**
