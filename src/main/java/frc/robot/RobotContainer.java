@@ -199,7 +199,9 @@ public class RobotContainer {
             .whileTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setTarget(TurretTargets.HUB);
+                        turretSubsystem.setTarget(
+                            TurretTargets.HUB
+                        );
                     }
                 )
             );
@@ -207,7 +209,9 @@ public class RobotContainer {
             .whileTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setTarget(TurretTargets.SHUTTLE_LEFT);
+                        turretSubsystem.setTarget(
+                            TurretTargets.SHUTTLE_LEFT
+                        );
                     }
                 )
             );
@@ -215,7 +219,9 @@ public class RobotContainer {
             .whileTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setTarget(TurretTargets.SHUTTLE_RIGHT);
+                        turretSubsystem.setTarget(
+                            TurretTargets.SHUTTLE_RIGHT
+                        );
                     }
                 )
             );
