@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -35,6 +34,7 @@ import java.util.function.BooleanSupplier;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
@@ -77,24 +77,24 @@ public class TurretSubsystem extends SubsystemBase {
         // TODO: double check these positions
         HUB(
             new Pose3d(
-                Units.inchesToMeters(162.15), 
                 Units.inchesToMeters(182.1),
+                Units.inchesToMeters(162.15), 
                 Units.inchesToMeters(72),
                 new Rotation3d()
             )
         ),
         SHUTTLE_LEFT(
             new Pose3d(
-                Units.inchesToMeters(79.3), 
                 Units.inchesToMeters(79.3),
+                Units.inchesToMeters(79.3), 
                 Units.inchesToMeters(0),
                 new Rotation3d()
             )
         ),
         SHUTTLE_RIGHT(
             new Pose3d(
-                Units.inchesToMeters(238.4), 
                 Units.inchesToMeters(79.3),
+                Units.inchesToMeters(238.4), 
                 Units.inchesToMeters(0),
                 new Rotation3d()
             )
@@ -153,6 +153,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
+    private final StructPublisher<Translation3d> ToTargetPublisher;
 
     public TurretSubsystem(
         SwerveSubsystem swerveSubsystem,
@@ -249,6 +250,9 @@ public class TurretSubsystem extends SubsystemBase {
 
         TargetPositionPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Turret/Target_position", Pose3d.struct)
+            .publish();
+        ToTargetPublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Turret/to_target", Translation3d.struct)
             .publish();
 
         targetVelocity = 0;
@@ -361,10 +365,12 @@ public class TurretSubsystem extends SubsystemBase {
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
-                MathUtil.clamp(
-                    getLauncherVelocity(),
-                    TurretConstants.Launcher.MINIMUM_VELOCITY,
-                    TurretConstants.Launcher.MAXIMUM_VELOCITY
+                calculateLauncherToExitVelocity(
+                    MathUtil.clamp(
+                        getLauncherVelocity(),
+                        TurretConstants.Launcher.MINIMUM_VELOCITY,
+                        TurretConstants.Launcher.MAXIMUM_VELOCITY
+                    )
                 ),
                 1
             };
@@ -378,9 +384,7 @@ public class TurretSubsystem extends SubsystemBase {
             // optimizer will be rerun at a frequency that the discrepancies 
             // wont matter
             double [] lowerBounds = {
-                Units.degreesToRadians(
-                    TurretConstants.Yaw.ANGLE_MIN
-                ),
+                Double.MIN_NORMAL,
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
@@ -397,9 +401,7 @@ public class TurretSubsystem extends SubsystemBase {
                 0
             };
             double [] upperBounds = {
-                (Units.degreesToRadians(
-                    TurretConstants.Yaw.ANGLE_MAX
-                ) % (2*Math.PI)),
+                Double.MAX_VALUE,
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
@@ -412,9 +414,9 @@ public class TurretSubsystem extends SubsystemBase {
             double optimalPitch;
             double optimalVelocity;
             double optimalTime;
-
+            
             if (targetingMode != targetingMode.MANUAL) {
-                double[] targetOptimum = targetingOptimizer.optimize(
+                PointValuePair targetOptimum = targetingOptimizer.optimize(
                     new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
                     new ObjectiveFunction(optimizerFunction),
                     GoalType.MINIMIZE,
@@ -423,20 +425,22 @@ public class TurretSubsystem extends SubsystemBase {
                         lowerBounds,
                         upperBounds
                     )
-                ).getPoint();
+                );
+
+                double[] optimalControls = targetOptimum.getPoint();
 
                 // double[] targetOptimum = guess;            
 
-                optimalYaw = targetOptimum[0];
-                optimalPitch = targetOptimum[1];
-                optimalVelocity = targetOptimum[2];
-                optimalTime = targetOptimum[3];
+                optimalYaw = Units.radiansToRotations(optimalControls[0])
+                    % 1;
+                optimalPitch = Units.radiansToRotations(optimalControls[1]);
+                optimalVelocity = optimalControls[2];
+                optimalTime = optimalControls[3];
             } else {
-                optimalYaw = Units.radiansToRotations(targetYaw);
+                optimalYaw = targetYaw;
                 optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
                 optimalVelocity = targetVelocity;
                 optimalTime = 0;
-                
             }
 
             // calculate voltages and send to motors
@@ -490,6 +494,15 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     )
             );
+            //targeting
+            ToTargetPublisher.set(toTarget);
+            SmartDashboard.putNumber(
+                "Turret/Targeting/absolute_angle_to_target",
+                Math.atan2(
+                    toTarget.getY(),
+                    toTarget.getX()
+                )
+            );
             // launcher
             SmartDashboard.putNumber(
                 "Turret/Launcher/Target_velocity", 
@@ -504,7 +517,7 @@ public class TurretSubsystem extends SubsystemBase {
                 atVelocity
             );
             SmartDashboard.putNumber(
-                "Turret/Launchere/pid_profile",
+                "Turret/Launcher/pid_profile",
                 isLaunching.getAsBoolean()
                     ? 1
                     : 0
@@ -528,10 +541,27 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Yaw/Set_yaw",
                 setYaw
             );
-
-
-
-            SmartDashboard.putNumber("test_shooter_targetV", setVelocity);
+            // optimizer
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Yaw", 
+                optimalYaw
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Pitch", 
+                optimalPitch
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Speed", 
+                optimalVelocity
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Time", 
+                optimalTime
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Error", 
+                optimalTime
+            );
         }
         // targeting
         SmartDashboard.putString(
@@ -647,10 +677,14 @@ public class TurretSubsystem extends SubsystemBase {
         return m_LauncherMotor.getVelocity().getValueAsDouble();
     }
 
-    // TODO: this
-    private double calculateExitToLauncherVelocity(double exitVelocity) {
-        return (TurretConstants.Launcher.VelocityRegression.A * exitVelocity)
+    private double calculateLauncherToExitVelocity(double launcherVelocity) {
+        return (TurretConstants.Launcher.VelocityRegression.A * launcherVelocity)
             + TurretConstants.Launcher.VelocityRegression.B; 
+    }
+
+    private double calculateExitToLauncherVelocity(double exitVelocity) {
+        return (exitVelocity - TurretConstants.Launcher.VelocityRegression.B)
+            / TurretConstants.Launcher.VelocityRegression.A;
     }
     
     public Command zeroYawCommand() {
@@ -802,7 +836,7 @@ public class TurretSubsystem extends SubsystemBase {
     ) {
         this.targetingMode = TargetingMode.MANUAL;
         this.targetVelocity = velocity;
-        this.targetYaw = yaw;
+        this.targetYaw = Units.degreesToRotations(yaw);
     }
     
     public boolean isAtVelocity() {
