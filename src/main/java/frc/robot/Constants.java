@@ -80,8 +80,8 @@ public final class Constants {
   public static final class FieldConstants {
     public static final double GRAVITY = 9.81;
 
-    public static final double FIELD_LENGTH = Units.inchesToMeters(690.876);
-    public static final double FIELD_WIDTH = Units.inchesToMeters(317);
+    public static final double FIELD_LENGTH = Units.inchesToMeters(651.2);
+    public static final double FIELD_WIDTH = Units.inchesToMeters(317.7);
 
     public static Alliance getAlliance() {
       if (DriverStation.getAlliance().isPresent()) {
