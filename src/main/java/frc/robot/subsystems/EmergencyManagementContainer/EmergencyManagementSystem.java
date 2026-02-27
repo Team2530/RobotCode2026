@@ -6,6 +6,7 @@
 package frc.robot.subsystems.EmergencyManagementContainer;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.ClimberCommand;
@@ -37,6 +38,11 @@ public class EmergencyManagementSystem extends SubsystemBase {
             emergencyManagementSystem.setEMSoutput(EMSoutput.LAUNCHERTRIGGER);
 
         }
+        if (EMSClimber) {
+            emergencyManagementSystem.setEMSoutput(EMSoutput.CLIMBERTRIGGER);
+            new WaitCommand(5);
+            emergencyManagementSystem.setEMSoutput(EMSoutput.INACTIVE);
+        }
         else {
             emergencyManagementSystem.setEMSoutput(EMSoutput.INACTIVE);
         }
@@ -67,7 +73,7 @@ public class EmergencyManagementSystem extends SubsystemBase {
         }
     }
 
-    public enum EMSoutput{ //Control panel. Developed Triggers: Launcher, Intake. Developed Buttons: Intake.
+    public enum EMSoutput{ //Control panel. Developed Triggers: Launcher, Intake, Climber. Developed Buttons: Intake, Launcher, Climber.
         INACTIVE,
         INTAKETRIGGER,
         LAUNCHERTRIGGER,

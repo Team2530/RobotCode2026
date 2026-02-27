@@ -170,6 +170,11 @@ public class RobotContainer {
             operatorXbox.b().whileFalse(new InstantCommand(() -> {
                 EmergencyManagementSystem.setEMSLauncher(false);
             }));
+
+            // EMS Climber (Lifts climber up to max)
+            operatorXbox.leftBumper().onTrue(new InstantCommand(() -> {
+                EmergencyManagementSystem.setEMSClimber(true);
+            }));
         }
 
     // Autonomous chooser
