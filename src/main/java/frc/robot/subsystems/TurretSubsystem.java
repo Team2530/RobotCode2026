@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -153,6 +152,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
+    private final StructPublisher<Translation3d> ToTargetPublisher;
 
     public TurretSubsystem(
         SwerveSubsystem swerveSubsystem,
@@ -249,6 +249,9 @@ public class TurretSubsystem extends SubsystemBase {
 
         TargetPositionPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Turret/Target_position", Pose3d.struct)
+            .publish();
+        ToTargetPublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Turret/to_target", Translation3d.struct)
             .publish();
 
         targetVelocity = 0;
@@ -490,6 +493,8 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     )
             );
+            //targeting
+            ToTargetPublisher.set(toTarget);
             // launcher
             SmartDashboard.putNumber(
                 "Turret/Launcher/Target_velocity", 
@@ -528,10 +533,6 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Yaw/Set_yaw",
                 setYaw
             );
-
-
-
-            SmartDashboard.putNumber("test_shooter_targetV", setVelocity);
         }
         // targeting
         SmartDashboard.putString(
