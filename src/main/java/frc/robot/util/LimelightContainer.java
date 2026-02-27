@@ -95,6 +95,17 @@ public class LimelightContainer {
     }
   }
 
+  public void snapToVision(SwerveDrive swerve) {
+    for (Limelight limelight : limelights) {
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
+
+      if (mt1 != null && mt1.tagCount > 0 ) {
+        swerve.resetOdometry(mt1.pose);
+        return;
+      }
+    }
+  }
+
   public void estimateMT1OdometryPrelim(SwerveDrivePoseEstimator odometry, ChassisSpeeds speeds, Pigeon2 pigeon,
       SwerveModulePosition[] swerveModulePositions) {
     for (Limelight limelight : limelights) {
@@ -112,37 +123,6 @@ public class LimelightContainer {
       if (!doRejectUpdate) {
         odometry.resetPosition(mt1.pose.getRotation(), swerveModulePositions, mt1.pose);
         SmartDashboard.putString("Pos MT1 prelim: ", mt1.pose.toString() + " " + RLCountermt1);
-        limelight.pushPoseToShuffleboard(mt1.pose);
-      }
-      RLCountermt1++;
-    }
-  }
-
-  public void estimateMT1Odometry(SwerveDrive swerveDrive) {
-    for (Limelight limelight : limelights) {
-      boolean doRejectUpdate = false;
-      
-      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
-      if (mt1 == null) {
-        continue;
-      }
-      if (mt1.tagCount == 0) {
-        doRejectUpdate = true;
-      }
-      if (mt1.avgTagDist < Units.feetToMeters(10)) { // origanally 10ft, for testing set to 2ft.
-        doRejectUpdate = true;
-      }
-      if (doRotationRejection(swerveDrive.getGyro(),720)) {
-        doRejectUpdate = true;
-      }
-
-
-      if (!doRejectUpdate) {
-        // Use realistic vision measurement standard deviations (meters, meters, radians)
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.15, 0.15, Units.degreesToRadians(5.0)));
-        swerveDrive.addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
-
-        SmartDashboard.putString("Pos MT1: ", mt1.pose.toString() + " " + RLCountermt1);
         limelight.pushPoseToShuffleboard(mt1.pose);
       }
       RLCountermt1++;

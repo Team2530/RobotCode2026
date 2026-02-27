@@ -44,6 +44,7 @@ import swervelib.imu.Pigeon2Swerve;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.util.LimelightContainer;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.choreoConstants;
@@ -301,6 +302,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     };
 
+
      public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = getPose();
@@ -334,12 +336,11 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         if (Robot.isSimulation()) {
             LimelightContainer.estimateSimOdometry();
-        } else {
-            RobotContainer.LLContainer.estimateMT2Odometry(swerveDrive);
-
+        } else 
+            RobotContainer.LLContainer.estimateMT2Odometry(this.swerveDrive);
             posePublisher.set(swerveDrive.getPose());
         }
-    }
+    
 
     @Override
     public void simulationPeriodic() {}
@@ -464,5 +465,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Field2d getField() {
         return swerveDrive.field;
+    }
+    
+        public SwerveDrive getSwerveDrive() {
+        return this.swerveDrive;
     }
 }
