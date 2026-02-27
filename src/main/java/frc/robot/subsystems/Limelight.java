@@ -57,7 +57,7 @@ public class Limelight extends SubsystemBase {
 
         SmartDashboard.putNumber(
             name + "/initialize_time",
-            startTime - Timer.getMatchTime()
+            Timer.getTimestamp() - startTime
         );
     }
 
