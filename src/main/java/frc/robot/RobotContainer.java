@@ -51,13 +51,13 @@ import frc.robot.subsystems.LoaderSubsystem;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
-    private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-bt", true, true);
+    private static final Limelight LL_BT = new Limelight(LimelightType.LL4, "limelight-bt", true, true);
+    private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
-    private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-fl", true, true);
-    private static final Limelight LL_BF = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
+    private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
 
     //initalizing limelight container (Group)
-    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BF, LL_BL, LL_BR, LL_FR);// remove the turret limelight, should not be used for odometry.
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_BR, LL_FR);// remove the turret limelight, should not be used for odometry.
     // @Logged
     public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged
@@ -65,7 +65,6 @@ public class RobotContainer {
 
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-    // private final LimeLightSubsystem limeLightSubsystem = new
     public final AutoChooser autoChooser = new AutoChooser();
     // LimeLightSubsystem();
     @Logged
@@ -199,9 +198,7 @@ public class RobotContainer {
             .whileTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setTarget(
-                            TurretTargets.HUB
-                        );
+                        turretSubsystem.setTarget(TurretTargets.HUB);
                     }
                 )
             );
@@ -209,9 +206,7 @@ public class RobotContainer {
             .whileTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setTarget(
-                            TurretTargets.SHUTTLE_LEFT
-                        );
+                        turretSubsystem.setTarget(TurretTargets.SHUTTLE_LEFT);
                     }
                 )
             );
@@ -219,9 +214,7 @@ public class RobotContainer {
             .whileTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setTarget(
-                            TurretTargets.SHUTTLE_RIGHT
-                        );
+                        turretSubsystem.setTarget(TurretTargets.SHUTTLE_RIGHT);
                     }
                 )
             );

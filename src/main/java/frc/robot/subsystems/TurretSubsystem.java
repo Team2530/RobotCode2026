@@ -159,6 +159,8 @@ public class TurretSubsystem extends SubsystemBase {
         SwerveSubsystem swerveSubsystem,
         BooleanSupplier isLaunching
     ) {
+        double startTime = Timer.getTimestamp(); 
+        
         this.swerveSubsystem = swerveSubsystem;
         this.isLaunching = isLaunching;
         // Initialize Motors and Encoders
@@ -255,6 +257,10 @@ public class TurretSubsystem extends SubsystemBase {
         targetVelocity = 0;
 
         atVelocity = false;
+        SmartDashboard.putNumber(
+            "Turret/initialize_time",
+            Timer.getTimestamp() - startTime
+        );
     }
 
     private double relativeAngularVelocityFromLinear(
