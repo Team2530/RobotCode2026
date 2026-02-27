@@ -483,10 +483,10 @@ public final class Constants {
 
         // TODO: update
         // position relative to the center of the robot, in meters
-        public static final double X = Units.inchesToMeters(10);
-        public static final double Y = Units.inchesToMeters(10);
+        public static final double X = Units.inchesToMeters(8.625);
+        public static final double Y = Units.inchesToMeters(1.375);
         // Height of Shooter from Ground, in meters
-        public static final double Z = Units.inchesToMeters(20); 
+        public static final double Z = Units.inchesToMeters(9.375); 
         public static final Translation3d TRANSLATION = new Translation3d(
             X,
             Y,
@@ -496,7 +496,7 @@ public final class Constants {
 
     public static final class TargetingOptimizer {
         public static final int INTERPOLATION_POINTS = 9;
-        public static final int MAX_EVALUATIONS = 1000;
+        public static final int MAX_EVALUATIONS = 5000;
         
         public static final double MAXIMUM_TIME = 5;
     }
@@ -518,8 +518,8 @@ public final class Constants {
 
       public static final class PID {
         public static final double P = 1;
-        public static final double I = 1;
-        public static final double D = 1;
+        public static final double I = 0;
+        public static final double D = 0;
       }
   }
 }
