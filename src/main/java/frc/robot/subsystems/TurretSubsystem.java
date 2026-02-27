@@ -311,13 +311,13 @@ public class TurretSubsystem extends SubsystemBase {
                         * Math.cos(pitch) 
                         * Math.cos(yaw) 
                         * time;
-                    dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
+                    //dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
                     // Y component of the ball's position relative to the robot. 
                     double dby = speed 
                         * Math.cos(pitch) 
                         * Math.sin(yaw) 
                         * time;
-                    dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
+                    //dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
                     // Z (vertical) component of the ball's position relative to the robot. 
                     double dbz = (
                         -0.5 
@@ -397,9 +397,9 @@ public class TurretSubsystem extends SubsystemBase {
                 0
             };
             double [] upperBounds = {
-                Units.degreesToRadians(
+                (Units.degreesToRadians(
                     TurretConstants.Yaw.ANGLE_MAX
-                ),
+                ) % (2*Math.PI)),
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
@@ -429,14 +429,14 @@ public class TurretSubsystem extends SubsystemBase {
 
                 optimalYaw = targetOptimum[0];
                 optimalPitch = targetOptimum[1];
-                // double optimalVelocity = targetOptimum[2];
-                optimalVelocity = targetVelocity;
+                optimalVelocity = targetOptimum[2];
                 optimalTime = targetOptimum[3];
             } else {
-                optimalYaw = Units.degreesToRotations(targetYaw);
+                optimalYaw = Units.radiansToRotations(targetYaw);
                 optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
                 optimalVelocity = targetVelocity;
                 optimalTime = 0;
+                
             }
 
             // calculate voltages and send to motors
@@ -457,10 +457,10 @@ public class TurretSubsystem extends SubsystemBase {
 
             double setYaw = MathUtil.clamp(
                 optimalYaw,
-                Units.degreesToRadians(
+                Units.degreesToRotations(
                     TurretConstants.Yaw.ANGLE_MIN
                 ),
-                Units.degreesToRadians(
+                Units.degreesToRotations(
                     TurretConstants.Yaw.ANGLE_MAX
                 )
             );
@@ -523,6 +523,13 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Pitch/Target_pitch",
                 optimalPitch
             );
+
+            SmartDashboard.putNumber(
+                "Turret/Yaw/Set_yaw",
+                setYaw
+            );
+
+
 
             SmartDashboard.putNumber("test_shooter_targetV", setVelocity);
         }
