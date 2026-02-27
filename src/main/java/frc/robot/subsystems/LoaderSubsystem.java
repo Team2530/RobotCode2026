@@ -10,7 +10,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,7 +20,6 @@ public class LoaderSubsystem extends SubsystemBase {
     private final TalonFX m_LoaderMotor;
 
     public LoaderSubsystem() {
-        double startTime = Timer.getTimestamp();
         m_LoaderMotor = new TalonFX(
             LoaderConstants.CAN_ID
         );
@@ -42,10 +40,6 @@ public class LoaderSubsystem extends SubsystemBase {
             );
 
         stop();
-        SmartDashboard.putNumber(
-            "Loader/initialize_time",
-            startTime - Timer.getTimestamp()
-        );
     }
 
     @Override
