@@ -348,19 +348,28 @@ public class TurretSubsystem extends SubsystemBase {
                 }
             };
            
-            // use difference to set guess and optimize from there
+            // use difference to set guess and optimize from there--Start 
+            // optimizer at current position to reduce optimization time.
+            //
+            // the weird clamping bounds are due to the fact that the 
+            // optimizer crashes when the starting guess is at the bounds
+            // {
+            //   - yaw
+            //   - pitch
+            //   - exit velocity
+            //   - time
+            // }
+
+            double boundsAdjustment = 0.00000000001;
             double[] guess = {
-                // Start optimizer at current position to reduce optimization 
-                // time.
                 MathUtil.clamp(
                     getYaw(),
                     Units.degreesToRadians(
                         TurretConstants.Yaw.ANGLE_MIN
-
-                    ),
+                    ) + boundsAdjustment,
                     Units.degreesToRadians(
                         TurretConstants.Yaw.ANGLE_MAX
-                    )
+                    ) - boundsAdjustment
                 ),               
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
@@ -368,11 +377,13 @@ public class TurretSubsystem extends SubsystemBase {
                 calculateLauncherToExitVelocity(
                     MathUtil.clamp(
                         getLauncherVelocity(),
-                        TurretConstants.Launcher.MINIMUM_VELOCITY,
+                        TurretConstants.Launcher.MINIMUM_VELOCITY
+                            + boundsAdjustment,
                         TurretConstants.Launcher.MAXIMUM_VELOCITY
+                            - boundsAdjustment
                     )
                 ),
-                1
+                boundsAdjustment
             };
 
             // WARNING: the minimum pitch of the turret is dependent on the yaw, 
@@ -397,7 +408,9 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     )
                 ),*/
-                TurretConstants.Launcher.MINIMUM_VELOCITY,
+                calculateLauncherToExitVelocity( 
+                    TurretConstants.Launcher.MINIMUM_VELOCITY
+                ),
                 0
             };
             double [] upperBounds = {
@@ -406,7 +419,9 @@ public class TurretSubsystem extends SubsystemBase {
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
                 /*TurretConstants.Pitch.ANGLE_MAX,*/
-                TurretConstants.Launcher.MAXIMUM_VELOCITY,
+                calculateLauncherToExitVelocity(
+                    TurretConstants.Launcher.MAXIMUM_VELOCITY
+                ),
                 TurretConstants.TargetingOptimizer.MAXIMUM_TIME
             };
 
