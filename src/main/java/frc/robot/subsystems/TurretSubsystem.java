@@ -454,8 +454,8 @@ public class TurretSubsystem extends SubsystemBase {
                 new VelocityTorqueCurrentFOC(setVelocity)
                     .withSlot(
                         isLaunching.getAsBoolean()
-                            ? 1
-                            : 0 // use more sensitive profile while launching
+                            ? 1 // use more sensitive profile while launching
+                            : 0
                     )
             );
 
