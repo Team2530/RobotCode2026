@@ -7,6 +7,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.subsystems.EmergencyManagementContainer.EmergencyManagementSystem.EMSoutput;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -21,6 +23,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public static SwerveSubsystem SwerveSubsystem;
 
     private final TalonFX m_Motor;
+    public LauncherPresets LauncherPresets;
     
     
 
@@ -42,6 +45,21 @@ public class LauncherSubsystem extends SubsystemBase {
   public void stopLauncher() {
     m_Motor.set(0.0);
   }
+  public void reverseLauncher() {
+    m_Motor.set(-LauncherSpeed);
+  }
+
+  @SuppressWarnings("static-access")
+  public void setLauncherPresets(LauncherPresets launch){
+    this.LauncherPresets = launch;
+
+    if (LauncherPresets.EMS == launch) {
+      reverseLauncher();
+    }
+    else {
+      stopLauncher();
+    }
+  }
 
   public void initalize() { //Helps make trigger keys
     if (output == true) {
@@ -60,5 +78,10 @@ public class LauncherSubsystem extends SubsystemBase {
   public boolean getOutput() {
     return output;
   }
-  
+  public enum LauncherPresets{
+    IDLE,
+    FIRING,
+    EMS,
+  }
+
 }

@@ -153,12 +153,22 @@ public class RobotContainer {
                 IntakeCommand.setDown(1);
             }));
 
-            // EMS for Intake (Emergency Use, Reverses Intake to clear)
+            // EMS buttons, change if you like :>
+
+            // EMS Intake (Reverses Intake)
             operatorXbox.y().whileTrue(new InstantCommand(() -> {
                 EmergencyManagementSystem.setEMSIntake(true);
             }));
             operatorXbox.y().whileFalse(new InstantCommand(() -> {
                 EmergencyManagementSystem.setEMSIntake(false);
+            }));
+
+            // EMS Launcher (Reverses Launcher)
+            operatorXbox.b().whileTrue(new InstantCommand(() -> {
+                EmergencyManagementSystem.setEMSLauncher(true);
+            }));
+            operatorXbox.b().whileFalse(new InstantCommand(() -> {
+                EmergencyManagementSystem.setEMSLauncher(false);
             }));
         }
 

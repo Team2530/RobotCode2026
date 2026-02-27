@@ -6,12 +6,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import edu.wpi.first.wpilibj2.command.WaitCommand;
 // import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.commands.ClimberCommand.ClimbPresets;
+import frc.robot.subsystems.EmergencyManagementContainer.EmergencyManagementSystem;
+import frc.robot.subsystems.EmergencyManagementContainer.EmergencyManagementSystem.EMSoutput;
 
 /*
  * FILE POSSIBLE WILL BE DEPRICATED FOR TOURNAMENT
@@ -69,6 +72,11 @@ public class ClimberSubsystem extends SubsystemBase {
         m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
 
       }
+      if (ClimbPresets.CLIMBINGEMS == climb) {
+            m_climbsubsystemMotor.set(Constants.ClimbMotors.CLIMB_SPEED);
+            new WaitCommand(5); //TODO: Update to reasonable time
+            m_climbsubsystemMotor.set(0);
+        }
     }
 
     public void runClimb() {

@@ -7,12 +7,22 @@ package frc.robot.subsystems.EmergencyManagementContainer;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.commands.ClimberCommand;
+import frc.robot.commands.ClimberCommand.ClimbPresets;
+import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.IntakeSubsystem.IntakePresets;
+import frc.robot.subsystems.LauncherSubsystem.LauncherPresets;
 
 public class EmergencyManagementSystem extends SubsystemBase {
     //use this space to defind other thing before linker
     
     public EMSoutput EMSoutput;
     private EmergencyManagementSystem emergencyManagementSystem;
+    private IntakeSubsystem subsystem;
+    private LauncherSubsystem subsystem2;
+    private ClimberSubsystem subsystem3;
     
     public EmergencyManagementSystem() { //Linker
 
@@ -25,29 +35,39 @@ public class EmergencyManagementSystem extends SubsystemBase {
         }
         if (EMSLauncher) {
             emergencyManagementSystem.setEMSoutput(EMSoutput.LAUNCHERTRIGGER);
+
         }
         else {
             emergencyManagementSystem.setEMSoutput(EMSoutput.INACTIVE);
         }
 
     }
-    
+    public EmergencyManagementSystem(IntakeSubsystem subsystem) {
+        this.subsystem = subsystem;
+    }
+
     @SuppressWarnings("static-access")
     public void setEMSoutput(EMSoutput active){
         this.EMSoutput = active;
 
         if (EMSoutput.INTAKETRIGGER == active) {
             SmartDashboard.putString("Emergency Management System", "Intake has triggered 'Emergency Mode'");
+            subsystem.setIntakePreset(IntakePresets.INTAKECLEAR);
         }
         if (EMSoutput.LAUNCHERTRIGGER == active) {
-            SmartDashboard.putString("Emergency Managment System","Launcher has triggered 'Emergency Mode");
+            SmartDashboard.putString("Emergency Management System","Launcher has triggered 'Emergency Mode");
+            subsystem2.setLauncherPresets(LauncherPresets.EMS);
+        }
+        if (EMSoutput.CLIMBERTRIGGER == active) {
+            SmartDashboard.putString("Emergency Management System","Climber has triggered 'Emergency Mode'");
+            subsystem3.setClimbPreset(ClimbPresets.CLIMBINGEMS);
         }
         else {
             SmartDashboard.putString("Emergency Management System", "System Inactive, no emergencies being delt with");
         }
     }
 
-    public enum EMSoutput{ //Control panel, only intake has this system installed
+    public enum EMSoutput{ //Control panel. Developed Triggers: Launcher, Intake. Developed Buttons: Intake.
         INACTIVE,
         INTAKETRIGGER,
         LAUNCHERTRIGGER,
@@ -69,5 +89,13 @@ public class EmergencyManagementSystem extends SubsystemBase {
     } 
     public boolean getEMSLauncher() {
         return EMSLauncher;
+    }
+    public static Boolean EMSClimber;
+    
+    public static void setEMSClimber(Boolean emsclimber) {
+        EmergencyManagementSystem.EMSClimber = emsclimber;
+    } 
+    public boolean getEMSClimber() {
+        return EMSClimber;
     }
 }   
