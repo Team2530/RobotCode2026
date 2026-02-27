@@ -20,7 +20,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public IndexerSubsystem() {
         double startTime = Timer.getMatchTime();
-
+        
         m_IndexerMotor = new SparkMax(
             IndexerConstants.CAN_ID,
             MotorType.kBrushless
@@ -41,7 +41,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber(
             "Indexer/initialize_time",
-            Timer.getTimestamp() - startTime
+            startTime - Timer.getTimestamp()
         );
     }
 

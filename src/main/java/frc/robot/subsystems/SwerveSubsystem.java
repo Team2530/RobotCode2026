@@ -303,7 +303,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber(
             "Swerve/initialize_time",
-            Timer.getTimestamp() - startTime
+            startTime - Timer.getTimestamp()
         );
     };
 

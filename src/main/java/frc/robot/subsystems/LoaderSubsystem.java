@@ -44,7 +44,7 @@ public class LoaderSubsystem extends SubsystemBase {
         stop();
         SmartDashboard.putNumber(
             "Loader/initialize_time",
-            Timer.getTimestamp() - startTime
+            startTime - Timer.getTimestamp()
         );
     }
 

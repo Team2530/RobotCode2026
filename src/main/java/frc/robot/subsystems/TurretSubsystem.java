@@ -258,7 +258,7 @@ public class TurretSubsystem extends SubsystemBase {
         atVelocity = false;
         SmartDashboard.putNumber(
             "Turret/initialize_time",
-            Timer.getTimestamp() - startTime
+            startTime - Timer.getTimestamp()
         );
     }
 
