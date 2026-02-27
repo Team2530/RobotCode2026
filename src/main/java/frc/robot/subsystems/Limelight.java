@@ -51,7 +51,7 @@ public class Limelight extends SubsystemBase {
         this.isEnabled = isEnabled;
         this.cropEnabled = cropEnabled;
 
-        publisher = NetworkTableInstance.getDefault().getStructTopic(name+" Pose2d", Pose2d.struct).publish();
+        publisher = NetworkTableInstance.getDefault().getStructTopic("LimelightPoses/"+name+" Pose2d", Pose2d.struct).publish();
 
         LimelightHelpers.SetIMUMode(name, 1);
 
@@ -180,7 +180,7 @@ public class Limelight extends SubsystemBase {
     public double getHFOV() {return limelightType.HFOV;}
 
     /** Set the publisher's pose. */
-    public void pushPoseToShuffleboard(String name, Pose2d pose) {
+    public void pushPoseToShuffleboard(Pose2d pose) {
         publisher.set(pose);
     }
 
