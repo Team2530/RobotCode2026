@@ -64,7 +64,7 @@ public class LimelightContainer {
         doRejectUpdate = true;
       }
       if (!doRejectUpdate) {
-        limelight.pushPoseToShuffleboard(limelight.getName() + " MT2Pose", mt2.pose);
+        limelight.pushPoseToShuffleboard(mt2.pose);
         SmartDashboard.putString(limelight.getName() + " Pose: ", mt2.pose.toString() + SIMCOUNTER);
         SIMCOUNTER++;
       }
@@ -88,8 +88,8 @@ public class LimelightContainer {
         doRejectUpdate = true;
       }
       if (!doRejectUpdate) {
-        limelight.pushPoseToShuffleboard(limelight.getName() + " MT2Pose", mt2Estimation.pose);
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(3, 3, 9999999));
+        limelight.pushPoseToShuffleboard(mt2Estimation.pose);
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(1, 1, 999));
         swerveDrive.addVisionMeasurement(mt2Estimation.pose, mt2Estimation.timestampSeconds);
       }
     }
@@ -112,7 +112,7 @@ public class LimelightContainer {
       if (!doRejectUpdate) {
         odometry.resetPosition(mt1.pose.getRotation(), swerveModulePositions, mt1.pose);
         SmartDashboard.putString("Pos MT1 prelim: ", mt1.pose.toString() + " " + RLCountermt1);
-        limelight.pushPoseToShuffleboard(limelight.getName() + " mt1", mt1.pose);
+        limelight.pushPoseToShuffleboard(mt1.pose);
       }
       RLCountermt1++;
     }
@@ -143,7 +143,7 @@ public class LimelightContainer {
         swerveDrive.addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
 
         SmartDashboard.putString("Pos MT1: ", mt1.pose.toString() + " " + RLCountermt1);
-        limelight.pushPoseToShuffleboard(limelight.getName() + " mt1", mt1.pose);
+        limelight.pushPoseToShuffleboard(mt1.pose);
       }
       RLCountermt1++;
     }

@@ -1,12 +1,13 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import choreo.auto.AutoChooser;
+import choreo.auto.*;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -50,13 +51,13 @@ import frc.robot.subsystems.LoaderSubsystem;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
+    private static final Limelight LL_BT = new Limelight(LimelightType.LL4, "limelight-bt", true, true);
     private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
     private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
-    private static final Limelight LL_BF = new Limelight(LimelightType.LL4, "limelight-bf", true, true);
 
     //initalizing limelight container (Group)
-    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BF, LL_BL, LL_BR, LL_FR);
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_BR, LL_FR);// remove the turret limelight, should not be used for odometry.
     // @Logged
     public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged
@@ -64,10 +65,7 @@ public class RobotContainer {
 
     @Logged
     public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-
-    // Autonomous chooser
-    private final AutoChooser autoChooser = new AutoChooser();
-    // private final LimeLightSubsystem limeLightSubsystem = new
+    public final AutoChooser autoChooser = new AutoChooser();
     // LimeLightSubsystem();
     @Logged
     private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
@@ -75,9 +73,28 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     private final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    private final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
+    private final TurretSubsystem turretSubsystem = new TurretSubsystem(
+        swerveDriveSubsystem,
+        new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean() {
+                return operatorXbox.getHID()
+                    .getBackButtonPressed();
+            }
+        }
+    );
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
+    private final AutoFactory autoFactory = new AutoFactory(
+          swerveDriveSubsystem::getPose, // A function that returns the current robot pose
+          swerveDriveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+          swerveDriveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
+          true, // If alliance flipping should be enabled 
+          swerveDriveSubsystem // The drive subsystem
+    );
+
+    private final String[] autos = {"NewAuto"};
+
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -94,6 +111,26 @@ public class RobotContainer {
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
+        for (String trajName : autos) {
+            autoChooser.addRoutine(trajName+"_routine", () -> {
+                AutoRoutine routine = autoFactory.newRoutine(trajName+"_routine");
+                AutoTrajectory trajectory = routine.trajectory(trajName);
+
+                routine.active().onTrue(
+                    Commands.sequence(
+                        trajectory.resetOdometry(),
+                        trajectory.cmd()
+                    )
+                );
+
+                // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
+
+                
+
+                return routine;
+            });
+        }
+        SmartDashboard.putData(autoChooser);
     }
 
     
@@ -141,13 +178,46 @@ public class RobotContainer {
             );
 
         operatorXbox.rightTrigger(0.3)
+        .and(
+            new BooleanSupplier() {
+                @Override
+                public boolean getAsBoolean() {
+                    return turretSubsystem.isAtVelocity();
+                }
+            }
+        )
             .whileTrue(
-                new RunLoaderCommand(loaderSubsystem)
-            ).whileTrue(
-                new RunIndexerCommand(indexerSubsystem)
+                new ParallelCommandGroup(
+                    new RunLoaderCommand(loaderSubsystem),
+                    new RunIndexerCommand(indexerSubsystem)
+                )
             );
 
         
+        operatorXbox.rightBumper()
+            .whileTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setTarget(TurretTargets.HUB);
+                    }
+                )
+            );
+        operatorXbox.x()
+            .whileTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setTarget(TurretTargets.SHUTTLE_LEFT);
+                    }
+                )
+            );
+        operatorXbox.b()
+            .whileTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setTarget(TurretTargets.SHUTTLE_RIGHT);
+                    }
+                )
+            );
         operatorXbox.start()
             .onTrue(
                 turretSubsystem.zeroYawCommand()
@@ -199,7 +269,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(52, 43);
+                        turretSubsystem.setManualControl(52, 45);
                     }
                 )
             );
@@ -207,7 +277,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(329, 42);
+                        turretSubsystem.setManualControl(329, 42.5);
                     }
                 )
             );
@@ -215,7 +285,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(0, 50);
+                        turretSubsystem.setManualControl(0, 48.5);
                     }
                 )
             );

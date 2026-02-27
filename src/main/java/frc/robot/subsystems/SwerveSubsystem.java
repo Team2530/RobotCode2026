@@ -8,16 +8,19 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.units.measure.Distance;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -43,9 +46,15 @@ import frc.robot.Constants.RobotConstants;
 import frc.robot.util.LimelightContainer;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.choreoConstants;
+
 
 public class SwerveSubsystem extends SubsystemBase {
-
+    //Choreo PID Controllers
+    private final PIDController xController = choreoConstants.x_CONTROLLER.getPIDController();
+    private final PIDController yController = choreoConstants.y_CONTROLLER.getPIDController();
+    private final PIDController headingController = choreoConstants.heading_CONTROLLER.getPIDController();
+    
     private final SwerveDrive swerveDrive;
 
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
@@ -67,33 +76,6 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public SwerveSubsystem() {
-
-        
-
-        // register gearshifter with smartdashboard
-        gearChooser = new SendableChooser<>();
-
-        gearChooser.addOption(
-            SwerveGearing.LIGHT.toString(),
-            SwerveGearing.LIGHT
-        );
-        gearChooser.setDefaultOption(
-            SwerveGearing.RIDICULUS.toString(),
-            SwerveGearing.RIDICULUS
-        );
-        gearChooser.addOption(
-            SwerveGearing.LUDICRUS.toString(),
-            SwerveGearing.LUDICRUS
-        );
-
-        gearChooser.onChange(gearing -> changeGearing(gearing));
-
-        SmartDashboard.putData("Swerve Drive Gearing", gearChooser);
-
-        // register sysId commands with smartdashboard
-        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
-        SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
-
         // instantiate yagsl library classes
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -113,20 +95,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     }};
                 }};
 
-            PIDFConfig drivePID = new PIDFConfig(
-                DriveConstants.PIDs.Drive.P,
-                DriveConstants.PIDs.Drive.I,
-                DriveConstants.PIDs.Drive.D,
-                DriveConstants.PIDs.Drive.F,
-                DriveConstants.PIDs.Drive.IZ
-            );
-            PIDFConfig anglePID = new PIDFConfig(
-                DriveConstants.PIDs.Angle.P,
-                DriveConstants.PIDs.Angle.I,
-                DriveConstants.PIDs.Angle.D,
-                DriveConstants.PIDs.Angle.F,
-                DriveConstants.PIDs.Angle.IZ
-            );
+            PIDFConfig drivePID = DriveConstants.PIDs.Drive.getPIDFConfig();
+            PIDFConfig anglePID = DriveConstants.PIDs.Angle.getPIDFConfig();
+
             SwerveModulePhysicalCharacteristics physicalCharacteristics = 
                 new SwerveModulePhysicalCharacteristics(
                         conversionFactors, 
@@ -267,13 +238,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     physicalCharacteristics
             );
 
-            PIDFConfig headingPID = new PIDFConfig(
-                DriveConstants.PIDs.Heading.P,
-                DriveConstants.PIDs.Heading.I,
-                DriveConstants.PIDs.Heading.D,
-                DriveConstants.PIDs.Heading.F,
-                DriveConstants.PIDs.Heading.IZ
-            );
+            PIDFConfig headingPID = DriveConstants.PIDs.Heading.getPIDFConfig();
 
             SwerveControllerConfiguration controllerConfiguration = 
                 new SwerveControllerConfiguration(
@@ -287,7 +252,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     driveConfiguration, 
                     controllerConfiguration,
                     DriveConstants.MAX_ROBOT_VELOCITY, 
-                    new Pose2d() // TODO: choreo's gonna need a different pose
+                    new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(90))
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -307,7 +272,63 @@ public class SwerveSubsystem extends SubsystemBase {
         //
         // TODO: idk this seems find
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
+
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+        // register gearshifter with smartdashboard
+        gearChooser = new SendableChooser<>();
+
+        gearChooser.addOption(
+            SwerveGearing.LIGHT.toString(),
+            SwerveGearing.LIGHT
+        );
+        gearChooser.setDefaultOption(
+            SwerveGearing.RIDICULUS.toString(),
+            SwerveGearing.RIDICULUS
+        );
+        gearChooser.addOption(
+            SwerveGearing.LUDICRUS.toString(),
+            SwerveGearing.LUDICRUS
+        );
+
+        gearChooser.onChange(gearing -> changeGearing(gearing));
+
+        SmartDashboard.putData("Swerve Drive Gearing", gearChooser);
+
+        // register sysId commands with smartdashboard
+        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
+        SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
+
     };
+
+     public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
+        
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+        
+        
+        setChassisSpeedsAUTO(speeds);
+    }
+
+    public void setChassisSpeedsAUTO(ChassisSpeeds speeds) {
+        double tmp = speeds.vxMetersPerSecond;
+        speeds.vxMetersPerSecond = speeds.vyMetersPerSecond;
+        speeds.vyMetersPerSecond = tmp;
+        tmp = speeds.omegaRadiansPerSecond;
+        speeds.omegaRadiansPerSecond *= -1;
+        
+        this.drive(
+            new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
+            speeds.omegaRadiansPerSecond
+        );
+        
+    }
 
     @Override
     public void periodic() {

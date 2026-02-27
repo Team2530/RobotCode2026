@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -12,10 +13,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,9 +30,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+import java.util.function.BooleanSupplier;
+
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
@@ -43,11 +49,19 @@ import com.revrobotics.spark.SparkMax;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -64,8 +78,8 @@ public class TurretSubsystem extends SubsystemBase {
         // TODO: double check these positions
         HUB(
             new Pose3d(
-                Inches.of(162.15), 
                 Inches.of(182.1),
+                Inches.of(162.15), 
                 Inches.of(72),
                 new Rotation3d()
             )
@@ -80,8 +94,8 @@ public class TurretSubsystem extends SubsystemBase {
         ),
         SHUTTLE_RIGHT(
             new Pose3d(
-                Inches.of(238.4), 
                 Inches.of(79.3),
+                Inches.of(238.4), 
                 Inches.of(0),
                 new Rotation3d()
             )
@@ -114,6 +128,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 
     private final SwerveSubsystem swerveSubsystem; 
+    private final BooleanSupplier isLaunching;
 
     private final TalonFX m_LauncherMotor;
     private final TalonFX m_YawMotor;
@@ -123,10 +138,9 @@ public class TurretSubsystem extends SubsystemBase {
     // lets just pray its a cancoder
     // TODO: this
     // private final CANcoder e_PitchEncoder;
-
     // targets
-    private TurretTargets target;
-    private TargetingMode targetingMode;
+    private TurretTargets target = TurretTargets.HUB;
+    private TargetingMode targetingMode = TargetingMode.MANUAL;
     private Pose3d targetPosition;
 
     private double targetVelocity;
@@ -134,14 +148,20 @@ public class TurretSubsystem extends SubsystemBase {
 
     // yaw logic
     private boolean yawIsZeroed;
+    private boolean atVelocity;
 
     private final BOBYQAOptimizer targetingOptimizer;
 
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
+    private final StructPublisher<Translation3d> ToTargetPublisher;
 
-    public TurretSubsystem(SwerveSubsystem swerveSubsystem) {
+    public TurretSubsystem(
+        SwerveSubsystem swerveSubsystem,
+        BooleanSupplier isLaunching
+    ) {
         this.swerveSubsystem = swerveSubsystem;
+        this.isLaunching = isLaunching;
         // Initialize Motors and Encoders
         m_LauncherMotor = new TalonFX(
             TurretConstants.CanIDs.LAUNCHER_MOTOR
@@ -168,19 +188,27 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     ).withSlot0(
                         new Slot0Configs()
-                            .withKP(TurretConstants.Launcher.PID.P)
-                            .withKI(TurretConstants.Launcher.PID.I)
-                            .withKD(TurretConstants.Launcher.PID.D)
-                            .withKS(TurretConstants.Launcher.Feedforward.kS)
-                            .withKV(TurretConstants.Launcher.Feedforward.kV)
-                            .withKA(TurretConstants.Launcher.Feedforward.kA)
-                    ).withMotionMagic(
-                        new MotionMagicConfigs()
-                            .withMotionMagicExpo_kV(
-                                TurretConstants.Launcher.Feedforward.kV
+                            .withKP(TurretConstants.Launcher.PID.Holding.P)
+                            .withKI(TurretConstants.Launcher.PID.Holding.I)
+                            .withKD(TurretConstants.Launcher.PID.Holding.D)
+                            .withKS(
+                                TurretConstants.Launcher.Feedforward.Holding.kS
                             )
-                            .withMotionMagicExpo_kA(
-                                TurretConstants.Launcher.Feedforward.kA
+                            .withKV(
+                                TurretConstants.Launcher.Feedforward.Holding.kV
+                            )
+                    ).withSlot1(
+                        new Slot1Configs()
+                            .withKP(TurretConstants.Launcher.PID.Launching.P)
+                            .withKI(TurretConstants.Launcher.PID.Launching.I)
+                            .withKD(TurretConstants.Launcher.PID.Launching.D)
+                            .withKS(
+                                TurretConstants.Launcher.Feedforward.Launching
+                                .kS
+                            )
+                            .withKV(
+                                TurretConstants.Launcher.Feedforward.Launching
+                                .kV
                             )
                     )
             );
@@ -203,16 +231,15 @@ public class TurretSubsystem extends SubsystemBase {
                 ).withMotionMagic(
                     new MotionMagicConfigs()
                         .withMotionMagicCruiseVelocity(
-                            TurretConstants.Yaw.VELOCITY_MAX
+                            TurretConstants.Yaw.MAX_VELOCITY
                         ).withMotionMagicAcceleration(
-                            TurretConstants.Yaw.ACCELERATION_MAX
+                            TurretConstants.Yaw.MAX_ACCELERATION
                         )
                 )
             );
 
         // TODO: this
         // e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
-
 
         targetingOptimizer = new BOBYQAOptimizer(
             TurretConstants.TargetingOptimizer.INTERPOLATION_POINTS
@@ -225,8 +252,13 @@ public class TurretSubsystem extends SubsystemBase {
         TargetPositionPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Turret/Target_position", Pose3d.struct)
             .publish();
+        ToTargetPublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Turret/to_target", Translation3d.struct)
+            .publish();
 
         targetVelocity = 0;
+
+        atVelocity = false;
     }
 
     private double relativeAngularVelocityFromLinear(
@@ -245,6 +277,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        //SmartDashboard.putNumber("shooter_velocity", m_LauncherMotor)
         double startTime = Timer.getTimestamp();
         if (yawIsZeroed) {
             // get difference to target
@@ -283,13 +316,13 @@ public class TurretSubsystem extends SubsystemBase {
                         * Math.cos(pitch) 
                         * Math.cos(yaw) 
                         * time;
-                    dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
+                    //dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
                     // Y component of the ball's position relative to the robot. 
                     double dby = speed 
                         * Math.cos(pitch) 
                         * Math.sin(yaw) 
                         * time;
-                    dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
+                    //dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
                     // Z (vertical) component of the ball's position relative to the robot. 
                     double dbz = (
                         -0.5 
@@ -333,10 +366,12 @@ public class TurretSubsystem extends SubsystemBase {
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
-                MathUtil.clamp(
-                    getLauncherVelocity(),
-                    TurretConstants.Launcher.MINIMUM_VELOCITY,
-                    TurretConstants.Launcher.MAXIMUM_VELOCITY
+                calculateLauncherToExitVelocity(
+                    MathUtil.clamp(
+                        getLauncherVelocity(),
+                        TurretConstants.Launcher.MINIMUM_VELOCITY,
+                        TurretConstants.Launcher.MAXIMUM_VELOCITY
+                    )
                 ),
                 1
             };
@@ -350,9 +385,7 @@ public class TurretSubsystem extends SubsystemBase {
             // optimizer will be rerun at a frequency that the discrepancies 
             // wont matter
             double [] lowerBounds = {
-                Units.degreesToRadians(
-                    TurretConstants.Yaw.ANGLE_MIN
-                ),
+                Double.MIN_NORMAL,
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
@@ -369,9 +402,7 @@ public class TurretSubsystem extends SubsystemBase {
                 0
             };
             double [] upperBounds = {
-                Units.degreesToRadians(
-                    TurretConstants.Yaw.ANGLE_MAX
-                ),
+                Double.MAX_VALUE,
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
@@ -384,9 +415,9 @@ public class TurretSubsystem extends SubsystemBase {
             double optimalPitch;
             double optimalVelocity;
             double optimalTime;
-
+            
             if (targetingMode != targetingMode.MANUAL) {
-                double[] targetOptimum = targetingOptimizer.optimize(
+                PointValuePair targetOptimum = targetingOptimizer.optimize(
                     new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
                     new ObjectiveFunction(optimizerFunction),
                     GoalType.MINIMIZE,
@@ -395,48 +426,54 @@ public class TurretSubsystem extends SubsystemBase {
                         lowerBounds,
                         upperBounds
                     )
-                ).getPoint();
+                );
+
+                double[] optimalControls = targetOptimum.getPoint();
 
                 // double[] targetOptimum = guess;            
 
-                optimalYaw = targetOptimum[0];
-                optimalPitch = targetOptimum[1];
-                // double optimalVelocity = targetOptimum[2];
-                optimalVelocity = targetVelocity;
-                optimalTime = targetOptimum[3];
+                optimalYaw = Units.radiansToRotations(optimalControls[0])
+                    % 1;
+                optimalPitch = Units.radiansToRotations(optimalControls[1]);
+                optimalVelocity = optimalControls[2];
+                optimalTime = optimalControls[3];
             } else {
-                optimalYaw = Units.degreesToRadians(targetYaw);
+                optimalYaw = targetYaw;
                 optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
                 optimalVelocity = targetVelocity;
                 optimalTime = 0;
             }
 
             // calculate voltages and send to motors
+            /** targetVelocity Clamped in Rot/s */
             double setVelocity = MathUtil.clamp(
-                targetVelocity,
+                calculateExitToLauncherVelocity(optimalVelocity),
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
             m_LauncherMotor.setControl(
-                new MotionMagicTorqueCurrentFOC(setVelocity)
+                new VelocityTorqueCurrentFOC(setVelocity)
+                    .withSlot(
+                        isLaunching.getAsBoolean()
+                            ? 1
+                            : 0 // use more sensitive profile while launching
+                    )
             );
 
             double setYaw = MathUtil.clamp(
                 optimalYaw,
-                Units.degreesToRadians(
+                Units.degreesToRotations(
                     TurretConstants.Yaw.ANGLE_MIN
                 ),
-                Units.degreesToRadians(
+                Units.degreesToRotations(
                     TurretConstants.Yaw.ANGLE_MAX
                 )
             );
-
-            // TODO: dunno if this allows for motion magic
             // WARNING: not too confident in this math
             m_YawMotor.setControl(
-                    new PositionTorqueCurrentFOC(
-                        setYaw * TurretConstants.Yaw.GEAR_RATIO
-                    )
+                new MotionMagicTorqueCurrentFOC(
+                    setYaw * TurretConstants.Yaw.GEAR_RATIO
+                )
             );
             
             // TODO: this
@@ -458,6 +495,15 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     )
             );
+            //targeting
+            ToTargetPublisher.set(toTarget);
+            SmartDashboard.putNumber(
+                "Turret/Targeting/absolute_angle_to_target",
+                Math.atan2(
+                    toTarget.getY(),
+                    toTarget.getX()
+                )
+            );
             // launcher
             SmartDashboard.putNumber(
                 "Turret/Launcher/Target_velocity", 
@@ -465,17 +511,57 @@ public class TurretSubsystem extends SubsystemBase {
             );
             SmartDashboard.putNumber(
                 "Turret/Launcher/output", 
-                setVelocity 
+                m_LauncherMotor.getMotorVoltage().getValueAsDouble()
+            );
+            SmartDashboard.putBoolean(
+                "Turret/Launcher/at_velocity",
+                atVelocity
+            );
+            SmartDashboard.putNumber(
+                "Turret/Launcher/pid_profile",
+                isLaunching.getAsBoolean()
+                    ? 1
+                    : 0
             );
             // yaw
             SmartDashboard.putNumber(
                 "Turret/Yaw/Target_yaw",
                 optimalYaw
             );
+            SmartDashboard.putNumber(
+                "Turret/Yaw/",
+                m_YawMotor.getMotorOutputStatus().getValueAsDouble() 
+            );
             // pitch
             SmartDashboard.putNumber(
                 "Turret/Pitch/Target_pitch",
                 optimalPitch
+            );
+
+            SmartDashboard.putNumber(
+                "Turret/Yaw/Set_yaw",
+                setYaw
+            );
+            // optimizer
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Yaw", 
+                optimalYaw
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Pitch", 
+                optimalPitch
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Speed", 
+                optimalVelocity
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Time", 
+                optimalTime
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Error", 
+                optimalTime
             );
         }
         // targeting
@@ -492,6 +578,10 @@ public class TurretSubsystem extends SubsystemBase {
             targetingMode.toString()
         );
         // launcher
+        SmartDashboard.putNumber(
+            "Turret/Launcher/Target_velocity",
+            targetVelocity
+        );
         SmartDashboard.putNumber(
             "Turret/Launcher/Current_velocity",
             getLauncherVelocity()
@@ -534,15 +624,14 @@ public class TurretSubsystem extends SubsystemBase {
     
 
     /*
-     * RADIANS
+     * rotations
      */
     public double getYaw() {
         if (yawIsZeroed) {
-            return Units.rotationsToRadians(
+            return
                 (m_YawMotor.getPosition().getValueAsDouble())
                 / TurretConstants.Yaw.GEAR_RATIO
-                + Units.degreesToRotations(TurretConstants.Yaw.ANGLE_MIN)
-            );
+                + Units.degreesToRotations(TurretConstants.Yaw.ANGLE_MIN);
         } else {
             return 0;
         }
@@ -589,10 +678,14 @@ public class TurretSubsystem extends SubsystemBase {
         return m_LauncherMotor.getVelocity().getValueAsDouble();
     }
 
-    // TODO: this
-    private double calculateExitToLauncherVelocity(double exitVelocity) {
-        return (TurretConstants.Launcher.VelocityRegression.A * exitVelocity)
+    private double calculateLauncherToExitVelocity(double launcherVelocity) {
+        return (TurretConstants.Launcher.VelocityRegression.A * launcherVelocity)
             + TurretConstants.Launcher.VelocityRegression.B; 
+    }
+
+    private double calculateExitToLauncherVelocity(double exitVelocity) {
+        return (exitVelocity - TurretConstants.Launcher.VelocityRegression.B)
+            / TurretConstants.Launcher.VelocityRegression.A;
     }
     
     public Command zeroYawCommand() {
@@ -744,6 +837,10 @@ public class TurretSubsystem extends SubsystemBase {
     ) {
         this.targetingMode = TargetingMode.MANUAL;
         this.targetVelocity = velocity;
-        this.targetYaw = yaw;
+        this.targetYaw = Units.degreesToRotations(yaw);
+    }
+    
+    public boolean isAtVelocity() {
+        return atVelocity;
     }
 }

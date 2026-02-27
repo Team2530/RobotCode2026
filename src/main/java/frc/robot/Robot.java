@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -29,6 +28,7 @@ import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Limelight.LimelightType;
 import frc.robot.util.LimelightHelpers;
 
+import com.ctre.phoenix6.Orchestra;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -40,9 +40,13 @@ import frc.robot.util.LimelightHelpers;
  */
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
-
+  public static Orchestra m_orchestra = new Orchestra();
   private Command m_autonomousCommand;
-
+  //private final SwerveSubsystem swerveDrive = new SwerveSubsystem();
+  //private final AutoFactory autoFactory;
+  /** This is one auto. */
+  //private final Trajectory trajectory;
+  
   @Logged
   private RobotContainer m_robotContainer;
 
@@ -59,6 +63,8 @@ public class Robot extends TimedRobot {
   
 
   public Robot() {
+
+
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
 
@@ -77,6 +83,7 @@ public class Robot extends TimedRobot {
     config.backend = new FileBackend(DataLogManager.getLog());
 
     // Epilogue.bind(this);
+    
   }
 
   /**
