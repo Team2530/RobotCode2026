@@ -384,7 +384,7 @@ public class TurretSubsystem extends SubsystemBase {
             // optimizer will be rerun at a frequency that the discrepancies 
             // wont matter
             double [] lowerBounds = {
-                Double.MIN_NORMAL,
+                Double.MIN_VALUE,
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
                 ),
@@ -428,8 +428,6 @@ public class TurretSubsystem extends SubsystemBase {
                 );
 
                 double[] optimalControls = targetOptimum.getPoint();
-
-                // double[] targetOptimum = guess;            
 
                 optimalYaw = Units.radiansToRotations(optimalControls[0])
                     % 1;
