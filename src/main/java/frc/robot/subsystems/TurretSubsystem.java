@@ -35,6 +35,7 @@ import java.util.function.BooleanSupplier;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
@@ -419,30 +420,27 @@ public class TurretSubsystem extends SubsystemBase {
             double optimalVelocity;
             double optimalTime;
 
+            PointValuePair targetOptimum = targetingOptimizer.optimize(
+                new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
+                new ObjectiveFunction(optimizerFunction),
+                GoalType.MINIMIZE,
+                new InitialGuess(guess),
+                new SimpleBounds(
+                    lowerBounds,
+                    upperBounds
+                )
+            );
+            
             if (targetingMode != targetingMode.MANUAL) {
-                double[] targetOptimum = targetingOptimizer.optimize(
-                    new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
-                    new ObjectiveFunction(optimizerFunction),
-                    GoalType.MINIMIZE,
-                    new InitialGuess(guess),
-                    new SimpleBounds(
-                        lowerBounds,
-                        upperBounds
-                    )
-                ).getPoint();
-
-                // double[] targetOptimum = guess;            
-
-                optimalYaw = targetOptimum[0];
-                optimalPitch = targetOptimum[1];
-                optimalVelocity = targetOptimum[2];
-                optimalTime = targetOptimum[3];
+                optimalYaw = targetOptimum.getPoint()[0];
+                optimalPitch = targetOptimum.getPoint()[1];
+                optimalVelocity = targetOptimum.getPoint()[2];
+                optimalTime = targetOptimum.getPoint()[3];
             } else {
                 optimalYaw = Units.radiansToRotations(targetYaw);
                 optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
                 optimalVelocity = targetVelocity;
                 optimalTime = 0;
-                
             }
 
             // calculate voltages and send to motors
@@ -533,6 +531,27 @@ public class TurretSubsystem extends SubsystemBase {
             SmartDashboard.putNumber(
                 "Turret/Yaw/Set_yaw",
                 setYaw
+            );
+            // optimizer
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Yaw", 
+                optimalYaw = targetOptimum.getPoint()[0]
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Pitch", 
+                optimalPitch = targetOptimum.getPoint()[1]
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Speed", 
+                optimalVelocity = targetOptimum.getPoint()[2]
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Time", 
+                optimalTime = targetOptimum.getPoint()[3]
+            );
+            SmartDashboard.putNumber(
+                "Turret/Optimizer/Error", 
+                optimalTime = targetOptimum.getValue()
             );
 
 
