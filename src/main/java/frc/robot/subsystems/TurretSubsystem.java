@@ -442,7 +442,7 @@ public class TurretSubsystem extends SubsystemBase {
             // calculate voltages and send to motors
             /** targetVelocity Clamped in Rot/s */
             double setVelocity = MathUtil.clamp(
-                targetVelocity,
+                calculateExitToLauncherVelocity(optimalVelocity),
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
