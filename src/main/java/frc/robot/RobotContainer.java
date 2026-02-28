@@ -154,7 +154,7 @@ public class RobotContainer {
         driverXbox.start()
             .onTrue(
                 new InstantCommand(() -> {
-                    swerveDriveSubsystem.resetOdometry();
+                    LLContainer.snapToVision(swerveDriveSubsystem.getSwerveDrive());
                 })
             );
         driverXbox.back()
