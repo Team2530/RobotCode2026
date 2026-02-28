@@ -336,10 +336,12 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         if (Robot.isSimulation()) {
             LimelightContainer.estimateSimOdometry();
-        } else 
+        } else {
             RobotContainer.LLContainer.estimateMT2Odometry(this.swerveDrive);
-            posePublisher.set(swerveDrive.getPose());
         }
+        swerveDrive.updateOdometry();
+        posePublisher.set(swerveDrive.getPose());
+    }
     
 
     @Override
