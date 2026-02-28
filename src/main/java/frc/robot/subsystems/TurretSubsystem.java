@@ -306,19 +306,23 @@ public class TurretSubsystem extends SubsystemBase {
                 // TODO: constant yaw
                 public double value(double[] point) {
                     double yaw = point[0];
-                    double pitch = point[1];
-                    double speed = point[2];
-                    double time = point[3];
+                    /*
+                     * double pitch = point[1];
+                     * double speed = point[2];
+                     * double time = point[3];
+                     */
+                    double speed = point[1];
+                    double time = point[2];
 
                     // X component of the ball's position relative to the robot. 
                     double dbx = speed 
-                        * Math.cos(pitch) 
+                        //* Math.cos(pitch) 
                         * Math.cos(yaw) 
                         * time;
                     //dbx += swerveSubsystem.getXVelocity() * time; // probably doesnt work
                     // Y component of the ball's position relative to the robot. 
                     double dby = speed 
-                        * Math.cos(pitch) 
+                        //* Math.cos(pitch) 
                         * Math.sin(yaw) 
                         * time;
                     //dby += swerveSubsystem.getYVelocity() * time; // probably doesnt work
@@ -329,7 +333,7 @@ public class TurretSubsystem extends SubsystemBase {
                         * Math.pow(time, 2)
                     ) + (
                         speed 
-                        * Math.sin(pitch) 
+                        //* Math.sin(pitch) 
                         * time
                     );
 
@@ -371,9 +375,11 @@ public class TurretSubsystem extends SubsystemBase {
                         TurretConstants.Yaw.ANGLE_MAX
                     ) - boundsAdjustment
                 ),               
+                /*
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
-                ),
+                ), 
+                */
                 calculateLauncherToExitVelocity(
                     MathUtil.clamp(
                         getLauncherVelocity(),
@@ -396,9 +402,11 @@ public class TurretSubsystem extends SubsystemBase {
             // wont matter
             double [] lowerBounds = {
                 Double.MIN_VALUE,
+                /*
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
-                ),
+                ), 
+                */
                 // WARNING: overridden for constant pitch
                 /*TurretConstants.Pitch.ANGLE_MIN(
                     Units.radiansToDegrees(
@@ -415,9 +423,11 @@ public class TurretSubsystem extends SubsystemBase {
             };
             double [] upperBounds = {
                 Double.MAX_VALUE,
+                /*
                 Units.degreesToRadians(
                     TurretConstants.Pitch.ANGLE_CONSTANT
-                ),
+                ), 
+                */
                 /*TurretConstants.Pitch.ANGLE_MAX,*/
                 calculateLauncherToExitVelocity(
                     TurretConstants.Launcher.MAXIMUM_VELOCITY
@@ -426,7 +436,8 @@ public class TurretSubsystem extends SubsystemBase {
             };
 
             double optimalYaw;
-            double optimalPitch;
+            //double optimalPitch;
+            double optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
             double optimalVelocity;
             double optimalTime;
             
@@ -446,9 +457,11 @@ public class TurretSubsystem extends SubsystemBase {
 
                 optimalYaw = Units.radiansToRotations(optimalControls[0])
                     % 1;
-                optimalPitch = Units.radiansToRotations(optimalControls[1]);
-                optimalVelocity = optimalControls[2];
-                optimalTime = optimalControls[3];
+                // optimalPitch = Units.radiansToRotations(optimalControls[1]);
+                // optimalVelocity = optimalControls[2];
+                // optimalTime = optimalControls[3];
+                optimalVelocity = optimalControls[1];
+                optimalTime = optimalControls[2];
             } else {
                 optimalYaw = targetYaw;
                 optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
