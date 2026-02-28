@@ -63,8 +63,6 @@ public class Robot extends TimedRobot {
   
 
   public Robot() {
-
-
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
 
@@ -93,6 +91,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    RobotContainer.debugTracer.resetTimer();
+    RobotContainer.debugTracer.clearEpochs();
+    
     m_robotContainer = new RobotContainer();
     RobotContainer.LLContainer.snapToVision(m_robotContainer.getSwerveSubsystem().getSwerveDrive()); //snapping odometry to a tag in the feild using MT1
     // Put git/code version metadata on networktables
@@ -182,6 +183,8 @@ public class Robot extends TimedRobot {
     }
 
     Elastic.selectTab("Teleop");
+
+    RobotContainer.debugTracer.printEpochs();
   }
 
   /** This function is called periodically during operator control. */

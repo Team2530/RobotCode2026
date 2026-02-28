@@ -11,6 +11,7 @@ import choreo.auto.*;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Tracer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -50,6 +51,8 @@ import frc.robot.subsystems.LoaderSubsystem;
  */
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
+    public static Tracer debugTracer = new Tracer();
+
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
     private static final Limelight LL_BT = new Limelight(LimelightType.LL4, "limelight-bt", true, true);
     private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);

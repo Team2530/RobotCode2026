@@ -11,6 +11,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
+import frc.robot.RobotContainer;
 import frc.robot.Constants.IndexerConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
@@ -35,6 +36,9 @@ public class IndexerSubsystem extends SubsystemBase {
         );
 
         stop();
+
+        RobotContainer.debugTracer.addEpoch(getName());
+
     }
 
     @Override

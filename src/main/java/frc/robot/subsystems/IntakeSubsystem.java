@@ -24,6 +24,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.RobotContainer;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -106,6 +107,9 @@ public class IntakeSubsystem extends SubsystemBase {
         setPreset(IntakePreset.STOWED);
 
         isHolding = false;
+
+        RobotContainer.debugTracer.addEpoch(getName());
+
     }
 
     @Override

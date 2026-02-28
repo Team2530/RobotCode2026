@@ -56,228 +56,56 @@ public class SwerveSubsystem extends SubsystemBase {
     private final PIDController yController = choreoConstants.y_CONTROLLER.getPIDController();
     private final PIDController headingController = choreoConstants.heading_CONTROLLER.getPIDController();
     
-    private final SwerveDrive swerveDrive;
-
-    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Odometry Pose", Pose2d.struct).publish();
+    private SwerveDrive swerveDrive;
     
-
-    private final SendableChooser<SwerveGearing> gearChooser;
-
-    enum SwerveGearing {
-        LIGHT(7.03f),
-        RIDICULUS(6.03f),
-        LUDICRUS(5.27f);
-
-        public final float gearRatio;
-
-        private SwerveGearing(float gearRatio) {
-            this.gearRatio = gearRatio;
-        }
-    }
-
-    public SwerveSubsystem() {
-        // instantiate yagsl library classes
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-
-        try {
-            // one liner >:3
-            ConversionFactorsJson conversionFactors = 
-                new ConversionFactorsJson(){{
-                    angle = new AngleConversionFactorsJson() {{
-                        gearRatio = DriveConstants.SwerveModules.ANGLE_GEARING;
-                        calculate();
-                    }};
-
-                    drive = new DriveConversionFactorsJson() {{
-                        gearRatio = DriveConstants.SwerveModules.DRIVE_GEARING;
-                        diameter = DriveConstants.SwerveModules.WHEEL_DIAMETER;
-                        calculate();
-                    }};
-                }};
-
-            PIDFConfig drivePID = DriveConstants.PIDs.Drive.getPIDFConfig();
-            PIDFConfig anglePID = DriveConstants.PIDs.Angle.getPIDFConfig();
-
-            SwerveModulePhysicalCharacteristics physicalCharacteristics = 
-                new SwerveModulePhysicalCharacteristics(
-                        conversionFactors, 
-                        DriveConstants.SwerveModules.WHEEL_FRICTION_COEFFICIENT, 
-                        DriveConstants.SwerveModules.OPTIMAL_VOLTAGE, 
-                        DriveConstants.SwerveModules.DRIVE_CURRENT_LIMIT, 
-                        DriveConstants.SwerveModules.STEER_CURRENT_LIMIT, 
-                        DriveConstants.SwerveModules.DRIVE_RAMP_RATE,
-                        DriveConstants.SwerveModules.STEER_RAMP_RATE,
-                        DriveConstants.SwerveModules.DRIVE_FRICTION_VOLTAGE,
-                        DriveConstants.SwerveModules.STEER_FRICTION_VOLTAGE,
-                        RobotConstants.MOMENT_OF_INERTIA, 
-                        RobotConstants.TOTAL_MASS_KG
-                );
-
-            // WARNING: if these types of motors ever change, so will this 
-            // configuration
-            SwerveModuleConfiguration modules[] = {
-                new SwerveModuleConfiguration(
-                    new TalonFXSwerve(
-                        DriveConstants.SwerveModules.CanIDs.FL_DRIVE,
-                        true, 
-                        DCMotor.getKrakenX60Foc(1)
-                    ), 
-                    new TalonFXSwerve(
-                        DriveConstants.SwerveModules.CanIDs.FL_STEER,
-                        false, 
-                        DCMotor.getKrakenX44Foc(1)
-                    ), 
-                    conversionFactors,
-                    new CANCoderSwerve(DriveConstants.SwerveModules.CanIDs.FL_CANCODER), 
-                    Units.rotationsToDegrees(DriveConstants.SwerveModules.Offsets.FL_ANGLE),
-                    DriveConstants.SwerveModules.Offsets.FL_X,
-                    DriveConstants.SwerveModules.Offsets.FL_Y,
-                    anglePID, drivePID, physicalCharacteristics, 
-                    DriveConstants.SwerveModules.Offsets.FL_ENCODER_INVERTED,
-                    DriveConstants.SwerveModules.Offsets.FL_DRIVE_INVERTED,
-                    DriveConstants.SwerveModules.Offsets.FL_ANGLE_INVERTED, 
-                    "PORT_BOW", 
-                    // Cosine compensation should not be used for simulations 
-                    // since it causes discrepancies not seen in real life.
-                    !RobotBase.isSimulation()
-                ),
-                new SwerveModuleConfiguration(
-                    new TalonFXSwerve(
-                        DriveConstants.SwerveModules.CanIDs.FR_DRIVE,
-                        true, 
-                        DCMotor.getKrakenX44Foc(1)
-                    ), 
-                    new TalonFXSwerve(
-                        DriveConstants.SwerveModules.CanIDs.FR_STEER,
-                        false, 
-                        DCMotor.getKrakenX44Foc(1)
-                    ), 
-                    conversionFactors,
-                    new CANCoderSwerve(
-                        DriveConstants.SwerveModules.CanIDs.FR_CANCODER
-                    ), 
-                    Units.rotationsToDegrees(
-                        DriveConstants.SwerveModules.Offsets.FR_ANGLE
-                    ),
-                    DriveConstants.SwerveModules.Offsets.FR_X,
-                    DriveConstants.SwerveModules.Offsets.FR_Y,
-                    anglePID, 
-                    drivePID, 
-                    physicalCharacteristics, 
-                    DriveConstants.SwerveModules.Offsets.FR_ENCODER_INVERTED,
-                    DriveConstants.SwerveModules.Offsets.FR_DRIVE_INVERTED,
-                    DriveConstants.SwerveModules.Offsets.FR_ANGLE_INVERTED,
-                    "STARBOARD_BOW", 
-                    !RobotBase.isSimulation()
-                ),
-                new SwerveModuleConfiguration(
-                    new TalonFXSwerve(
-                        DriveConstants.SwerveModules.CanIDs.BL_DRIVE,
-                        true, 
-                        DCMotor.getKrakenX44Foc(1)
-                    ), 
-                    new TalonFXSwerve(
-                        DriveConstants.SwerveModules.CanIDs.BL_STEER,
-                        false, 
-                        DCMotor.getKrakenX44Foc(1)
-                    ), 
-                    conversionFactors,
-                    new CANCoderSwerve(
-                        DriveConstants.SwerveModules.CanIDs.BL_CANCODER
-                    ), 
-                    Units.rotationsToDegrees(
-                        DriveConstants.SwerveModules.Offsets.BL_ANGLE
-                    ),
-                    DriveConstants.SwerveModules.Offsets.BL_X,
-                    DriveConstants.SwerveModules.Offsets.BL_Y,
-                    anglePID, 
-                    drivePID, 
-                    physicalCharacteristics, 
-                    DriveConstants.SwerveModules.Offsets.BL_ENCODER_INVERTED,
-                    DriveConstants.SwerveModules.Offsets.BL_DRIVE_INVERTED,
-                    DriveConstants.SwerveModules.Offsets.BL_ANGLE_INVERTED,
-                    "PORT_QUARTER", 
-                    !RobotBase.isSimulation()
-                ),
-                new SwerveModuleConfiguration(
-                    new TalonFXSwerve(
-                        DriveConstants.SwerveModules.CanIDs.BR_DRIVE,
-                        true, 
-                        DCMotor.getKrakenX44Foc(1)
-                    ), 
-                    new TalonFXSwerve(
-                        DriveConstants.SwerveModules.CanIDs.BR_STEER,
-                        false, 
-                        DCMotor.getKrakenX44Foc(1)
-                    ), 
-                    conversionFactors,
-                    new CANCoderSwerve(
-                        DriveConstants.SwerveModules.CanIDs.BR_CANCODER
-                    ), 
-                    Units.rotationsToDegrees(
-                        DriveConstants.SwerveModules.Offsets.BR_ANGLE
-                    ),
-                    DriveConstants.SwerveModules.Offsets.BR_X,
-                    DriveConstants.SwerveModules.Offsets.BR_Y,
-                    anglePID, 
-                    drivePID, 
-                    physicalCharacteristics, 
-                    DriveConstants.SwerveModules.Offsets.BR_ENCODER_INVERTED,
-                    DriveConstants.SwerveModules.Offsets.BR_DRIVE_INVERTED,
-                    DriveConstants.SwerveModules.Offsets.BR_ANGLE_INVERTED,
-                    "STARBOARD_QUARTER", 
-                    !RobotBase.isSimulation()
-                )
-            };
-            
-            SwerveDriveConfiguration driveConfiguration = 
-                new SwerveDriveConfiguration(
-                    modules, 
-                    new Pigeon2Swerve(DriveConstants.IMU.CANID), 
-                    DriveConstants.IMU.INVERTED,
-                    physicalCharacteristics
-            );
-
-            PIDFConfig headingPID = DriveConstants.PIDs.Heading.getPIDFConfig();
-
-            SwerveControllerConfiguration controllerConfiguration = 
-                new SwerveControllerConfiguration(
-                    driveConfiguration,
-                    headingPID,
-                    DriveConstants.ControlConstants.Deadband.HEADING,
-                    DriveConstants.MAX_ROBOT_VELOCITY
-            );
-
-            swerveDrive = new SwerveDrive(
-                    driveConfiguration, 
-                    controllerConfiguration,
-                    DriveConstants.MAX_ROBOT_VELOCITY, 
-                    new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(90))
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
+                .getStructTopic("Odometry Pose", Pose2d.struct).publish();
         
-        // Heading correction should only be used while controlling the robot 
-        // via angle. 
-        swerveDrive.setHeadingCorrection(false);
-        // Compensates for heading drift due to spinny fast
-        swerveDrive.setAngularVelocityCompensation(
-                DriveConstants.AngularCompensation.ENABLE_IN_TELEOP,
-                DriveConstants.AngularCompensation.ENABLE_IN_AUTO,
-                DriveConstants.AngularCompensation.COMPENSATION_COEFFICIENT
-        );
-        // Enable if you want to resynchronize your absolute encoders and motor 
-        // encoders periodically when they are not moving.
-        //
-        // TODO: idk this seems find
-        swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
-
-        headingController.enableContinuousInput(-Math.PI, Math.PI);
-
-        // register gearshifter with smartdashboard
-        gearChooser = new SendableChooser<>();
+    
+        private SendableChooser<SwerveGearing> gearChooser;
+        
+            enum SwerveGearing {
+                LIGHT(7.03f),
+                RIDICULUS(6.03f),
+                LUDICRUS(5.27f);
+        
+                public final float gearRatio;
+        
+                private SwerveGearing(float gearRatio) {
+                    this.gearRatio = gearRatio;
+                }
+            }
+        
+            public SwerveSubsystem() {
+        
+                        // instantiate yagsl library classes
+                SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+                    swerveDrive = new SwerveDrive(
+                        DriveConstants.DRIVE_CONFIGURATION, 
+                        DriveConstants.CONTROLLER_CONFIGURATION,
+                        DriveConstants.MAX_ROBOT_VELOCITY, 
+                        new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(90))
+                );
+            
+            // Heading correction should only be used while controlling the robot 
+            // via angle. 
+            swerveDrive.setHeadingCorrection(false);
+            // Compensates for heading drift due to spinny fast
+            swerveDrive.setAngularVelocityCompensation(
+                    DriveConstants.AngularCompensation.ENABLE_IN_TELEOP,
+                    DriveConstants.AngularCompensation.ENABLE_IN_AUTO,
+                    DriveConstants.AngularCompensation.COMPENSATION_COEFFICIENT
+            );
+            // Enable if you want to resynchronize your absolute encoders and motor 
+            // encoders periodically when they are not moving.
+            //
+            // TODO: idk this seems find
+            swerveDrive.setModuleEncoderAutoSynchronize(true, 1); 
+    
+            headingController.enableContinuousInput(-Math.PI, Math.PI);
+    
+            // register gearshifter with smartdashboard
+            gearChooser = new SendableChooser<>();
 
         gearChooser.addOption(
             SwerveGearing.LIGHT.toString(),
@@ -299,6 +127,10 @@ public class SwerveSubsystem extends SubsystemBase {
         // register sysId commands with smartdashboard
         SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
         SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
+       
+        
+
+         RobotContainer.debugTracer.addEpoch(getName());
 
     };
 

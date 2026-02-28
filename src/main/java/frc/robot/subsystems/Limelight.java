@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.RawFiducial;
 
@@ -40,16 +41,21 @@ public class Limelight extends SubsystemBase {
 
     private final StructPublisher<Pose2d> publisher;
 
-
     public Limelight(LimelightType limelightType, String name, boolean isEnabled, boolean cropEnabled) {
+        RobotContainer.debugTracer.addEpoch(getName());
+
         this.limelightType = limelightType;
         this.name = name;
         this.isEnabled = isEnabled;
         this.cropEnabled = cropEnabled;
 
-        publisher = NetworkTableInstance.getDefault().getStructTopic("LimelightPoses/"+name+" Pose2d", Pose2d.struct).publish();
+        publisher = NetworkTableInstance.getDefault()
+                .getStructTopic("LimelightPoses/" + name + " Pose2d", Pose2d.struct).publish();
 
         LimelightHelpers.SetIMUMode(name, 1);
+
+        RobotContainer.debugTracer.addEpoch(getName());
+
     }
 
     @Override
@@ -72,73 +78,71 @@ public class Limelight extends SubsystemBase {
     public void smartCrop() {
         LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
-        if(poseEstimate == null) {
+        if (poseEstimate == null) {
             return;
         }
 
-        if (lastPoseEstimate != poseEstimate.timestampSeconds){
+        if (lastPoseEstimate != poseEstimate.timestampSeconds) {
             counter = ++counter % 50;
-            if(counter > 40){ // For every 5 frames, out of 50, check the entire screen for apriltags
+            if (counter > 40) { // For every 5 frames, out of 50, check the entire screen for apriltags
                 restoreCrop(); // 45 will be cropped onto whichever limelights they find
                 return;
             }
-            
-            lastPoseEstimate = poseEstimate.timestampSeconds; //making sure we're only running this process on new frames
-            RawFiducial[] targets = LimelightHelpers.getRawFiducials(name); //get our targets
-            boolean useCrop = true; //we are currently using it, more changes will be implemented
-            Translation2d[] targetTranslations = new Translation2d[targets.length]; 
+
+            lastPoseEstimate = poseEstimate.timestampSeconds; // making sure we're only running this process on new
+                                                              // frames
+            RawFiducial[] targets = LimelightHelpers.getRawFiducials(name); // get our targets
+            boolean useCrop = true; // we are currently using it, more changes will be implemented
+            Translation2d[] targetTranslations = new Translation2d[targets.length];
             double area = 0;
 
             for (int i = 0; i < targetTranslations.length; ++i) {
-                targetTranslations[i] = new Translation2d(targets[i].txnc, targets[i].tync); 
-                area = Math.max(area, targets[i].ta); //Finding the largest area of the targets
+                targetTranslations[i] = new Translation2d(targets[i].txnc, targets[i].tync);
+                area = Math.max(area, targets[i].ta); // Finding the largest area of the targets
             }
 
             double xc = 0, yc = 0;
 
-            for (int i = 0; i < targetTranslations.length; ++i) { // Add to the width, depending on the locations of the other targets
-                xc += targetTranslations[i].getX(); //If one is at (2, 1), the width of our box increases on each size by 2, and the height by 1
-                yc += targetTranslations[i].getY(); //xc & xy increase per target
+            for (int i = 0; i < targetTranslations.length; ++i) { // Add to the width, depending on the locations of the
+                                                                  // other targets
+                xc += targetTranslations[i].getX(); // If one is at (2, 1), the width of our box increases on each size
+                                                    // by 2, and the height by 1
+                yc += targetTranslations[i].getY(); // xc & xy increase per target
             }
 
-            xc /= targetTranslations.length; //Then, average depending on the number of targets
+            xc /= targetTranslations.length; // Then, average depending on the number of targets
             yc /= targetTranslations.length; // (2,1), (.05, .25), (-1, 2) -> xc =.35, yc= .75
 
             xc = xc / (limelightType.HFOV / 2); // scales it to FOV
             yc = yc / (limelightType.VFOV / 2);
 
-            double borderx = 0, bordery = 0; 
+            double borderx = 0, bordery = 0;
 
             if (targetTranslations.length > 1) { // for more than one tag
                 borderx = (area + 0.75) * 0.22 * targetTranslations.length + .2; // relatively randomly generated border
                 bordery = (area + 0.5) * 0.22 * targetTranslations.length;
-            } 
+            }
 
-            //todo optimize
+            // todo optimize
 
             else {
-                if (area > 0.75){
+                if (area > 0.75) {
                     borderx = 1;
                     bordery = .5;
-                }
-                else if (area > 0.5) {  //Remember that "area" only refers to the area of the largest apriltag
-                    borderx = 0.8; 
+                } else if (area > 0.5) { // Remember that "area" only refers to the area of the largest apriltag
+                    borderx = 0.8;
                     bordery = 0.5;
-                } 
-                else if (area > .015){ 
-                    borderx = 1; 
+                } else if (area > .015) {
+                    borderx = 1;
                     bordery = 0.25;
-                }
-                else if (area > .005){
+                } else if (area > .005) {
                     borderx = 1;
                     bordery = .5;
-                }
-                else { 
+                } else {
                     borderx = 1;
                     bordery = .5;
                 }
             }
-
 
             // Doesn't let borders extend beyond -1, 1 for x & y
             double xlim = (xc - borderx < -1) ? -1 : xc - borderx;
@@ -152,23 +156,46 @@ public class Limelight extends SubsystemBase {
             }
         }
     }
-    
+
     public void restoreCrop() {
         LimelightHelpers.setCropWindow(name, -1, 1, -1, 1);
     }
 
-    public void setIMUMode(int mode) {LimelightHelpers.SetIMUMode(name, mode);}
+    public void setIMUMode(int mode) {
+        LimelightHelpers.SetIMUMode(name, mode);
+    }
 
-    public void setEnabled(boolean enabled) {this.isEnabled = enabled;}
-    public void setCropEnabled(boolean enabled) {this.cropEnabled = enabled;}
-    public boolean isEnabled() {return isEnabled;}
-    public boolean isCropEnabled() {return cropEnabled;}
+    public void setEnabled(boolean enabled) {
+        this.isEnabled = enabled;
+    }
 
-    public double getLastFrameTime(){return lastFrame;}
-    public void setLastFrame(double lastFrameTime){lastFrame = lastFrameTime;}
+    public void setCropEnabled(boolean enabled) {
+        this.cropEnabled = enabled;
+    }
 
-    public double getVFOV() {return limelightType.VFOV;}
-    public double getHFOV() {return limelightType.HFOV;}
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public boolean isCropEnabled() {
+        return cropEnabled;
+    }
+
+    public double getLastFrameTime() {
+        return lastFrame;
+    }
+
+    public void setLastFrame(double lastFrameTime) {
+        lastFrame = lastFrameTime;
+    }
+
+    public double getVFOV() {
+        return limelightType.VFOV;
+    }
+
+    public double getHFOV() {
+        return limelightType.HFOV;
+    }
 
     /** Set the publisher's pose. */
     public void pushPoseToShuffleboard(Pose2d pose) {
