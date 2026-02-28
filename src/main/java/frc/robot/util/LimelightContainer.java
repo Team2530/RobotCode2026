@@ -60,6 +60,7 @@ public class LimelightContainer {
    * For every limelight in the container, addVisionMesurement and get robot orientation from pigeon.
    */
   public void estimateMT2Odometry(SwerveDrive swerveDrive) {
+      SwerveIMU gyro = swerveDrive.getGyro();
     for (Limelight limelight : limelights) {
       LimelightHelpers.SetRobotOrientation(limelight.getName(), swerveDrive.getYaw().getDegrees(), 0, 0, 0, 0, 0);
       
