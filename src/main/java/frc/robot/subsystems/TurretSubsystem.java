@@ -464,15 +464,24 @@ public class TurretSubsystem extends SubsystemBase {
                     // optimalTime = optimalControls[3];
                     optimalVelocity = optimalControls[1];
                     optimalTime = optimalControls[2];
+                    SmartDashboard.putString(
+                        "Turret/Optimizer/status",
+                        String.format(
+                            "Completed optimization: { %f, %f, %f }",
+                            optimalYaw,
+                            optimalVelocity,
+                            optimalTime
+                        )
+                    );
                 } catch (Exception e) {
                     if (e instanceof MathIllegalStateException) {
                         SmartDashboard.putString(
-                            "Turret/Optimizer/error",
+                            "Turret/Optimizer/status",
                             "Caught known error: " + e
                         );
                     } else {
                         SmartDashboard.putString(
-                            "Turret/Optimizer/error",
+                            "Turret/Optimizer/status",
                             "Caught unknown error: " + e
                         );
                     }
