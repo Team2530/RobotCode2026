@@ -103,6 +103,9 @@ public class Robot extends TimedRobot {
       .schedule(
         m_robotContainer.getInitCommand() 
       );
+
+    Elastic.sendNotification(new Notification(NotificationLevel.INFO, "RobotInit", "Robot is Initializing..."));
+    Elastic.selectTab(0);
   }
 
   /**
