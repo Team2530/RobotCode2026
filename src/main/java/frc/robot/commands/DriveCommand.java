@@ -41,14 +41,19 @@ public class DriveCommand extends Command {
             // these'll range form -1.0 to 1.0; we'll convert them to m/s later
             // x,y translate to correspond to literal x,y translation; z corresponds
             // rotation
+            //
+            // apparently, a forward on the joystick (relative to the 
+            // controller) corresponds to a negative value
             double x = MathUtil.applyDeadband(
-                    driverXbox.getLeftY(),
+                    -driverXbox.getLeftY(),
                     ControlConstants.Deadband.X);
             double y = MathUtil.applyDeadband(
                     driverXbox.getLeftX(),
                     ControlConstants.Deadband.Y);
+            // to yagsl, a positive rotation value corresponds to a ccw 
+            // rotation
             double z = MathUtil.applyDeadband(
-                    driverXbox.getRightX(),
+                    -driverXbox.getRightX(),
                     ControlConstants.Deadband.Z);
 
             // trigger-base slow / fast mode
