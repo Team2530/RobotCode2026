@@ -59,21 +59,21 @@ public class RobotContainer {
     //initalizing limelight container (Group)
     public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_BR, LL_FR);// remove the turret limelight, should not be used for odometry.
     // @Logged
-    public final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
+    public static final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged
-    public final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    public static final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
     @Logged
-    public final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-    public final AutoChooser autoChooser = new AutoChooser();
+    public static final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+    public static final AutoChooser autoChooser = new AutoChooser();
     // LimeLightSubsystem();
     @Logged
-    private final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
+    private static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
 
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
-    private final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    private final TurretSubsystem turretSubsystem = new TurretSubsystem(
+    private static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    private static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+    private static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
+    private static final TurretSubsystem turretSubsystem = new TurretSubsystem(
         swerveDriveSubsystem,
         new BooleanSupplier() {
             @Override
