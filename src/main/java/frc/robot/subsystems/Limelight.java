@@ -174,9 +174,9 @@ public class Limelight extends SubsystemBase {
     public double getHFOV() {return limelightType.HFOV;}
 
     /** Set the publisher's pose to StructPublisher in NT */
-    public void publishEstimationToNT(PoseEstimate poseEstimate, boolean skipped) {
+    public void publishEstimationToNT(PoseEstimate poseEstimate, boolean doAddVision) {
         posePublisher.set(poseEstimate.pose);
-        skipPublisher.set(skipped);
+        skipPublisher.set(doAddVision);
     }
 
     @Override

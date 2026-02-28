@@ -48,7 +48,7 @@ public class LimelightContainer {
     for (Limelight limelight : limelights) {
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
       if (mt2 != null && mt2.tagCount > 0) {
-        limelight.publishEstimationToNT(mt2, false);
+        limelight.publishEstimationToNT(mt2, true);
         SmartDashboard.putString(limelight.getName() + " Pose: ", mt2.pose.toString() + SIMCOUNTER);
         SIMCOUNTER++;
       }
