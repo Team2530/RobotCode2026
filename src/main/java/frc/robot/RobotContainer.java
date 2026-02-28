@@ -50,7 +50,7 @@ public class RobotContainer {
     private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
 
     //initalizing limelight container (Group)
-    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_BR, LL_FR);// remove the turret limelight, should not be used for odometry.
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_BR, LL_FR); // remove the turret limelight, should not be used for odometry.
     // @Logged
     public static final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged
@@ -147,7 +147,7 @@ public class RobotContainer {
         driverXbox.start()
             .onTrue(
                 new InstantCommand(() -> {
-                    swerveDriveSubsystem.resetOdometry();
+                    LLContainer.snapToVision(swerveDriveSubsystem.getSwerveDrive());
                 })
             );
         driverXbox.back()
