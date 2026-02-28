@@ -299,7 +299,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // register sysId commands with smartdashboard
         SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
         SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
-
+        SmartDashboard.putData("Field", swerveDrive.field);
     };
 
 
@@ -334,21 +334,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-         SmartDashboard.putData("Feild", swerveDrive.field);
-         SmartDashboard.putNumberArray("RobotPose", new double[] {
-            swerveDrive.getPose().getX(),
-            swerveDrive.getPose().getY(),
-            swerveDrive.getPose().getRotation().getDegrees()
-        });
-        
         if (Robot.isSimulation()) {
             LimelightContainer.estimateSimOdometry();
         } else {
             RobotContainer.LLContainer.estimateMT2Odometry(this.swerveDrive);
         }
         swerveDrive.updateOdometry();
-        posePublisher.set(swerveDrive.getPose());
+
+        posePublisher.set(getPose());
     }
     
 
