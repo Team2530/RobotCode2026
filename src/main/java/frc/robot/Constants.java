@@ -256,54 +256,53 @@ public final class Constants {
         public static final double ANGLE_GEARING = 26.09; // 26.09
 
         public static final class CanIDs {
-            public static final int FL_DRIVE = 1;
-            public static final int FL_STEER = 2;
-            public static final int FL_CANCODER = 3;
+            public static final int FL_DRIVE = 10;
+            public static final int FL_STEER = 11;
+            public static final int FL_CANCODER = 12;
 
-            public static final int FR_DRIVE = 4;
-            public static final int FR_STEER = 5;
-            public static final int FR_CANCODER = 6;
+            public static final int FR_DRIVE = 7;
+            public static final int FR_STEER = 8;
+            public static final int FR_CANCODER = 9;
 
+            public static final int BL_DRIVE = 4;
+            public static final int BL_STEER = 5;
+            public static final int BL_CANCODER = 6;
 
-            public static final int BL_DRIVE = 7;
-            public static final int BL_STEER = 8;
-            public static final int BL_CANCODER = 9;
-
-            public static final int BR_DRIVE = 10;
-            public static final int BR_STEER = 11;
-            public static final int BR_CANCODER = 12;
+            public static final int BR_DRIVE = 1;
+            public static final int BR_STEER = 2;
+            public static final int BR_CANCODER = 3;
         };
     
         public static final class Offsets {
             // inches left of the center of the robot
             public static final double FL_X = 9.75;
-                // inchest forward of the center of the robot
-                public static final double FL_Y = 12.263;
-                // as in absolute encoder offset in terms of a full rotation
-                public static final double FL_ANGLE = 0.245850;
+            // inchest forward of the center of the robot
+            public static final double FL_Y = 12.263;
+            // as in absolute encoder offset in terms of a full rotation
+            public static final double FL_ANGLE = 0.073975;
             public static final boolean FL_ENCODER_INVERTED = false;
-            public static final boolean FL_DRIVE_INVERTED = false;
+            public static final boolean FL_DRIVE_INVERTED = true;
             public static final boolean FL_ANGLE_INVERTED = true;
 
             public static final double FR_X = 9.75;
             public static final double FR_Y = -12.263;
-            public static final double FR_ANGLE = 0.152832;
+            public static final double FR_ANGLE = 0.918457;
             public static final boolean FR_ENCODER_INVERTED = false;
             public static final boolean FR_DRIVE_INVERTED = true;
             public static final boolean FR_ANGLE_INVERTED = true;
 
             public static final double BL_X = -9.75;
             public static final double BL_Y = 12.263;
-            public static final double BL_ANGLE = 0.917969;
+            public static final double BL_ANGLE = 0.653564;
             public static final boolean BL_ENCODER_INVERTED = false;
-            public static final boolean BL_DRIVE_INVERTED = false;
+            public static final boolean BL_DRIVE_INVERTED = true;
             public static final boolean BL_ANGLE_INVERTED = true;
 
             public static final double BR_X = -9.75;
             public static final double BR_Y = -12.263;
-            public static final double BR_ANGLE = 0.075928;
+            public static final double BR_ANGLE = 0.246826;
             public static final boolean BR_ENCODER_INVERTED = false;
-            public static final boolean BR_DRIVE_INVERTED = false;
+            public static final boolean BR_DRIVE_INVERTED = true;
             public static final boolean BR_ANGLE_INVERTED = true;
         };
     }
