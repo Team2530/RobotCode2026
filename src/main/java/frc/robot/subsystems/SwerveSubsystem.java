@@ -334,6 +334,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+         SmartDashboard.putData("Feild", swerveDrive.field);
+         SmartDashboard.putNumberArray("RobotPose", new double[] {
+            swerveDrive.getPose().getX(),
+            swerveDrive.getPose().getY(),
+            swerveDrive.getPose().getRotation().getDegrees()
+        });
+        
         if (Robot.isSimulation()) {
             LimelightContainer.estimateSimOdometry();
         } else {
