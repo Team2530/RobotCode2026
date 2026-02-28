@@ -499,13 +499,7 @@ public class TurretSubsystem extends SubsystemBase {
             */
 
             TargetPositionPublisher.set(
-                swerveSubsystem.get3dPose()
-                    .plus(
-                        new Transform3d(
-                            toTarget,
-                            new Rotation3d()
-                        )
-                    )
+                targetPosition
             );
             //targeting
             ToTargetPublisher.set(toTarget);
