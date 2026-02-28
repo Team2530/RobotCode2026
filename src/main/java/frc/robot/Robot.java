@@ -47,7 +47,6 @@ public class Robot extends TimedRobot {
   /** This is one auto. */
   //private final Trajectory trajectory;
   
-  @Logged
   private RobotContainer m_robotContainer;
 
   double lastLoopTime = Timer.getFPGATimestamp();

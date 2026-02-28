@@ -2,10 +2,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.LimelightHelpers.RawFiducial;
 
 /**
@@ -38,8 +40,8 @@ public class Limelight extends SubsystemBase {
     private int counter = 0;
     private double lastFrame = 0;
 
-    private final StructPublisher<Pose2d> publisher;
-
+    private final StructPublisher<Pose2d> posePublisher;
+    private final BooleanPublisher skipPublisher;
 
     public Limelight(LimelightType limelightType, String name, boolean isEnabled, boolean cropEnabled) {
         this.limelightType = limelightType;
@@ -47,7 +49,8 @@ public class Limelight extends SubsystemBase {
         this.isEnabled = isEnabled;
         this.cropEnabled = cropEnabled;
 
-        publisher = NetworkTableInstance.getDefault().getStructTopic("LimelightPoses/"+name+" Pose2d", Pose2d.struct).publish();
+        posePublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightPoses/"+name+"/Pose2d", Pose2d.struct).publish();
+        skipPublisher = NetworkTableInstance.getDefault().getBooleanTopic("LimelightPoses/"+name+"/Skipped?").publish();
 
         LimelightHelpers.SetIMUMode(name, 1);
     }
@@ -170,9 +173,14 @@ public class Limelight extends SubsystemBase {
     public double getVFOV() {return limelightType.VFOV;}
     public double getHFOV() {return limelightType.HFOV;}
 
-    /** Set the publisher's pose. */
-    public void pushPoseToShuffleboard(Pose2d pose) {
-        publisher.set(pose);
+    /** Set the publisher's pose to StructPublisher in NT */
+    public void publishEstimationToNT(PoseEstimate poseEstimate, boolean skipped) {
+        posePublisher.set(poseEstimate.pose);
+        skipPublisher.set(skipped);
     }
 
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }
