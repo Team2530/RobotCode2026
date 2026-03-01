@@ -294,10 +294,7 @@ public class TurretSubsystem extends SubsystemBase {
                 case ABSOLUTE:
                     toTarget = targetPosition
                         .minus(getLauncherPosition())
-                        .getTranslation()
-                        .rotateBy(
-                            swerveSubsystem.getRotation()
-                        );
+                        .getTranslation();
                     break;
                 case RELATIVE:
                 default:
