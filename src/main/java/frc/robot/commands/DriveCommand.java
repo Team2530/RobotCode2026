@@ -47,9 +47,8 @@ public class DriveCommand extends Command {
             double x = MathUtil.applyDeadband(
                     -driverXbox.getLeftY(),
                     ControlConstants.Deadband.X);
-            // dunno why, this value also needs to be inverted
             double y = MathUtil.applyDeadband(
-                    -driverXbox.getLeftX(),
+                    driverXbox.getLeftX(),
                     ControlConstants.Deadband.Y);
             // to yagsl, a positive rotation value corresponds to a ccw 
             // rotation
