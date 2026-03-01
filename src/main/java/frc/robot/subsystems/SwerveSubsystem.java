@@ -334,12 +334,13 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Robot.isSimulation()) {
+     swerveDrive.updateOdometry(); 
+        if(Robot.isSimulation()) {
             LimelightContainer.estimateSimOdometry();
         } else {
             RobotContainer.LLContainer.estimateMT2Odometry(this.swerveDrive);
         }
-        swerveDrive.updateOdometry();
+       
 
         posePublisher.set(getPose());
     }

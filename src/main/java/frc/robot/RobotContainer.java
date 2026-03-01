@@ -44,13 +44,13 @@ import frc.robot.util.LimelightContainer;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
-    private static final Limelight LL_BT = new Limelight(LimelightType.LL4, "limelight-bt", true, true);
+    private static final Limelight LL_BT = new Limelight(LimelightType.LL4, "limelight-bt", false, true);
     private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
     private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
 
     //initalizing limelight container (Group)
-    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_BR, LL_FR); // remove the turret limelight, should not be used for odometry.
+    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_BR, LL_FR, LL_BT); // remove the turret limelight, should not be used for odometry.
     // @Logged
     public static final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     // @Logged

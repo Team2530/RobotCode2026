@@ -48,7 +48,6 @@ public class LimelightContainer {
     for (Limelight limelight : limelights) {
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
       if (mt2 != null && mt2.tagCount > 0) {
-        limelight.publishEstimationToNT(mt2, true);
         SmartDashboard.putString(limelight.getName() + " Pose: ", mt2.pose.toString() + SIMCOUNTER);
         SIMCOUNTER++;
       }
@@ -58,7 +57,6 @@ public class LimelightContainer {
    * For every limelight in the container, addVisionMesurement and get robot orientation from pigeon.
    */
   public void estimateMT2Odometry(SwerveDrive swerveDrive) {
-      SwerveIMU gyro = swerveDrive.getGyro();
     for (Limelight limelight : limelights) {
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(limelight.getName(), swerveDrive.getYaw().getDegrees(), 0, 0, 0, 0, 0);
@@ -66,13 +64,12 @@ public class LimelightContainer {
       LimelightHelpers.PoseEstimate mt2Estimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
 
       // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      if (mt2Estimation == null || mt2Estimation.tagCount == 0 || doRotationRejection(gyro, 720)) {
+      if (
+        mt2Estimation != null
+        && mt2Estimation.tagCount > 0
+      ){
         doAddVision = false;
-      }
-
-      limelight.publishEstimationToNT(mt2Estimation, doAddVision);
-
-      if (doAddVision) {
+      } else {
         swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 99999));
         swerveDrive.addVisionMeasurement(mt2Estimation.pose, mt2Estimation.timestampSeconds);
       }
