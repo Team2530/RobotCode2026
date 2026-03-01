@@ -183,4 +183,9 @@ public class Limelight extends SubsystemBase {
     public String toString() {
         return this.name;
     }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
 }
