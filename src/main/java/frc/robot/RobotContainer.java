@@ -65,7 +65,7 @@ public class RobotContainer {
 
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
-    public static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
+    public static final RunLoaderSubsystem loaderSubsystem = new LoaderSubsystem();
     public static final TurretSubsystem turretSubsystem = new TurretSubsystem(
         swerveDriveSubsystem,
         new BooleanSupplier() {
