@@ -7,7 +7,6 @@ import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.EpilogueConfiguration;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -19,15 +18,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.util.Elastic;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.Limelight.LimelightType;
-import frc.robot.util.LimelightHelpers;
-
 import com.ctre.phoenix6.Orchestra;
 /**
  * The VM is configured to automatically run this class, and to call the
