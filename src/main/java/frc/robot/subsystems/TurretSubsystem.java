@@ -74,6 +74,8 @@ import frc.robot.Constants.LoaderConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 
+import org.apache.commons.lang3.time.StopWatch; 
+
 public class TurretSubsystem extends SubsystemBase {
     
     public enum TurretTargets {
@@ -453,9 +455,11 @@ public class TurretSubsystem extends SubsystemBase {
             double optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
             double optimalVelocity;
             double optimalTime;
+            StopWatch optimizerStopWatch = new StopWatch();
             
             if (targetingMode != targetingMode.MANUAL) {
                 try {
+                    optimizerStopWatch.start();
                     PointValuePair targetOptimum = targetingOptimizer.optimize(
                         new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
                         new ObjectiveFunction(optimizerFunction),
@@ -464,6 +468,7 @@ public class TurretSubsystem extends SubsystemBase {
                         // TODO: update this when we add pitch back
                         new NelderMeadSimplex(3)
                     );
+                    optimizerStopWatch.stop();
 
                     double[] optimalControls = targetOptimum.getPoint();
 
@@ -482,6 +487,10 @@ public class TurretSubsystem extends SubsystemBase {
                             optimalVelocity,
                             optimalTime
                         )
+                    );
+                    SmartDashboard.putNumber(
+                        "Turret/Optimizer/ComputeTimeMilliseconds",
+                        optimizerStopWatch.getNanoTime()/1.e6
                     );
 
                     // debugging

@@ -60,19 +60,24 @@ public class LimelightContainer {
    */
   public void estimateMT2Odometry(SwerveDrive swerveDrive) {
     for (Limelight limelight : limelights) {
+      SwerveIMU gyro = swerveDrive.getGyro();
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(limelight.getID(), swerveDrive.getYaw().getDegrees()-35, 0, 0, 0, 0, 0);
       
       LimelightHelpers.PoseEstimate mt2Estimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getID());
 
       // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      
       if (
         mt2Estimation != null
         && mt2Estimation.tagCount > 0
+        && doRotationRejection(gyro, 720)
       ){
-        doAddVision = false;
-      } else {
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 99999));
         swerveDrive.addVisionMeasurement(mt2Estimation.pose, mt2Estimation.timestampSeconds);
+        // add set vision measurments and add vision measurments here instead of the else statment. 
+      } else {
+         doAddVision = false;
       }
     }
   }
