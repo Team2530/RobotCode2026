@@ -63,10 +63,10 @@ public class RobotContainer {
     @Logged
     private static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
 
-    private static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    private static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
-    private static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    private static final TurretSubsystem turretSubsystem = new TurretSubsystem(
+    public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+    public static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
+    public static final TurretSubsystem turretSubsystem = new TurretSubsystem(
         swerveDriveSubsystem,
         new BooleanSupplier() {
             @Override
@@ -312,10 +312,6 @@ public class RobotContainer {
 
     public CommandXboxController getOperatorXbox() {
         return operatorXbox;
-    }
-
-    public Command getInitCommand() {
-        return turretSubsystem.zeroYawCommand();
     }
 
     public Command getResetCommand() {

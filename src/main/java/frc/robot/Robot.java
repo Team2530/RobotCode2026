@@ -102,11 +102,6 @@ public class Robot extends TimedRobot {
     versionTable.putValue("DIRTY", NetworkTableValue.makeBoolean(BuildConstants.DIRTY != 0));
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-
-    CommandScheduler.getInstance()
-      .schedule(
-        m_robotContainer.getInitCommand() 
-      );
   }
 
   /**
@@ -158,14 +153,16 @@ public class Robot extends TimedRobot {
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
        CommandScheduler.getInstance().schedule(
-          new ParallelCommandGroup(
-            m_autonomousCommand,
-            m_robotContainer.getInitCommand() 
-          )
+          m_autonomousCommand
         );
     }
 
+
     Elastic.selectTab("Autonomous");
+
+    CommandScheduler.getInstance().schedule(
+      RobotContainer.turretSubsystem.zeroYawCommand()
+    );
   }
 
   /** This function is called periodically during autonomous. */
@@ -195,6 +192,9 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().cancelAll();
 
     Elastic.selectTab("Debug");
+    CommandScheduler.getInstance().schedule(
+      RobotContainer.turretSubsystem.zeroYawCommand()
+    );
   }
 
   /** This function is called periodically during test mode. */
