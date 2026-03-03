@@ -6,9 +6,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.SwerveSubsystem;
 
 public class ManualTurretCommand extends Command {
     private final TurretSubsystem m_LauncherSubsystem;
+    private final SwerveSubsystem m_SwerveSubsystem;
     private final XboxController operatorXbox;
 
     private double targetVelocity;
@@ -16,9 +18,11 @@ public class ManualTurretCommand extends Command {
 
     public ManualTurretCommand(
         TurretSubsystem LauncherSubsystem,
+        SwerveSubsystem SwerveSubsystem,
         XboxController operatorXbox
     ) {
         m_LauncherSubsystem = LauncherSubsystem;
+        m_SwerveSubsystem = SwerveSubsystem;
         this.operatorXbox = operatorXbox;
     
         this.targetVelocity = 0;
@@ -51,7 +55,7 @@ public class ManualTurretCommand extends Command {
                     operatorXbox.getLeftX(),
                     operatorXbox.getLeftY()
                 )
-            );
+            ) + m_SwerveSubsystem.getRotation().getX();  
         }
         m_LauncherSubsystem.setManualControl(
             targetYaw,

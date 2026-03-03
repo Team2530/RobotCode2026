@@ -1,13 +1,16 @@
 package frc.robot;
 
+import java.lang.annotation.Target;
 import java.util.function.BooleanSupplier;
 
+import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -85,8 +88,6 @@ public class RobotContainer {
           true, // If alliance flipping should be enabled 
           swerveDriveSubsystem // The drive subsystem
     );
-
-    private final String[] autos = {"NewAuto"};
 
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -168,14 +169,14 @@ public class RobotContainer {
             );
 
         operatorXbox.rightTrigger(0.3)
-        .and(
+        /*.and(
             new BooleanSupplier() {
                 @Override
                 public boolean getAsBoolean() {
                     return turretSubsystem.isAtVelocity();
                 }
             }
-        )
+        ) */
             .whileTrue(
                 new ParallelCommandGroup(
                     new RunLoaderCommand(loaderSubsystem),
@@ -184,6 +185,7 @@ public class RobotContainer {
             );
 
         
+        /*
         operatorXbox.rightBumper()
             .whileTrue(
                 new InstantCommand(
@@ -208,6 +210,7 @@ public class RobotContainer {
                     }
                 )
             );
+        */
         operatorXbox.start()
             .onTrue(
                 turretSubsystem.zeroYawCommand()
@@ -234,6 +237,7 @@ public class RobotContainer {
         
         ManualTurretCommand turretCommand = new ManualTurretCommand(
             turretSubsystem,
+            swerveDriveSubsystem,
             operatorXbox.getHID()
         );
         operatorXbox.y()
@@ -275,7 +279,8 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(0, 48.5);
+                        // turretSubsystem.setManualControl(0, 48.5);
+                        turretSubsystem.setTarget(TurretTargets.HUB);
                     }
                 )
             );
@@ -283,11 +288,20 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(0, 0);
+                        turretSubsystem.setManualControl(180, 0);
+                    }
+                )
+            );
+        operatorXbox.povLeft()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setManualControl(58, 34);
                     }
                 )
             );
     }
+
 
 
     /**

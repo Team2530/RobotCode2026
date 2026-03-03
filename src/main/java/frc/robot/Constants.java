@@ -225,7 +225,7 @@ public final class Constants {
 
     public static final class IMU {
         public static final int CANID = 0;
-        public static final boolean INVERTED = false;
+        public static final boolean INVERTED = true;
     }
 
     public static final class SwerveModules {
@@ -354,7 +354,7 @@ public final class Constants {
 
         public static final class PID {
             public static final class Holding {
-                public static final double P = 10;
+                public static final double P = 5;
                 public static final double I = 0;
                 public static final double D = 0;
             }
@@ -368,8 +368,10 @@ public final class Constants {
 
         public static final class Feedforward {
             public static final class Holding {
-                public static final double kS = 0.44;
-                public static final double kV = 0.645;
+                public static final double kS = 0;
+                public static final double kV = 0;
+                // public static final double kS = 0.44;
+                // public static final double kV = 0.645;
             }
 
             public static final class Launching {

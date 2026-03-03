@@ -34,7 +34,7 @@ public class LimelightContainer {
     for (Limelight limelight : limelights) {
       LimelightContainer.limelights.add(limelight);
       LimelightHelpers.SetFiducialIDFiltersOverride(limelight.getID(), validTagIDs); // makes sure the helper only considers the specified valid tag IDs.
-      LimelightHelpers.SetIMUMode(limelight.getID(), 0);
+      LimelightHelpers.SetIMUMode(limelight.getID(), 4);
       limelight.setEnabled(true);
     }
   }
@@ -61,7 +61,7 @@ public class LimelightContainer {
   public void estimateMT2Odometry(SwerveDrive swerveDrive) {
     for (Limelight limelight : limelights) {
       boolean doAddVision = true;
-      LimelightHelpers.SetRobotOrientation(limelight.getID(), swerveDrive.getYaw().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(limelight.getID(), swerveDrive.getYaw().getDegrees()-35, 0, 0, 0, 0, 0);
       
       LimelightHelpers.PoseEstimate mt2Estimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getID());
 
@@ -72,7 +72,6 @@ public class LimelightContainer {
       ){
         doAddVision = false;
       } else {
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 99999));
         swerveDrive.addVisionMeasurement(mt2Estimation.pose, mt2Estimation.timestampSeconds);
       }
     }
