@@ -175,8 +175,7 @@ public class Limelight extends SubsystemBase {
         return this.name;
     }
 
-    @Override
-    public String getName() {
+    public String getID() {
         return this.name;
     }
 }
