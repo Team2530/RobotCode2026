@@ -104,10 +104,10 @@ public class RobotContainer {
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
-        for (String trajName : autos) {
-            autoChooser.addRoutine(trajName+"_routine", () -> {
-                AutoRoutine routine = autoFactory.newRoutine(trajName+"_routine");
-                AutoTrajectory trajectory = routine.trajectory(trajName);
+        for (String trajectoryName : Choreo.availableTrajectories()) {
+            autoChooser.addRoutine(trajectoryName + "_routine", () -> {
+                AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
+                AutoTrajectory trajectory = routine.trajectory(trajectoryName);
 
                 routine.active().onTrue(
                     Commands.sequence(
@@ -117,13 +117,10 @@ public class RobotContainer {
                 );
 
                 // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
-
-                
-
                 return routine;
             });
         }
-        SmartDashboard.putData(autoChooser);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     
