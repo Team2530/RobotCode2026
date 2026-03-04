@@ -69,7 +69,7 @@ public class LimelightContainer {
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
-        swerveDrive.getYaw().getDegrees(),
+        Units.radiansToDegrees(swerveDrive.getGyroRotation3d().getX()),
         0, 
         0, 
         0, 
@@ -102,7 +102,7 @@ public class LimelightContainer {
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
-        swerveDrive.getYaw().getDegrees(),
+        Units.radiansToDegrees(swerveDrive.getGyroRotation3d().getX()),
         0, 
         0, 
         0, 
