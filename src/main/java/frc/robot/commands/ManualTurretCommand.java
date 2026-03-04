@@ -25,7 +25,7 @@ public class ManualTurretCommand extends Command {
         m_SwerveSubsystem = SwerveSubsystem;
         this.operatorXbox = operatorXbox;
     
-        this.targetVelocity = 0;
+        this.targetVelocity = 40;
         this.targetYaw = 0;
 
         addRequirements(LauncherSubsystem);
@@ -51,11 +51,15 @@ public class ManualTurretCommand extends Command {
             ) > 0.2
         ) {
             targetYaw = Units.radiansToDegrees(
-                Math.PI + Math.atan2(
-                    operatorXbox.getLeftX(),
-                    operatorXbox.getLeftY()
-                )
-            ) + m_SwerveSubsystem.getRotation().getX();  
+                (
+                    (3 * Math.PI) 
+                    + Math.atan2(
+                        operatorXbox.getLeftX(),
+                        operatorXbox.getLeftY()
+                    ) 
+                    - m_SwerveSubsystem.getRotation().getZ()
+                ) % (2 * Math.PI)
+            );
         }
         m_LauncherSubsystem.setManualControl(
             targetYaw,

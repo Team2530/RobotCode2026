@@ -636,6 +636,8 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Optimizer/Error", 
                 optimalTime
             );
+        } else {
+            m_LauncherMotor.stopMotor();
         }
         // targeting
         SmartDashboard.putString(
@@ -903,5 +905,9 @@ public class TurretSubsystem extends SubsystemBase {
     
     public boolean isAtVelocity() {
         return atVelocity && yawIsZeroed;
+    }
+
+    public void stop() {
+        this.yawIsZeroed = false;
     }
 }
