@@ -1,20 +1,44 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.IndexerSubsystem;
+
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class RunIndexerCommand extends Command {
     private final IndexerSubsystem indexerSubsystem;
+    private final BooleanSupplier conditional;
     private final boolean isReversed;
+
+    public RunIndexerCommand(
+        IndexerSubsystem subsystem,
+        BooleanSupplier conditional,
+        boolean reversed
+    ) {
+        this.indexerSubsystem = subsystem;
+        this.conditional = conditional;
+        this.isReversed = reversed;
+        // Require the subsystem to prevent other commands from running on it concurrently
+        addRequirements(indexerSubsystem);
+        
+    }
+
 
     public RunIndexerCommand(
         IndexerSubsystem indexerSubsystem,
         boolean isReversed
     ) {
-        this.indexerSubsystem = indexerSubsystem;
-        this.isReversed = isReversed;
-        // Require the subsystem to prevent other commands from running on it concurrently
-        addRequirements(indexerSubsystem);
+        this(
+            indexerSubsystem,
+            new BooleanSupplier() {
+                @Override
+                public boolean getAsBoolean() {
+                    return true;
+                }
+            },
+            isReversed
+        );
     }
 
     public RunIndexerCommand(IndexerSubsystem indexerSubsystem) {
@@ -25,8 +49,12 @@ public class RunIndexerCommand extends Command {
     }
     
     @Override
-    public void initialize() {
-        indexerSubsystem.run(isReversed);
+    public void execute() {
+        if (conditional.getAsBoolean()) {
+            indexerSubsystem.run(isReversed);
+        } else {
+            indexerSubsystem.stop();
+        }
     }
 
     @Override
