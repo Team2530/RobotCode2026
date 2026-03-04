@@ -828,17 +828,6 @@ public class TurretSubsystem extends SubsystemBase {
         );
     }
 
-    public Command resetCommand() {
-        return new  ParallelCommandGroup(
-            zeroYawCommand(),
-            new InstantCommand(
-                () -> {
-                    setTargetVelocity(0);
-                }
-            )
-        );
-    }
-
     public void setTarget(TurretTargets target) {
         this.targetingMode = TargetingMode.ABSOLUTE;
         this.target = target;
