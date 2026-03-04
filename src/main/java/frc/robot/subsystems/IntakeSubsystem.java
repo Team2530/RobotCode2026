@@ -32,7 +32,7 @@ public class IntakeSubsystem extends SubsystemBase {
         // i.e., 90 would be vertical
         STOWED(true, 0),
         OUT(false, 0),
-        INTAKING(false, 45), //intake speed, in rps
+        INTAKING(false, 40), //intake speed, in rps
         AGITATING(true, 40),
         SPITTING(false, -IntakeConstants.Feeder.MAXIMUM_VELOCITY),
         CUSTOM(false, Double.MAX_VALUE);
@@ -91,11 +91,9 @@ public class IntakeSubsystem extends SubsystemBase {
         m_PivotPID = m_PivotMotor.getClosedLoopController();
 
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
-        pivotConfig.idleMode(IdleMode.kBrake)
-            .closedLoop
-                .p(IntakeConstants.Pivot.PID.P) 
-                .i(IntakeConstants.Pivot.PID.I) 
-                .d(IntakeConstants.Pivot.PID.D);
+        pivotConfig
+            .secondaryCurrentLimit(IntakeConstants.Pivot.ABSOLUTE_CURRENT_LIMIT)
+            .idleMode(IdleMode.kBrake);
         m_PivotMotor.configure(
             pivotConfig,
             ResetMode.kResetSafeParameters,
@@ -116,13 +114,7 @@ public class IntakeSubsystem extends SubsystemBase {
             )
         );
 
-        if (
-            !pivotDebouncer.calculate(
-                m_PivotMotor.getOutputCurrent() 
-                > IntakeConstants.Pivot.Zeroing.CURRENT_LIMIT
-            )
-        ) {
-            isHolding = false;
+        if (!isHolding) {
             // if moving to deploy / stow
             m_PivotMotor.set(
                 IntakeConstants.Pivot.DEPLOY_OUTPUT
@@ -131,12 +123,17 @@ public class IntakeSubsystem extends SubsystemBase {
                     : 1
                 )
             );
-        } else {
-            if (!isHolding) {
+            
+            if (
+                pivotDebouncer.calculate(
+                    m_PivotMotor.getOutputCurrent() 
+                    > IntakeConstants.Pivot.Zeroing.CURRENT_LIMIT
+                )
+            ) {
                 isHolding = true;
-                m_PivotMotor.getEncoder().setPosition(0);
+                m_PivotMotor.set(0);
             }
-        }
+        } 
 
         SmartDashboard.putNumber(
             "Intake/Feeder/target_velocity",
@@ -241,6 +238,7 @@ public class IntakeSubsystem extends SubsystemBase {
             IntakeConstants.Pivot.Zeroing.DEBOUNCE_TIME,
             DebounceType.kRising
         );
+        isHolding = false;
     }
 
     public IntakePreset getPreset() {
