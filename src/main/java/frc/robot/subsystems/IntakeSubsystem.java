@@ -164,6 +164,11 @@ public class IntakeSubsystem extends SubsystemBase {
             "Intake/Pivot/output",
             m_PivotMotor.getAppliedOutput()
         );
+        
+        SmartDashboard.putNumber(
+            "Intake/Pivot/amps",
+             m_PivotMotor.getOutputCurrent()
+        );
     }
     
    /*
