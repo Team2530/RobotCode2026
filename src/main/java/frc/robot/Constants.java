@@ -225,7 +225,7 @@ public final class Constants {
 
     public static final class IMU {
         public static final int CANID = 0;
-        public static final boolean INVERTED = true;
+        public static final boolean INVERTED = false;
     }
 
     public static final class SwerveModules {
@@ -350,7 +350,7 @@ public final class Constants {
         /** In Rotations/s */
         public static final double MINIMUM_VELOCITY = 25;
 
-        public static final double MAXIMUM_VELOCITY_ERROR = 10;
+        public static final double MAXIMUM_VELOCITY_ERROR = 5;
 
         public static final class PID {
             public static final class Holding {
