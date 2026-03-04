@@ -93,7 +93,11 @@ public class IntakeSubsystem extends SubsystemBase {
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
         pivotConfig
             .secondaryCurrentLimit(IntakeConstants.Pivot.ABSOLUTE_CURRENT_LIMIT)
-            .idleMode(IdleMode.kBrake);
+            .idleMode(IdleMode.kBrake)
+            .closedLoop
+                .p(IntakeConstants.Pivot.PID.P) 
+                .i(IntakeConstants.Pivot.PID.I) 
+                .d(IntakeConstants.Pivot.PID.D);
         m_PivotMotor.configure(
             pivotConfig,
             ResetMode.kResetSafeParameters,
@@ -131,7 +135,8 @@ public class IntakeSubsystem extends SubsystemBase {
                 )
             ) {
                 isHolding = true;
-                m_PivotMotor.set(0);
+                m_PivotMotor.getEncoder().setPosition(0);
+                m_PivotMotor.getClosedLoopController().setSetpoint(0, ControlType.kPosition);
             }
         } 
 

@@ -149,6 +149,12 @@ public final class Constants {
               public static final double CURRENT_LIMIT = 30;
               public static final double DEBOUNCE_TIME = 0.15;
           }
+          
+          public static final class PID {
+            public static final double P = 0.05;
+            public static final double I = 0;
+            public static final double D = 0;
+          }
       }
   }
 
@@ -344,13 +350,13 @@ public final class Constants {
         /** in rotations/s */
         public static final double MAXIMUM_VELOCITY = 500;
         /** In Rotations/s */
-        public static final double MINIMUM_VELOCITY = 25;
+        public static final double MINIMUM_VELOCITY = 15;
 
         public static final double MAXIMUM_VELOCITY_ERROR = 5;
 
         public static final class PID {
             public static final class Holding {
-                public static final double P = 5;
+                public static final double P = 2;
                 public static final double I = 0;
                 public static final double D = 0;
             }
