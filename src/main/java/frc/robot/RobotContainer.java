@@ -324,10 +324,4 @@ public class RobotContainer {
     public CommandXboxController getOperatorXbox() {
         return operatorXbox;
     }
-
-    public Command getResetCommand() {
-        return new ParallelCommandGroup(
-            turretSubsystem.resetCommand()
-        );
-    }
 }
