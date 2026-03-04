@@ -34,7 +34,6 @@ public class LimelightContainer {
       LimelightContainer.limelights.add(limelight);
       LimelightHelpers.SetFiducialIDFiltersOverride(limelight.getID(), validTagIDs); // makes sure the helper only considers the specified valid tag IDs.
       LimelightHelpers.SetIMUMode(limelight.getID(), 4);
-      limelight.setEnabled(true);
     }
   }
 
