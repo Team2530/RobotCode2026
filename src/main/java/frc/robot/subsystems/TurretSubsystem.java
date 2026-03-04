@@ -522,6 +522,7 @@ public class TurretSubsystem extends SubsystemBase {
                 optimalTime = 0;
             }
 
+            atVelocity = Math.abs(getLauncherVelocity() - optimalVelocity) < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR;
             // calculate voltages and send to motors
             /** targetVelocity Clamped in Rot/s */
             double setVelocity = MathUtil.clamp(
@@ -912,6 +913,6 @@ public class TurretSubsystem extends SubsystemBase {
     }
     
     public boolean isAtVelocity() {
-        return atVelocity;
+        return atVelocity && yawIsZeroed;
     }
 }
