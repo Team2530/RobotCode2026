@@ -133,7 +133,6 @@ public class TurretSubsystem extends SubsystemBase {
 
 
     private final SwerveSubsystem swerveSubsystem; 
-    private final BooleanSupplier isLaunching;
 
     private final TalonFX m_LauncherMotor;
     private final TalonFX m_YawMotor;
@@ -152,6 +151,8 @@ public class TurretSubsystem extends SubsystemBase {
     private boolean yawIsZeroed;
     private boolean atVelocity;
 
+    private final boolean isFueled;
+
     private final SimplexOptimizer targetingOptimizer;
     private double targetYaw;
     private double targetPitch;
@@ -163,11 +164,9 @@ public class TurretSubsystem extends SubsystemBase {
     private final StructPublisher<Translation3d> ToTargetPublisher;
 
     public TurretSubsystem(
-        SwerveSubsystem swerveSubsystem,
-        BooleanSupplier isLaunching
+        SwerveSubsystem swerveSubsystem
     ) {
         this.swerveSubsystem = swerveSubsystem;
-        this.isLaunching = isLaunching;
         // Initialize Motors and Encoders
         m_LauncherMotor = new TalonFX(
             TurretConstants.CanIDs.LAUNCHER_MOTOR
@@ -263,6 +262,7 @@ public class TurretSubsystem extends SubsystemBase {
         targetVelocity = 0;
 
         atVelocity = false;
+        isFueled = false;
     }
 
     private double relativeAngularVelocityFromLinear(
@@ -555,14 +555,15 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     );
             setPitch = targetPitch;
+            boolean isFueled = getLauncherCurrent()
+                > TurretConstants.Launcher.FUELED_CURRENT_LIMIT;
+            int setVelocityProfile = isFueled
+                    ? 1 // use a stronger profile when fuel is in the launcher
+                    : 0;
             m_LauncherMotor.setControl(
-                    new VelocityTorqueCurrentFOC(setVelocity)
-                    .withSlot(
-                        isLaunching.getAsBoolean()
-                        ? 1 // use more sensitive profile while launching
-                        : 0
-                        )
-                    );
+                new VelocityTorqueCurrentFOC(setVelocity)
+                    .withSlot(setVelocityProfile)
+            );
 
             m_YawMotor.setControl(
                     new MotionMagicTorqueCurrentFOC(
@@ -581,14 +582,13 @@ public class TurretSubsystem extends SubsystemBase {
                */
 
             SmartDashboard.putNumber(
-                "Turret/Last_was_active",
-                periodicTimestamp
+                "Turret/Launcher/pid_profile",
+                setVelocityProfile
             );
             SmartDashboard.putNumber(
                 "Turret/Yaw/Set_yaw",
                 setYaw
             );
-
         } else {
             m_LauncherMotor.stopMotor();
         }
@@ -597,6 +597,10 @@ public class TurretSubsystem extends SubsystemBase {
             targetPosition
         );
 
+        SmartDashboard.putNumber(
+            "Turret/Last_was_active",
+            periodicTimestamp
+        );
         // targeting
         SmartDashboard.putString(
             "Turret/Targeting/current_target_name",
@@ -609,6 +613,18 @@ public class TurretSubsystem extends SubsystemBase {
 
         // launcher
         SmartDashboard.putNumber(
+            "Turret/Launcher/output", 
+            m_LauncherMotor.getMotorVoltage().getValueAsDouble()
+        );
+        SmartDashboard.putBoolean(
+            "Turret/Launcher/at_velocity",
+            atVelocity
+        );
+        SmartDashboard.putBoolean(
+            "Turret/Launcher/is_fueled",
+            isFueled
+        );
+        SmartDashboard.putNumber(
             "Turret/Launcher/Target_velocity",
             targetVelocity
         );
@@ -616,33 +632,24 @@ public class TurretSubsystem extends SubsystemBase {
             "Turret/Launcher/Current_velocity",
             getLauncherVelocity()
         );
-        SmartDashboard.putNumber(
-            "Turret/Launcher/output",
-            m_LauncherMotor.getMotorVoltage().getValueAsDouble()
-        );
-        SmartDashboard.putBoolean(
-            "Turret/Launcher/at_velocity",
-            atVelocity
-        );
-        SmartDashboard.putNumber(
-            "Turret/Launcher/pid_profile",
-            isLaunching.getAsBoolean()
-                ? 1
-                : 0
-        );
+        ;
         SmartDashboard.putNumber(
             "Turret/Launcher/voltage",
             m_LauncherMotor.getMotorVoltage().getValueAsDouble()
         );
+        SmartDashboard.putNumber(
+            "Turret/Launcher/current",
+            getLauncherCurrent()
+        );
 
         // yaw
         SmartDashboard.putNumber(
-            "Turret/Yaw/Target_yaw",
-            targetYaw
+            "Turret/Yaw/output",
+            m_YawMotor.getMotorOutputStatus().getValueAsDouble() 
         );
         SmartDashboard.putNumber(
-            "Turret/Yaw/",
-            m_YawMotor.getMotorOutputStatus().getValueAsDouble() 
+            "Turret/Yaw/Target_yaw",
+            targetYaw
         );
         SmartDashboard.putNumber(
             "Turret/Yaw/Current_yaw",
@@ -729,6 +736,11 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getLauncherVelocity() {
         return m_LauncherMotor.getVelocity().getValueAsDouble();
+    }
+
+    // WARNING: oh baby talonfx i don't know if this is the right calls
+    public double getLauncherCurrent() {
+        return m_LauncherMotor.getTorqueCurrent().getValueAsDouble();
     }
 
     private static double calculateLauncherToExitVelocity(double launcherVelocity) {
