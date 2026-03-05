@@ -3,6 +3,8 @@ package frc.robot;
 import java.lang.annotation.Target;
 import java.util.function.BooleanSupplier;
 
+import javax.naming.PartialResultException;
+
 import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -11,11 +13,14 @@ import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
@@ -61,7 +66,8 @@ public class RobotContainer {
 
     @Logged
     public static final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-    public static final AutoChooser autoChooser = new AutoChooser();
+    // public static final AutoChooser autoChooser = new AutoChooser();
+    public static final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
     // LimeLightSubsystem();
     @Logged
     private static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
@@ -104,7 +110,7 @@ public class RobotContainer {
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
-        for (String trajectoryName : Choreo.availableTrajectories()) {
+        /* for (String trajectoryName : Choreo.availableTrajectories()) {
             autoChooser.addRoutine(trajectoryName + "_routine", () -> {
                 AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
                 AutoTrajectory trajectory = routine.trajectory(trajectoryName);
@@ -119,7 +125,60 @@ public class RobotContainer {
                 // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
                 return routine;
             });
-        }
+        } */
+
+        BooleanSupplier launch = new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean() {
+                return turretSubsystem.isAtVelocity();
+            }
+        };
+        autoChooser.addOption(
+            "trench left",
+            new SequentialCommandGroup(
+                turretSubsystem.zeroYawCommand(),
+                new ParallelCommandGroup(
+                    new InstantCommand(
+                        () -> {
+                            turretSubsystem.setManualControl(20, 30);
+                        }
+                    ),
+                    new RunIndexerCommand(
+                        indexerSubsystem,
+                        launch,
+                        false
+                    ),
+                    new RunLoaderCommand(
+                        loaderSubsystem,
+                        launch,
+                        false
+                    )
+                )
+            )
+        );
+        autoChooser.addOption(
+            "trench right",
+            new SequentialCommandGroup(
+                turretSubsystem.zeroYawCommand(),
+                new ParallelCommandGroup(
+                    new InstantCommand(
+                        () -> {
+                            turretSubsystem.setManualControl(20, 30);
+                        }
+                    ),
+                    new RunIndexerCommand(
+                        indexerSubsystem,
+                        launch,
+                        false
+                    ),
+                    new RunLoaderCommand(
+                        loaderSubsystem,
+                        launch,
+                        false
+                    )
+                )
+            )
+        );
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -311,7 +370,8 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.selectedCommand();
+        // return autoChooser.selectedCommand();
+        return autoChooser.getSelected();
     }
 
     public SwerveSubsystem getSwerveSubsystem() {
