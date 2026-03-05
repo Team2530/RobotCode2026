@@ -105,7 +105,8 @@ public class IntakeSubsystem extends SubsystemBase {
         );
         m_PivotPID.setSetpoint(0, ControlType.kPosition);
 
-        setPreset(IntakePreset.STOWED);
+        targetPivotRaised = false;
+        setPreset(IntakePreset.OUT);
 
         isHolding = false;
     }
