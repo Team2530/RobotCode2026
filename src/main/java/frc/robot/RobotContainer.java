@@ -203,7 +203,7 @@ public class RobotContainer {
         driverXbox.start()
             .onTrue(
                 new InstantCommand(() -> {
-                    LLContainer.snapToVision(swerveDriveSubsystem.getSwerveDrive());
+                    LLContainer.snapToVision(swerveDriveSubsystem);
                 })
             );
         driverXbox.back()
