@@ -477,7 +477,7 @@ public class TurretSubsystem extends SubsystemBase {
                     // optimalPitch = Units.radiansToRotations(optimalControls[1]);
                     // optimalVelocity = optimalControls[2];
                     // optimalTime = optimalControls[3];
-                    optimalVelocity = optimalControls[1];
+                    optimalVelocity = calculateExitToLauncherVelocity(optimalControls[1]);
                     optimalTime = optimalControls[2];
                     SmartDashboard.putString(
                         "Turret/Optimizer/status",
@@ -495,7 +495,7 @@ public class TurretSubsystem extends SubsystemBase {
 
                     // debugging
                     lastYaw = optimalYaw;
-                    lastVelocity = optimalVelocity;
+                    lastVelocity = calculateExitToLauncherVelocity(optimalVelocity);
                     lastTime = optimalTime;
                 } catch (Exception e) {
                     if (e instanceof MathIllegalStateException) {
@@ -512,7 +512,7 @@ public class TurretSubsystem extends SubsystemBase {
 
                     optimalYaw = lastYaw;
                     optimalPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
-                    optimalVelocity = lastVelocity;
+                    optimalVelocity = calculateExitToLauncherVelocity(lastVelocity);
                     optimalTime = lastTime;
                 }
             } else {
@@ -526,7 +526,7 @@ public class TurretSubsystem extends SubsystemBase {
             // calculate voltages and send to motors
             /** targetVelocity Clamped in Rot/s */
             double setVelocity = MathUtil.clamp(
-                calculateExitToLauncherVelocity(optimalVelocity),
+                optimalVelocity,
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
