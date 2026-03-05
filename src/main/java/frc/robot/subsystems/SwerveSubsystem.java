@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -8,6 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -462,8 +465,17 @@ public class SwerveSubsystem extends SubsystemBase {
     public Field2d getField() {
         return swerveDrive.field;
     }
-    
-        public SwerveDrive getSwerveDrive() {
-        return this.swerveDrive;
+
+    public void setVisionStandardDeviations(
+        Matrix<N3, N1> standardDeviations
+    ) {
+        swerveDrive.setVisionMeasurementStdDevs(standardDeviations);
+    }
+
+    public void addVisionMeasurement(
+        Pose2d pose,
+        double timestamp
+    ) {
+        swerveDrive.addVisionMeasurement(pose, timestamp);
     }
 }

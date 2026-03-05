@@ -11,7 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Limelight;
-import swervelib.SwerveDrive;
+import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.imu.SwerveIMU;
 
 /**
@@ -65,16 +65,15 @@ public class LimelightContainer {
   /** 
    * For every limelight in the container, addVisionMesurement and get robot orientation from pigeon.
    */
-  public void estimateMT2Odometry(SwerveDrive swerveDrive) {
+  public void estimateMT2Odometry(SwerveSubsystem swerve) {
     for (Limelight limelight : limelights) {
-      SwerveIMU gyro = swerveDrive.getGyro();
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
         Units.radiansToDegrees(
           (
             (Math.PI / 2)
-            + swerveDrive.getGyroRotation3d().getZ()
+            + swerve.getRotation().getX()
           ) % (Math.PI * 2)
         ),
         0, 
@@ -97,10 +96,15 @@ public class LimelightContainer {
         limelight.isEnabled()
         && mt2Estimation != null
         && mt2Estimation.tagCount >= 3
-        && doRotationRejection(gyro, 360)
+        && swerve.getAngularVelocity() > Math.PI
       ){
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 99999));
-        swerveDrive.addVisionMeasurement(mt2Estimation.pose, mt2Estimation.timestampSeconds);
+        swerve.setVisionStandardDeviations(
+            VecBuilder.fill(0.7, 0.7, 99999)
+        );
+        swerve.addVisionMeasurement(
+            mt2Estimation.pose,
+            mt2Estimation.timestampSeconds
+        );
         // add set vision measurments and add vision measurments here instead of the else statment. 
         added = true;
       } else {
@@ -114,16 +118,15 @@ public class LimelightContainer {
     }
   }
   
-  public void estimateMT1Odometry(SwerveDrive swerveDrive) {
+  public void estimateMT1Odometry(SwerveSubsystem swerve) {
     for (Limelight limelight : limelights) {
-      SwerveIMU gyro = swerveDrive.getGyro();
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
         Units.radiansToDegrees(
           (
             (Math.PI / 2)
-            + swerveDrive.getGyroRotation3d().getZ()
+            + swerve.getAngularVelocity()
           ) % (Math.PI * 2)
         ),
         0, 
@@ -147,10 +150,15 @@ public class LimelightContainer {
         limelight.isEnabled()
         && mt1Estimation != null
         && mt1Estimation.tagCount > 0
-        && doRotationRejection(gyro, 720)
+        && (swerve.getAngularVelocity() > (Math.PI * 2))
       ){
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 99999));
-        swerveDrive.addVisionMeasurement(mt1Estimation.pose, mt1Estimation.timestampSeconds);
+        swerve.setVisionStandardDeviations(
+            VecBuilder.fill(0.7, 0.7, 99999)
+        );
+        swerve.addVisionMeasurement(
+            mt1Estimation.pose,
+            mt1Estimation.timestampSeconds
+        );
         added = true;
       } else {
         added = false;
@@ -163,7 +171,7 @@ public class LimelightContainer {
     }
   }
 
-  public void snapToVision(SwerveDrive swerve) {
+  public void snapToVision(SwerveSubsystem swerve) {
     for (Limelight limelight : limelights) {
       LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getID());
       if (mt1 != null && mt1.tagCount > 0 ) {
@@ -195,13 +203,4 @@ public class LimelightContainer {
       RLCountermt1++;
     }
   } */
-
-  /** Returns if the pigeon detects high angular velocity in degrees per second */
-  private boolean doRotationRejection(Pigeon2 pigeon, int dps) {
-    return Math.abs(pigeon.getAngularVelocityZWorld().getValueAsDouble()) > dps;
-  }
-  private boolean doRotationRejection(SwerveIMU gyro, double maxDps) {
-    // TODO: Check if this is correct
-    return Math.abs(Units.radiansToDegrees(gyro.getYawAngularVelocity().magnitude())) > maxDps;
-  }
 }
