@@ -297,7 +297,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(58, 34);
+                        turretSubsystem.setManualControl(60, 36);
                     }
                 )
             );
