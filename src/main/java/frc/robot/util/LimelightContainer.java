@@ -8,6 +8,7 @@ import edu.wpi.first.math.VecBuilder;
 // import edu.wpi.first.math.kinematics.Odometry;
 // import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Limelight;
 import swervelib.SwerveDrive;
@@ -85,8 +86,13 @@ public class LimelightContainer {
       
       LimelightHelpers.PoseEstimate mt2Estimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getID());
 
+      SmartDashboard.putNumber(
+        "Odometry/mt2/" + limelight.getID() + "/lastConsidered",
+        Timer.getTimestamp()
+      );
+
+      boolean added;
       // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      
       if (
         limelight.isEnabled()
         && mt2Estimation != null
@@ -96,9 +102,15 @@ public class LimelightContainer {
         swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 99999));
         swerveDrive.addVisionMeasurement(mt2Estimation.pose, mt2Estimation.timestampSeconds);
         // add set vision measurments and add vision measurments here instead of the else statment. 
+        added = true;
       } else {
-
+        added = false;
       }
+
+      SmartDashboard.putBoolean(
+        "Odometry/mt2/" + limelight.getID() + "/added",
+        added
+      );
     }
   }
   
@@ -125,6 +137,12 @@ public class LimelightContainer {
 
       // if our angular velocity is greater than 720 degrees per second, ignore vision updates
       
+      SmartDashboard.putNumber(
+        "Odometry/mt1/" + limelight.getID() + "/lastConsidered",
+        Timer.getTimestamp()
+      );
+
+      boolean added;
       if (
         limelight.isEnabled()
         && mt1Estimation != null
@@ -133,10 +151,15 @@ public class LimelightContainer {
       ){
         swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 99999));
         swerveDrive.addVisionMeasurement(mt1Estimation.pose, mt1Estimation.timestampSeconds);
-        // add set vision measurments and add vision measurments here instead of the else statment. 
+        added = true;
       } else {
-
+        added = false;
       }
+
+      SmartDashboard.putBoolean(
+        "Odometry/mt2/" + limelight.getID() + "/added",
+        added
+      );
     }
   }
 
