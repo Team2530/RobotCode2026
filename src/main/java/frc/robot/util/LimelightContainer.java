@@ -34,6 +34,7 @@ public class LimelightContainer {
       LimelightContainer.limelights.add(limelight);
       LimelightHelpers.SetFiducialIDFiltersOverride(limelight.getID(), validTagIDs); // makes sure the helper only considers the specified valid tag IDs.
       LimelightHelpers.SetIMUMode(limelight.getID(), 4);
+      LimelightHelpers.SetIMUAssistAlpha("limelight", 0.001);
     }
   }
 
@@ -69,7 +70,12 @@ public class LimelightContainer {
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
-        Units.radiansToDegrees(swerveDrive.getGyroRotation3d().getX()),
+        Units.radiansToDegrees(
+          (
+            (Math.PI / 2)
+            + swerveDrive.getGyroRotation3d().getZ()
+          ) % (Math.PI * 2)
+        ),
         0, 
         0, 
         0, 
@@ -84,10 +90,10 @@ public class LimelightContainer {
       if (
         limelight.isEnabled()
         && mt2Estimation != null
-        && mt2Estimation.tagCount > 0
-        && doRotationRejection(gyro, 720)
+        && mt2Estimation.tagCount >= 3
+        && doRotationRejection(gyro, 360)
       ){
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 99999));
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 99999));
         swerveDrive.addVisionMeasurement(mt2Estimation.pose, mt2Estimation.timestampSeconds);
         // add set vision measurments and add vision measurments here instead of the else statment. 
       } else {
@@ -102,7 +108,12 @@ public class LimelightContainer {
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
-        Units.radiansToDegrees(swerveDrive.getGyroRotation3d().getX()),
+        Units.radiansToDegrees(
+          (
+            (Math.PI / 2)
+            + swerveDrive.getGyroRotation3d().getZ()
+          ) % (Math.PI * 2)
+        ),
         0, 
         0, 
         0, 

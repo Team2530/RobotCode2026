@@ -48,8 +48,6 @@ public class Limelight extends SubsystemBase {
         this.name = name;
         this.isEnabled = isEnabled;
         this.cropEnabled = cropEnabled;
-
-        LimelightHelpers.SetIMUMode(name, 4);
     }
 
     @Override
