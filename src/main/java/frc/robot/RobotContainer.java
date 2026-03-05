@@ -11,6 +11,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -140,7 +141,7 @@ public class RobotContainer {
                 new ParallelCommandGroup(
                     new InstantCommand(
                         () -> {
-                            turretSubsystem.setManualControl(20, 30);
+                            turretSubsystem.setManualControl(295.5, 36.5);
                         }
                     ),
                     new RunIndexerCommand(
@@ -163,7 +164,7 @@ public class RobotContainer {
                 new ParallelCommandGroup(
                     new InstantCommand(
                         () -> {
-                            turretSubsystem.setManualControl(20, 30);
+                            turretSubsystem.setManualControl(64.5,36.5);
                         }
                     ),
                     new RunIndexerCommand(
@@ -300,50 +301,74 @@ public class RobotContainer {
             swerveDriveSubsystem,
             operatorXbox.getHID()
         );
-        operatorXbox.y()
-                .onTrue(turretCommand);
-        operatorXbox.povUp()
-                .onTrue(
-                    new InstantCommand(
-                        () -> {
-                            turretCommand.increaseVelocity();
-                        }
-                    )
-                );
-        operatorXbox.povDown()
-                .onTrue(
-                    new InstantCommand(
-                        () -> {
-                            turretCommand.decreaseVelocity();
-                        }
-                    )
-                );
         
+        operatorXbox.y().onTrue(turretCommand);
+
+        // operatorXbox.povUp()
+        //         .onTrue(
+        //             new InstantCommand(
+        //                 () -> {
+                            
+        //                     turretCommand.increaseVelocity();
+        //                 }
+        //             )
+        //         );
+
+        // operatorXbox.povDown()
+        //         .onTrue(
+        //             new InstantCommand(
+        //                 () -> {
+        //                     turretCommand.decreaseVelocity();
+        //                 }
+        //             )
+        //         );
+
+
+        
+        // LEFT CORNER
         operatorXbox.x()
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(52, 45);
+                        turretSubsystem.setManualControl(47.5, 40.5);
                     }
                 )
             );
+
+        // RIGHT CORNER
         operatorXbox.b()
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(329, 42.5);
+                        turretSubsystem.setManualControl(312.5, 40.5);
                     }
                 )
             );
+
+        // SHUTTLE
         operatorXbox.a()
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        // turretSubsystem.setManualControl(0, 48.5);
-                        turretSubsystem.setTarget(TurretTargets.HUB);
+                        turretSubsystem.setManualControl(0, 45);
+                        //turretSubsystem.setTarget(TurretTargets.HUB);
                     }
                 )
             );
+
+        // DEPOT
+        operatorXbox.povDown()
+            //.onTrue(turretCommand);
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setManualControl(62, 37.5);
+                    }
+                )
+            );
+
+
+        // KILL
         operatorXbox.leftStick()
             .onTrue(
                 new InstantCommand(
@@ -352,14 +377,28 @@ public class RobotContainer {
                     }
                 )
             );
+
+        // LEFT TRENCH  
         operatorXbox.povLeft()
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(60, 36);
+                        turretSubsystem.setManualControl(295.5, 36.5);
                     }
                 )
             );
+
+        // RIGHT TRENCH
+        operatorXbox.povRight()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setManualControl(64.5,36.5);
+                    }
+                )
+            );
+
+        
     }
 
 
