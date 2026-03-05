@@ -48,20 +48,30 @@ public class DriveCommand extends Command {
             //
             // apparently, a forward on the joystick (relative to the 
             // controller) corresponds to a negative value
-            double x = MathUtil.applyDeadband(
-                    -driverXbox.getLeftY(),
-                    ControlConstants.Deadband.X);
-            double y = MathUtil.applyDeadband(
-                    -driverXbox.getLeftX(),
-                    ControlConstants.Deadband.Y);
+            double rawX = MathUtil.applyDeadband(
+                -driverXbox.getLeftY(),
+                ControlConstants.Deadband.X
+            );
+            double rawY = MathUtil.applyDeadband(
+                -driverXbox.getLeftX(),
+                ControlConstants.Deadband.Y
+            );
+
+            double angle = Math.atan2(rawY, rawX);
+            double magnitude = Math.sqrt(
+                Math.pow(rawX, 2)
+                + Math.pow(rawY, 2)
+            );
             // to yagsl, a positive rotation value corresponds to a ccw 
             // rotation
+            double x = Math.cos(angle + headingOffset) * magnitude;
+            ;
+            double y = Math.sin(angle + headingOffset) * magnitude;
+
             double z = MathUtil.applyDeadband(
                     -driverXbox.getRightX(),
                     ControlConstants.Deadband.Z);
 
-            x *= Math.cos(headingOffset);
-            y *= Math.sin(headingOffset);
 
             // trigger-base slow / fast mode
             double driveMultiplier = driveMultiplierSlewLimiter
