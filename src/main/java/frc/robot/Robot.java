@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    RobotContainer.LLContainer.snapToVision(m_robotContainer.getSwerveSubsystem().getSwerveDrive()); //snapping odometry to a tag in the feild using MT1
+    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem); //snapping odometry to a tag in the feild using MT1
     // Put git/code version metadata on networktables
     NetworkTable versionTable = NetworkTableInstance.getDefault().getTable("Version");
     versionTable.putValue("GIT_SHA", NetworkTableValue.makeString(BuildConstants.GIT_SHA));
@@ -142,7 +142,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    RobotContainer.LLContainer.snapToVision(m_robotContainer.getSwerveSubsystem().getSwerveDrive());
+    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem);
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -162,7 +162,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    RobotContainer.LLContainer.snapToVision(m_robotContainer.getSwerveSubsystem().getSwerveDrive());
+    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -177,7 +177,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    RobotContainer.LLContainer.snapToVision(m_robotContainer.getSwerveSubsystem().getSwerveDrive());
+    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem);
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
