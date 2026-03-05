@@ -106,7 +106,7 @@ public class IntakeSubsystem extends SubsystemBase {
         m_PivotPID.setSetpoint(0, ControlType.kPosition);
 
         targetPivotRaised = false;
-        setPreset(IntakePreset.OUT);
+        setPreset(IntakePreset.STOWED);
 
         isHolding = false;
     }
@@ -171,6 +171,10 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber(
             "Intake/Pivot/amps",
              m_PivotMotor.getOutputCurrent()
+        );
+        SmartDashboard.putString(
+            "Intake/preset",
+            intakePreset.toString()
         );
     }
     
