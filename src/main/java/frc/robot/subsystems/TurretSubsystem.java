@@ -599,6 +599,10 @@ public class TurretSubsystem extends SubsystemBase {
                 "Turret/Launcher/is_fueled",
                 isFueled
             );
+            SmartDashboard.putNumber(
+                "Turret/Launcher/current",
+                getLauncherCurrent()
+            );
             // yaw
             SmartDashboard.putNumber(
                 "Turret/Yaw/Target_yaw",
