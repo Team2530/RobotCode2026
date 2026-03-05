@@ -61,10 +61,17 @@ public class ManualTurretCommand extends Command {
                 ) % (2 * Math.PI)
             );
         }
+
+        if (operatorXbox.getRightY()> 0.2 || operatorXbox.getRightY() < 0.2) {
+            changeVelocity(operatorXbox.getRightY() * 0.1);
+        }
+
         m_LauncherSubsystem.setManualControl(
             targetYaw,
-            targetVelocity
+            targetVelocity 
         );
+
+         
     }
 
     @Override
