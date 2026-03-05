@@ -314,7 +314,7 @@ public final class Constants {
     public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
     public static final PID x_CONTROLLER = new PID(10, 0, 0);
     public static final PID y_CONTROLLER = new PID(10, 0, 0);
-    public static final PID heading_CONTROLLER = new PID(7.5, 0, 0);
+    public static final PID heading_CONTROLLER = new PID(1.4, 0, 0);
   }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
@@ -356,24 +356,22 @@ public final class Constants {
 
         public static final class PID {
             public static final class Holding {
-                public static final double P = 1.45;
+                public static final double P = 4;
                 public static final double I = 0;
-                public static final double D = 0;
+                public static final double D = 0;  
             }
 
             public static final class Launching {
-                public static final double P = 40;
+                public static final double P = 6;
                 public static final double I = 0;
-                public static final double D = 0;
+                public static final double D = 0.05;
             }
         }
 
         public static final class Feedforward {
             public static final class Holding {
-                public static final double kS = 0.42;
-                public static final double kV = 0.40;
-                // public static final double kS = 0.44;
-                // public static final double kV = 0.645;
+                public static final double kS = 0.44;
+                public static final double kV = 0.645;
             }
 
             public static final class Launching {
