@@ -522,21 +522,22 @@ public class TurretSubsystem extends SubsystemBase {
                 optimalTime = 0;
             }
 
-            atVelocity = Math.abs(getLauncherVelocity() - optimalVelocity) < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR;
             // calculate voltages and send to motors
+            atVelocity = Math.abs(getLauncherVelocity() - optimalVelocity) < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR;
             /** targetVelocity Clamped in Rot/s */
             double setVelocity = MathUtil.clamp(
                 calculateExitToLauncherVelocity(optimalVelocity),
                 TurretConstants.Launcher.MINIMUM_VELOCITY,
                 TurretConstants.Launcher.MAXIMUM_VELOCITY
             );
+            boolean isFueled = getLauncherCurrent()
+                > TurretConstants.Launcher.FUELED_CURRENT_LIMIT;
+            int setVelocityProfile = isFueled
+                    ? 1 // use a stronger profile when fuel is in the launcher
+                    : 0
             m_LauncherMotor.setControl(
                 new VelocityTorqueCurrentFOC(setVelocity)
-                    .withSlot(
-                        isLaunching.getAsBoolean()
-                            ? 1 // use more sensitive profile while launching
-                            : 0
-                    )
+                    .withSlot(setVelocityProfile)
             );
 
             double setYaw = MathUtil.clamp(
@@ -592,9 +593,11 @@ public class TurretSubsystem extends SubsystemBase {
             );
             SmartDashboard.putNumber(
                 "Turret/Launcher/pid_profile",
-                isLaunching.getAsBoolean()
-                    ? 1
-                    : 0
+                setVelocityProfile
+            );
+            SmartDashboard.putBoolean(
+                "Turret/Launcher/is_fueled",
+                isFueled
             );
             // yaw
             SmartDashboard.putNumber(
@@ -750,6 +753,11 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getLauncherVelocity() {
         return m_LauncherMotor.getVelocity().getValueAsDouble();
+    }
+
+    // WARNING: oh baby talonfx i don't know if this is the right calls
+    public double getLauncherCurrent() {
+        return m_LauncherMotor.getTorqueCurrent().getValueAsDouble();
     }
 
     private double calculateLauncherToExitVelocity(double launcherVelocity) {

@@ -354,6 +354,9 @@ public final class Constants {
 
         public static final double MAXIMUM_VELOCITY_ERROR = 5;
 
+        // TODO: find this
+        public static final double FUELED_CURRENT_LIMIT = 40;
+
         public static final class PID {
             public static final class Holding {
                 public static final double P = 2;
