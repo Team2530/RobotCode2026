@@ -3,6 +3,8 @@ package frc.robot;
 import java.lang.annotation.Target;
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix6.Orchestra;
+
 import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -79,6 +81,8 @@ public class RobotContainer {
             }
         }
     );
+
+    public static final Orchestra orchestra = new Orchestra();
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     private final AutoFactory autoFactory = new AutoFactory(

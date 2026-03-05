@@ -12,7 +12,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.RobotContainer;
 import frc.robot.Constants.LoaderConstants;
 
 public class LoaderSubsystem extends SubsystemBase {
@@ -40,6 +40,8 @@ public class LoaderSubsystem extends SubsystemBase {
             );
 
         stop();
+
+        RobotContainer.orchestra.addInstrument(m_LoaderMotor);
     }
 
     @Override

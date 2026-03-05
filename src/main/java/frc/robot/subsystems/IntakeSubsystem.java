@@ -23,6 +23,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import frc.robot.RobotContainer;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -109,6 +110,8 @@ public class IntakeSubsystem extends SubsystemBase {
         setPreset(IntakePreset.OUT);
 
         isHolding = false;
+
+        RobotContainer.orchestra.addInstrument(m_FeederMotor);
     }
 
     @Override

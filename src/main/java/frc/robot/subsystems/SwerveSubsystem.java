@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
@@ -30,6 +32,7 @@ import frc.robot.RobotContainer;
 import frc.robot.util.LimelightContainer;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveModule;
 import swervelib.encoders.CANCoderSwerve;
 import swervelib.imu.Pigeon2Swerve;
 import swervelib.math.SwerveMath;
@@ -251,6 +254,26 @@ public class SwerveSubsystem extends SubsystemBase {
                     DriveConstants.MAX_ROBOT_VELOCITY, 
                     new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(90))
             );
+
+            for (SwerveModule module : swerveDrive.getModules()) {
+                try {
+                    RobotContainer.orchestra.addInstrument(
+                        ((TalonFX)
+                            module.getDriveMotor().getMotor()
+                        )
+                    );
+                    RobotContainer.orchestra.addInstrument(
+                        ((TalonFX)
+                            module.getAngleMotor().getMotor()
+                        )
+                    );
+                } catch (Exception e) {
+                    System.out.println(
+                        "error when adding swerve instrument to orchestra: "
+                        + e
+                    );
+                }
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

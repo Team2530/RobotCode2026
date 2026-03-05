@@ -70,6 +70,7 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 
 import frc.robot.Constants.TurretConstants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.LoaderConstants;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -263,6 +264,9 @@ public class TurretSubsystem extends SubsystemBase {
         targetVelocity = 0;
 
         atVelocity = false;
+
+        RobotContainer.orchestra.addInstrument(m_YawMotor);
+        RobotContainer.orchestra.addInstrument(m_LauncherMotor);
     }
 
     private double relativeAngularVelocityFromLinear(
