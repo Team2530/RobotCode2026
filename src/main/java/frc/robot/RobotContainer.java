@@ -48,7 +48,7 @@ import frc.robot.util.LimelightContainer;
 public class RobotContainer {
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
     private static final Limelight LL_BT = new Limelight(LimelightType.LL4, "limelight-bt", false, true);
-    private static final Limelight LL_BR = new Limelight(LimelightType.LL4, "limelight-br", true, true);
+    private static final Limelight LL_FL = new Limelight(LimelightType.LL4, "limelight-fl", true, true);
     private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
     private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
 
