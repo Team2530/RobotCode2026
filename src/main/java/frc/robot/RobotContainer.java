@@ -74,8 +74,7 @@ public class RobotContainer {
         new BooleanSupplier() {
             @Override
             public boolean getAsBoolean() {
-                return operatorXbox.getHID()
-                    .getBackButtonPressed();
+                return operatorXbox.getHID().getRightTriggerAxis() > 0.3;
             }
         }
     );
