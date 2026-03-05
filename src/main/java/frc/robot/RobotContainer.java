@@ -78,15 +78,7 @@ public class RobotContainer {
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     public static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    public static final TurretSubsystem turretSubsystem = new TurretSubsystem(
-        swerveDriveSubsystem,
-        new BooleanSupplier() {
-            @Override
-            public boolean getAsBoolean() {
-                return operatorXbox.getHID().getRightTriggerAxis() > 0.3;
-            }
-        }
-    );
+    public static final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     private final AutoFactory autoFactory = new AutoFactory(

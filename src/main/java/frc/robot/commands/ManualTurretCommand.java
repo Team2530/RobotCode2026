@@ -16,6 +16,8 @@ public class ManualTurretCommand extends Command {
     private double targetVelocity;
     private double targetYaw;
 
+    private boolean analogClick;
+
     public ManualTurretCommand(
         TurretSubsystem LauncherSubsystem,
         SwerveSubsystem SwerveSubsystem,
@@ -29,6 +31,8 @@ public class ManualTurretCommand extends Command {
         this.targetYaw = 0;
 
         addRequirements(LauncherSubsystem);
+
+        analogClick = false;
     }
     
     @Override
@@ -63,7 +67,12 @@ public class ManualTurretCommand extends Command {
         }
 
         if (operatorXbox.getRightY()> 0.2 || operatorXbox.getRightY() < 0.2) {
-            changeVelocity(operatorXbox.getRightY() * 0.1);
+            if (!analogClick) {
+                analogClick = true;
+                changeVelocity(operatorXbox.getRightY() * 0.1);
+            }            
+        } else {
+            analogClick = false;
         }
 
         m_LauncherSubsystem.setManualControl(

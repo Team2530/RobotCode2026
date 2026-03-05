@@ -365,9 +365,9 @@ public final class Constants {
             }
 
             public static final class Launching {
-                public static final double P = 12;
+                public static final double P = 16;
                 public static final double I = 0;
-                public static final double D = 0.05;
+                public static final double D = 0.01;
             }
         }
 
