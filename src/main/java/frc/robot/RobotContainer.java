@@ -11,6 +11,8 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
@@ -215,6 +217,8 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(() -> {
                     LLContainer.snapToVision(swerveDriveSubsystem);
+                    // this works because swervesubsyste.getrotation pulls directly from the pigeon and not the fused pose
+                    normalDrive.resetHeading();
                 })
             );
         driverXbox.back()

@@ -16,6 +16,8 @@ public class DriveCommand extends Command {
     private final SwerveSubsystem subsystem;
     private final XboxController driverXbox;
 
+    private double headingOffset;
+
     /** Limit the speed of change */
     private SlewRateLimiter driveMultiplierSlewLimiter = new SlewRateLimiter(
             ControlConstants.DRIVE_MULTIPLIER_SLEW_RATE);
@@ -30,6 +32,8 @@ public class DriveCommand extends Command {
 
         driveMultiplierSlewLimiter.reset(
                 ControlConstants.TURTLE_DRIVE_MULT);
+
+        headingOffset = 0;
     }
 
     @Override
@@ -56,8 +60,10 @@ public class DriveCommand extends Command {
                     -driverXbox.getRightX(),
                     ControlConstants.Deadband.Z);
 
-            // trigger-base slow / fast mode
+            x *= Math.cos(headingOffset);
+            y *= Math.sin(headingOffset);
 
+            // trigger-base slow / fast mode
             double driveMultiplier = driveMultiplierSlewLimiter
                     .calculate((ControlConstants.REGULAR_DRIVE_MULT - ControlConstants.TURTLE_DRIVE_MULT)
                             * driverXbox.getRightTriggerAxis() + ControlConstants.TURTLE_DRIVE_MULT);
@@ -89,5 +95,9 @@ public class DriveCommand extends Command {
     @Override
     public boolean isFinished() {
         return false;
+    }
+
+    public void resetHeading() {
+        headingOffset = subsystem.getHeading();
     }
 }

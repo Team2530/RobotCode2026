@@ -478,4 +478,9 @@ public class SwerveSubsystem extends SubsystemBase {
     ) {
         swerveDrive.addVisionMeasurement(pose, timestamp);
     }
+
+    /* in radians */
+    public double getHeading() {
+        return getRotation().getZ();
+    }
 }
