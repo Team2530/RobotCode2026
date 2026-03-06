@@ -516,6 +516,16 @@ public class TurretSubsystem extends SubsystemBase {
                             "Turret/Optimizer/LastCompleted",
                             periodicTimestamp
                             );
+                    
+                    targetYaw = ((3 * Math.PI) 
+                        + Math.atan2(
+                            toTarget.getY(),
+                            toTarget.getX()
+                        )) % (2 * Math.PI);
+                    targetPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
+                    targetVelocity =  calculateExitToLauncherVelocity(
+                        getVelocityWithKinematics(toTarget)
+                    );
                 } catch (Exception e) {
                     if (e instanceof MathIllegalStateException) {
                         SmartDashboard.putString(
@@ -902,15 +912,21 @@ public class TurretSubsystem extends SubsystemBase {
         this.yawIsZeroed = false;
     }
 
-    public double getVelocityWithKinematics(double distance) {
-        double exitVelocity = (
-        Math.sqrt(
-                (FieldConstants.GRAVITY * distance * distance)
-                        / ((2 * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT) *
-                                Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT)) *
-                                (distance * Math.tan(TurretConstants.Pitch.ANGLE_CONSTANT) -
-                                        (Units.inchesToMeters(72) + Units.inchesToMeters(24))))));
-
-        return exitVelocity;
+    public double getVelocityWithKinematics(Translation3d toTarget) {
+        return Math.sqrt(
+            (FieldConstants.GRAVITY *  toTarget.toTranslation2d().getSquaredNorm())
+            / (
+                (
+                    2 * Math.pow(
+                      Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT), 
+                      2
+                    )   
+                ) * (
+                        toTarget.getNorm() 
+                        * Math.tan(TurretConstants.Pitch.ANGLE_CONSTANT) 
+                        - (toTarget.getZ() - TurretConstants.Offsets.Z)
+                )
+            )
+        );
     }
 }
