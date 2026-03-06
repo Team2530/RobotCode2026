@@ -144,6 +144,15 @@ public final class Constants {
           public static final double DEPLOY_OUTPUT = 0.25;
           // cause we burnt a neo v2
           public static final double ABSOLUTE_CURRENT_LIMIT = 60;
+        
+          // in seconds
+          public static final double WAVE_PERIOD = 2;
+          // an arbitrary value
+          //
+          // this is probably dependent on the gear ratio of the pivot, i 
+          // just don't know what that is
+          public static final double WAVE_HEIGHT = 3;
+
           public static final class Zeroing {
               // amps ocourse
               public static final double CURRENT_LIMIT = 30;
@@ -151,9 +160,17 @@ public final class Constants {
           }
           
           public static final class PID {
-            public static final double P = 0.05;
-            public static final double I = 0;
-            public static final double D = 0;
+            public static final class Holding {
+                public static final double P = 0.05;
+                public static final double I = 0;
+                public static final double D = 0;
+            }
+
+            public static final class Wave {
+                public static final double P = 0.5;
+                public static final double I = 0;
+                public static final double D = 0;
+            }
           }
       }
   }

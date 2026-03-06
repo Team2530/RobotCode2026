@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -14,6 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
@@ -32,7 +34,8 @@ public class IntakeSubsystem extends SubsystemBase {
         // i.e., 90 would be vertical
         STOWED(true, 0),
         OUT(false, 0),
-        INTAKING(false, 50), //intake speed, in rps
+        INTAKING(false, 43), //intake speed, in rps
+        AGITATING(false, 50),
         SPITTING(false, -IntakeConstants.Feeder.MAXIMUM_VELOCITY),
         CUSTOM(false, Double.MAX_VALUE);
 
@@ -60,6 +63,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private Debouncer pivotDebouncer;
     private boolean isHolding;
+
+    private double waveStart;
 
     public IntakeSubsystem() {
         m_FeederMotor = new TalonFX(
@@ -94,9 +99,15 @@ public class IntakeSubsystem extends SubsystemBase {
             .secondaryCurrentLimit(IntakeConstants.Pivot.ABSOLUTE_CURRENT_LIMIT)
             .idleMode(IdleMode.kBrake)
             .closedLoop
-                .p(IntakeConstants.Pivot.PID.P) 
-                .i(IntakeConstants.Pivot.PID.I) 
-                .d(IntakeConstants.Pivot.PID.D);
+                // while holding  
+                .p(IntakeConstants.Pivot.PID.Holding.P, ClosedLoopSlot.kSlot0) 
+                .i(IntakeConstants.Pivot.PID.Holding.I, ClosedLoopSlot.kSlot0) 
+                .d(IntakeConstants.Pivot.PID.Holding.D, ClosedLoopSlot.kSlot0)
+                // while agitating 
+                .p(IntakeConstants.Pivot.PID.Wave.P, ClosedLoopSlot.kSlot1) 
+                .i(IntakeConstants.Pivot.PID.Wave.I, ClosedLoopSlot.kSlot1) 
+                .d(IntakeConstants.Pivot.PID.Wave.D, ClosedLoopSlot.kSlot1);
+                
         m_PivotMotor.configure(
             pivotConfig,
             ResetMode.kResetSafeParameters,
@@ -133,10 +144,37 @@ public class IntakeSubsystem extends SubsystemBase {
                 )
             ) {
                 isHolding = true;
-                m_PivotMotor.getEncoder().setPosition(0);
-                m_PivotMotor.getClosedLoopController().setSetpoint(0, ControlType.kPosition);
+                m_PivotMotor.getEncoder().setPosition(IntakeConstants.Pivot.WAVE_HEIGHT);
+                m_PivotMotor.getClosedLoopController().setSetpoint(
+                    IntakeConstants.Pivot.WAVE_HEIGHT,
+                    ControlType.kPosition,
+                    ClosedLoopSlot.kSlot0
+                );
+                waveStart = Timer.getFPGATimestamp();
             }
-        } 
+        }
+
+
+        if (
+            isHolding
+            && intakePreset == IntakePreset.AGITATING
+        ) {
+            m_PivotMotor.getClosedLoopController()
+                .setSetpoint(
+                    Math.cos(
+                        (
+                            (Timer.getFPGATimestamp() - waveStart)
+                            * (2 * Math.PI)
+                        )
+                        / (
+                            IntakeConstants.Pivot.WAVE_PERIOD
+                        )
+                    ) * IntakeConstants.Pivot.WAVE_HEIGHT,
+                    ControlType.kPosition,
+                    ClosedLoopSlot.kSlot1
+                );
+        }
+
 
         SmartDashboard.putNumber(
             "Intake/Feeder/target_velocity",
@@ -164,10 +202,17 @@ public class IntakeSubsystem extends SubsystemBase {
             "Intake/Pivot/output",
             m_PivotMotor.getAppliedOutput()
         );
-        
         SmartDashboard.putNumber(
             "Intake/Pivot/amps",
              m_PivotMotor.getOutputCurrent()
+        );
+        SmartDashboard.putNumber(
+            "Intake/Pivot/target_position",
+            m_PivotMotor.getClosedLoopController().getSetpoint()
+        );
+        SmartDashboard.putNumber(
+            "Intake/Pivot/position",
+            m_PivotMotor.getEncoder().getPosition()
         );
         SmartDashboard.putString(
             "Intake/preset",

@@ -296,7 +296,14 @@ public class RobotContainer {
                 )
             );
 
-        operatorXbox.rightTrigger(0.3).and(
+        operatorXbox.rightTrigger(0.3)
+        .whileTrue(
+            new IntakeCommand(
+                intakeSubsystem,
+                IntakePreset.AGITATING
+            )
+        )
+        .and(
                 new BooleanSupplier() {
                     @Override
                     public boolean getAsBoolean() {
