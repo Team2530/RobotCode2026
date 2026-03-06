@@ -160,7 +160,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem);
+    RobotContainer.normalDrive.resetHeading();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
