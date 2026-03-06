@@ -169,7 +169,7 @@ public class RobotContainer {
                 new ParallelCommandGroup(
                     new InstantCommand(
                         () -> {
-                            turretSubsystem.setManualControl(64.5,36.5);
+                            turretSubsystem.setManualControl(69,36);
                         }
                     ),
                     new RunIndexerCommand(
@@ -448,7 +448,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(295.5, 36.5);
+                        turretSubsystem.setManualControl(295, 36);
                     }
                 )
             );
