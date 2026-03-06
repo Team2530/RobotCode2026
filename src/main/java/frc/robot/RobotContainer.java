@@ -132,11 +132,10 @@ public class RobotContainer {
         autoChooser.addOption(
             "trench left",
             new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    intakeSubsystem.setPreset(
-                        IntakePreset.OUT
-                    );
-                }),
+                new IntakeCommand(
+                    intakeSubsystem,
+                    IntakePreset.AGITATING
+                ),
                 turretSubsystem.zeroYawCommand(),
                 new ParallelCommandGroup(
                     new InstantCommand(
@@ -160,11 +159,10 @@ public class RobotContainer {
         autoChooser.addOption(
             "trench right",
             new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    intakeSubsystem.setPreset(
-                        IntakePreset.OUT
-                    );
-                }),
+                new IntakeCommand(
+                    intakeSubsystem,
+                    IntakePreset.AGITATING
+                ),
                 turretSubsystem.zeroYawCommand(),
                 new ParallelCommandGroup(
                     new InstantCommand(
@@ -188,11 +186,10 @@ public class RobotContainer {
         autoChooser.addOption(
             "inner trench left",
             new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    intakeSubsystem.setPreset(
-                        IntakePreset.OUT
-                    );
-                }),
+                new IntakeCommand(
+                    intakeSubsystem,
+                    IntakePreset.AGITATING
+                ),
                 turretSubsystem.zeroYawCommand(),
                 new ParallelCommandGroup(
                     new InstantCommand(
@@ -216,11 +213,10 @@ public class RobotContainer {
         autoChooser.addOption(
             "inner trench right",
             new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    intakeSubsystem.setPreset(
-                        IntakePreset.OUT
-                    );
-                }),
+                new IntakeCommand(
+                    intakeSubsystem,
+                    IntakePreset.AGITATING
+                ),
                 turretSubsystem.zeroYawCommand(),
                 new ParallelCommandGroup(
                     new InstantCommand(
