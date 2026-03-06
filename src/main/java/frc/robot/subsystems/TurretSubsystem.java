@@ -539,7 +539,6 @@ public class TurretSubsystem extends SubsystemBase {
                                 );
                     }
                 }
-                optimizerStopWatch.stop();
             }
 
             double setYaw;
