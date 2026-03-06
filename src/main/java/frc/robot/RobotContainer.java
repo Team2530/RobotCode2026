@@ -13,6 +13,7 @@ import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
@@ -184,6 +185,62 @@ public class RobotContainer {
                 )
             )
         );
+        autoChooser.addOption(
+            "inner trench left",
+            new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    intakeSubsystem.setPreset(
+                        IntakePreset.OUT
+                    );
+                }),
+                turretSubsystem.zeroYawCommand(),
+                new ParallelCommandGroup(
+                    new InstantCommand(
+                        () -> {
+                        turretSubsystem.setManualControl(28.8, 30);
+                        }
+                    ),
+                    new RunIndexerCommand(
+                        indexerSubsystem,
+                        launch,
+                        false
+                    ),
+                    new RunLoaderCommand(
+                        loaderSubsystem,
+                        launch,
+                        false
+                    )
+                )
+            )
+        );
+        autoChooser.addOption(
+            "inner trench right",
+            new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    intakeSubsystem.setPreset(
+                        IntakePreset.OUT
+                    );
+                }),
+                turretSubsystem.zeroYawCommand(),
+                new ParallelCommandGroup(
+                    new InstantCommand(
+                        () -> {
+                            turretSubsystem.setManualControl(331.2, 30);
+                        }
+                    ),
+                    new RunIndexerCommand(
+                        indexerSubsystem,
+                        launch,
+                        false
+                    ),
+                    new RunLoaderCommand(
+                        loaderSubsystem,
+                        launch,
+                        false
+                    )
+                )
+            )
+        );
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -209,8 +266,12 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(() -> {
                     LLContainer.snapToVision(swerveDriveSubsystem);
-                    // this works because swervesubsyste.getrotation pulls directly from the pigeon and not the fused pose
-                    normalDrive.resetHeading();
+                    swerveDriveSubsystem.resetOdometry(
+                        new Pose2d(
+                            swerveDriveSubsystem.getPose().getTranslation(),
+                            new Rotation2d()
+                        )
+                    );
                 })
             );
         driverXbox.back()
@@ -346,7 +407,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(312.5, 40.5);
+                        turretSubsystem.setManualControl(318, 40);
                     }
                 )
             );
@@ -399,7 +460,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(64.5,36.5);
+                        turretSubsystem.setManualControl(69,36);
                     }
                 )
             );
