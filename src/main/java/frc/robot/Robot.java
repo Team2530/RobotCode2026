@@ -96,6 +96,7 @@ public class Robot extends TimedRobot {
     versionTable.putValue("DIRTY", NetworkTableValue.makeBoolean(BuildConstants.DIRTY != 0));
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+    Elastic.selectTab("Autonomous");
   }
 
   /**
@@ -150,9 +151,6 @@ public class Robot extends TimedRobot {
           m_autonomousCommand
         );
     }
-
-
-    Elastic.selectTab("Autonomous");
   }
 
   /** This function is called periodically during autonomous. */
@@ -167,7 +165,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    Elastic.selectTab("Teleop");
+    Elastic.selectTab("Teleoperated");
   }
 
   /** This function is called periodically during operator control. */
