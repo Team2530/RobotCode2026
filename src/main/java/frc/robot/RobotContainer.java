@@ -74,7 +74,7 @@ public class RobotContainer {
     public static final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
     // LimeLightSubsystem();
     @Logged
-    private static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
+    public static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
 
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
