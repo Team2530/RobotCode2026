@@ -57,17 +57,10 @@ public class DriveCommand extends Command {
                 ControlConstants.Deadband.Y
             );
 
-            double angle = Math.atan2(rawY, rawX);
-            double magnitude = Math.sqrt(
-                Math.pow(rawX, 2)
-                + Math.pow(rawY, 2)
-            );
             // to yagsl, a positive rotation value corresponds to a ccw 
             // rotation
-            double x = Math.cos(angle + headingOffset) * magnitude;
-            ;
-            double y = Math.sin(angle + headingOffset) * magnitude;
-
+            double x = (rawX * Math.cos(headingOffset)) - (rawY * Math.sin(headingOffset));
+            double y = (rawX * Math.sin(headingOffset)) + (rawY * Math.cos(headingOffset));
             double z = MathUtil.applyDeadband(
                     -driverXbox.getRightX(),
                     ControlConstants.Deadband.Z);
@@ -108,6 +101,7 @@ public class DriveCommand extends Command {
     }
 
     public void resetHeading() {
-        headingOffset = subsystem.getHeading();
+        // WARNING: check this
+        headingOffset = subsystem.getHeading() + Math.PI;
     }
 }
