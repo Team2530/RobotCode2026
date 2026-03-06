@@ -310,8 +310,6 @@ public class RobotContainer {
                 )
             );
 
-        
-        /*
         operatorXbox.rightBumper()
             .whileTrue(
                 new InstantCommand(
@@ -320,6 +318,8 @@ public class RobotContainer {
                     }
                 )
             );
+        
+        /*
         operatorXbox.x()
             .whileTrue(
                 new InstantCommand(
