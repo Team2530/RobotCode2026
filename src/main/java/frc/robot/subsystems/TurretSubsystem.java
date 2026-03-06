@@ -901,4 +901,16 @@ public class TurretSubsystem extends SubsystemBase {
     public void stop() {
         this.yawIsZeroed = false;
     }
+
+    public double getVelocityWithKinematics(double distance) {
+        double exitVelocity = (
+        Math.sqrt(
+                (FieldConstants.GRAVITY * distance * distance)
+                        / ((2 * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT) *
+                                Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT)) *
+                                (distance * Math.tan(TurretConstants.Pitch.ANGLE_CONSTANT) -
+                                        (Units.inchesToMeters(72) + Units.inchesToMeters(24))))));
+
+        return exitVelocity;
+    }
 }
