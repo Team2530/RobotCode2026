@@ -26,7 +26,7 @@ public class IntakeCommand extends Command {
         this(
             subsystem,
             preset,
-            IntakePreset.STOWED
+            subsystem.getPreset()
         );
     }
     
