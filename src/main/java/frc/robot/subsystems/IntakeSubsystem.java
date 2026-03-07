@@ -34,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
         // i.e., 90 would be vertical
         STOWED(true, 0),
         OUT(false, 0),
-        INTAKING(false, 43), //intake speed, in rps
+        INTAKING(false, 44), //intake speed, in rps
         AGITATING(false, 50),
         SPITTING(false, -IntakeConstants.Feeder.MAXIMUM_VELOCITY),
         CUSTOM(false, Double.MAX_VALUE);
