@@ -66,10 +66,10 @@ public class ManualTurretCommand extends Command {
             );
         }
 
-        if (operatorXbox.getRightY()> 0.2 || operatorXbox.getRightY() < 0.2) {
+        if (operatorXbox.getRightY() > 0.2 || operatorXbox.getRightY() < -0.2) {
             if (!analogClick) {
                 analogClick = true;
-                changeVelocity(operatorXbox.getRightY() * 0.1);
+                changeVelocity(-Math.signum(operatorXbox.getRightY()));
             }            
         } else {
             analogClick = false;
