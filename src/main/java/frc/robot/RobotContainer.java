@@ -309,7 +309,7 @@ public class RobotContainer {
             );
 
         operatorXbox.rightBumper()
-            .whileTrue(
+            .onTrue(
                 new InstantCommand(
                     () -> {
                         turretSubsystem.setTarget(TurretTargets.HUB);
