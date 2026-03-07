@@ -504,7 +504,7 @@ public final class Constants {
 
         // TODO: update
         // position relative to the center of the robot, in meters
-        public static final double X = Units.inchesToMeters(8.625);
+        public static final double X = Units.inchesToMeters(-8.625);
         public static final double Y = Units.inchesToMeters(1.375);
         // Height of Shooter from Ground, in meters
         public static final double Z = Units.inchesToMeters(9.375); 
