@@ -268,10 +268,8 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setPivotIsRaised(boolean raised) {
         this.intakePreset = IntakePreset.CUSTOM;
 
-        if (raised != targetPivotRaised) {
-            targetPivotRaised = raised;
-            resetPivotTracking();
-        }
+        targetPivotRaised = raised;
+        resetPivotTracking();
     }
 
     public void setPreset(IntakePreset preset) {
@@ -279,10 +277,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
         targetFeederVelocity = preset.feederVelocity;
 
-        if (preset.pivotRaised != targetPivotRaised) {
-            targetPivotRaised = preset.pivotRaised;
-            resetPivotTracking();
-        }
+        targetPivotRaised = preset.pivotRaised;
+        resetPivotTracking();
     }
 
     private void resetPivotTracking() {
