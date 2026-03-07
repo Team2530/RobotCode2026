@@ -417,7 +417,7 @@ public final class Constants {
         public static final double ANGLE_MAX = 340;
         
         // rps
-        public static final double MAX_VELOCITY = 45;
+        public static final double MAX_VELOCITY = 40;
         public static final double MAX_ACCELERATION= 800;
 
 
@@ -432,7 +432,7 @@ public final class Constants {
         }
 
         public static final class PID {
-            public static final double P = 6;
+            public static final double P = 10;
             public static final double I = 0;
             public static final double D = 0;
         }
