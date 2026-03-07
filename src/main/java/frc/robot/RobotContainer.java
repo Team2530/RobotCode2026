@@ -132,10 +132,6 @@ public class RobotContainer {
         autoChooser.addOption(
             "trench left",
             new SequentialCommandGroup(
-                new IntakeCommand(
-                    intakeSubsystem,
-                    IntakePreset.AGITATING
-                ),
                 turretSubsystem.zeroYawCommand(),
                 new ParallelCommandGroup(
                     new InstantCommand(
@@ -152,6 +148,10 @@ public class RobotContainer {
                         loaderSubsystem,
                         launch,
                         false
+                    ),
+                    new IntakeCommand(
+                        intakeSubsystem,
+                        IntakePreset.AGITATING
                     )
                 )
             )
@@ -159,10 +159,6 @@ public class RobotContainer {
         autoChooser.addOption(
             "trench right",
             new SequentialCommandGroup(
-                new IntakeCommand(
-                    intakeSubsystem,
-                    IntakePreset.AGITATING
-                ),
                 turretSubsystem.zeroYawCommand(),
                 new ParallelCommandGroup(
                     new InstantCommand(
@@ -179,6 +175,10 @@ public class RobotContainer {
                         loaderSubsystem,
                         launch,
                         false
+                    ),
+                    new IntakeCommand(
+                        intakeSubsystem,
+                        IntakePreset.AGITATING
                     )
                 )
             )
@@ -186,10 +186,6 @@ public class RobotContainer {
         autoChooser.addOption(
             "inner trench left",
             new SequentialCommandGroup(
-                new IntakeCommand(
-                    intakeSubsystem,
-                    IntakePreset.AGITATING
-                ),
                 turretSubsystem.zeroYawCommand(),
                 new ParallelCommandGroup(
                     new InstantCommand(
@@ -206,6 +202,10 @@ public class RobotContainer {
                         loaderSubsystem,
                         launch,
                         false
+                    ),
+                    new IntakeCommand(
+                        intakeSubsystem,
+                        IntakePreset.AGITATING
                     )
                 )
             )
@@ -213,10 +213,6 @@ public class RobotContainer {
         autoChooser.addOption(
             "inner trench right",
             new SequentialCommandGroup(
-                new IntakeCommand(
-                    intakeSubsystem,
-                    IntakePreset.AGITATING
-                ),
                 turretSubsystem.zeroYawCommand(),
                 new ParallelCommandGroup(
                     new InstantCommand(
@@ -233,6 +229,10 @@ public class RobotContainer {
                         loaderSubsystem,
                         launch,
                         false
+                    ),
+                    new IntakeCommand(
+                        intakeSubsystem,
+                        IntakePreset.AGITATING
                     )
                 )
             )
