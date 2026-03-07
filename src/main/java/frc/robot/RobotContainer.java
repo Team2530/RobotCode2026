@@ -261,8 +261,13 @@ public class RobotContainer {
         driverXbox.start()
             .onTrue(
                 new InstantCommand(() -> {
-                    LLContainer.snapToVision(swerveDriveSubsystem);
-                    normalDrive.resetHeading();
+                    //LLContainer.snapToVision(swerveDriveSubsystem);
+                    swerveDriveSubsystem.resetOdometry(
+                        new Pose2d(
+                            swerveDriveSubsystem.getPose().getTranslation(),
+                            new Rotation2d(Math.PI / 2)
+                        )
+                    );
                 })
             );
         driverXbox.back()
