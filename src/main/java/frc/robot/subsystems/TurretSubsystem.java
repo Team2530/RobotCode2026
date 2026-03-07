@@ -517,14 +517,26 @@ public class TurretSubsystem extends SubsystemBase {
                             periodicTimestamp
                             );
                     
-                    targetYaw = ((3 * Math.PI) 
+                    targetYaw = Units.radiansToRotations(((2 * Math.PI) 
                         + Math.atan2(
                             toTarget.getY(),
                             toTarget.getX()
-                        )) % (2 * Math.PI);
+                        ) ) % (2 * Math.PI)) ;
                     targetPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
+                    
+
+                    double groundDistance = toTarget.toTranslation2d().getNorm();
                     targetVelocity =  calculateExitToLauncherVelocity(
-                        getVelocityWithKinematics(toTarget)
+                        (
+                            groundDistance / Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT)
+                        ) / Math.sqrt(
+                            (
+                                (
+                                    groundDistance 
+                                    * Math.tan(TurretConstants.Pitch.ANGLE_CONSTANT) 
+                                ) - toTarget.getZ()
+                            ) * (2 / FieldConstants.GRAVITY)
+                        )
                     );
                 } catch (Exception e) {
                     if (e instanceof MathIllegalStateException) {
@@ -753,13 +765,17 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private static double calculateLauncherToExitVelocity(double launcherVelocity) {
-        return (TurretConstants.Launcher.VelocityRegression.A * launcherVelocity)
-            + TurretConstants.Launcher.VelocityRegression.B; 
+        return Units.feetToMeters(
+            (TurretConstants.Launcher.VelocityRegression.A * launcherVelocity)
+            + TurretConstants.Launcher.VelocityRegression.B
+        ); 
     }
 
     private static double calculateExitToLauncherVelocity(double exitVelocity) {
-        return (exitVelocity - TurretConstants.Launcher.VelocityRegression.B)
-            / TurretConstants.Launcher.VelocityRegression.A;
+        return (
+            Units.metersToFeet(exitVelocity)
+            - TurretConstants.Launcher.VelocityRegression.B
+        ) / TurretConstants.Launcher.VelocityRegression.A;
     }
     
     public Command zeroYawCommand() {
@@ -909,23 +925,5 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void stop() {
         this.yawIsZeroed = false;
-    }
-
-    public double getVelocityWithKinematics(Translation3d toTarget) {
-        return Math.sqrt(
-            (FieldConstants.GRAVITY *  toTarget.toTranslation2d().getSquaredNorm())
-            / (
-                (
-                    2 * Math.pow(
-                      Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT), 
-                      2
-                    )   
-                ) * (
-                        toTarget.getNorm() 
-                        * Math.tan(TurretConstants.Pitch.ANGLE_CONSTANT) 
-                        - (toTarget.getZ() - TurretConstants.Offsets.Z)
-                )
-            )
-        );
     }
 }
