@@ -87,7 +87,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem); //snapping odometry to a tag in the feild using MT1
     // Put git/code version metadata on networktables
     NetworkTable versionTable = NetworkTableInstance.getDefault().getTable("Version");
     versionTable.putValue("GIT_SHA", NetworkTableValue.makeString(BuildConstants.GIT_SHA));
