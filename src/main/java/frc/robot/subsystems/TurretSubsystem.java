@@ -195,14 +195,14 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     ).withSlot0(
                         new Slot0Configs()
-                            .withKP(TurretConstants.Launcher.PID.Holding.P)
-                            .withKI(TurretConstants.Launcher.PID.Holding.I)
-                            .withKD(TurretConstants.Launcher.PID.Holding.D)
+                            .withKP(TurretConstants.Launcher.PID.P)
+                            .withKI(TurretConstants.Launcher.PID.I)
+                            .withKD(TurretConstants.Launcher.PID.D)
                             .withKS(
-                                TurretConstants.Launcher.Feedforward.Holding.kS
+                                TurretConstants.Launcher.Feedforward.kS
                             )
                             .withKV(
-                                TurretConstants.Launcher.Feedforward.Holding.kV
+                                TurretConstants.Launcher.Feedforward.kV
                             )
                     )
             );
