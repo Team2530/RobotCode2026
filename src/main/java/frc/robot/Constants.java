@@ -335,7 +335,7 @@ public final class Constants {
   }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
-    public static final boolean LOG_TO_NETWORKTABLES = true;
+    public static final boolean LOG_TO_NETWORKTABLES = false;
   }
   public static final class PoseConstants {
 
@@ -375,34 +375,19 @@ public final class Constants {
         public static final double FUELED_CURRENT_LIMIT = 35;
 
         public static final class PID {
-            public static final class Holding {
-                public static final double P = 10;
-                public static final double I = 0;
-                public static final double D = 0;  
-            }
-
-            public static final class Launching {
-                public static final double P = 17;
-                public static final double I = 0;
-                public static final double D = 0.005;
-            }
+            public static final double P = 26.50;
+            public static final double I = 0.025;
+            public static final double D = 0.08; // max .5
         }
 
         public static final class Feedforward {
-            public static final class Holding {
-                public static final double kS = 0.44;
-                public static final double kV = 0.645;
-            }
-
-            public static final class Launching {
-                public static final double kS = Holding.kS;
-                public static final double kV = Holding.kV;
-            }
+            public static final double kS = 13;
+            public static final double kV = 1; 
         }
 
         public static final class VelocityRegression {
-            public static final double A = 0.748916;
-            public static final double B = -0.678921;
+            public static final double A = 0.825772;
+            public static final double B = 0.33633; //-1.03633;
         }
     }
 
@@ -417,7 +402,7 @@ public final class Constants {
         public static final double ANGLE_MAX = 340;
         
         // rps
-        public static final double MAX_VELOCITY = 40;
+        public static final double MAX_VELOCITY = 50;
         public static final double MAX_ACCELERATION= 800;
 
 
@@ -432,7 +417,7 @@ public final class Constants {
         }
 
         public static final class PID {
-            public static final double P = 10;
+            public static final double P = 12;
             public static final double I = 0;
             public static final double D = 0;
         }
@@ -441,13 +426,14 @@ public final class Constants {
             public static final double kS = 0;
             public static final double kV = 0;
             public static final double kA = 0;
+
         }
     }
 
     public static final class Pitch {
         public static final double GEAR_RATIO = 1;
 
-        public static final double ANGLE_CONSTANT = 50.5;
+        public static final double ANGLE_CONSTANT = 51.5;
 
         // 90 would have the "face" of the turret as vertical
         // 0 would have the "face" be horizontal (outputting up)

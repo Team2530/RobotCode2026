@@ -52,6 +52,8 @@ import com.revrobotics.spark.SparkMax;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -202,19 +204,6 @@ public class TurretSubsystem extends SubsystemBase {
                             .withKV(
                                 TurretConstants.Launcher.Feedforward.Holding.kV
                             )
-                    ).withSlot1(
-                        new Slot1Configs()
-                            .withKP(TurretConstants.Launcher.PID.Launching.P)
-                            .withKI(TurretConstants.Launcher.PID.Launching.I)
-                            .withKD(TurretConstants.Launcher.PID.Launching.D)
-                            .withKS(
-                                TurretConstants.Launcher.Feedforward.Launching
-                                .kS
-                            )
-                            .withKV(
-                                TurretConstants.Launcher.Feedforward.Launching
-                                .kV
-                            )
                     )
             );
         m_YawMotor.getConfigurator()
@@ -224,7 +213,7 @@ public class TurretSubsystem extends SubsystemBase {
                         TurretConstants.Yaw.REVERSE
                             ? InvertedValue.Clockwise_Positive    
                             : InvertedValue.CounterClockwise_Positive        
-                    )
+                    ).withNeutralMode(NeutralModeValue.Brake)
                 ).withSlot0(
                     new Slot0Configs()
                         .withKP(TurretConstants.Yaw.PID.P)
@@ -526,18 +515,38 @@ public class TurretSubsystem extends SubsystemBase {
                     
 
                     double groundDistance = toTarget.toTranslation2d().getNorm();
-                    targetVelocity =  calculateExitToLauncherVelocity(
-                        (
-                            groundDistance / Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT)
+                    double exitVelocity = (
+                            groundDistance / Math.cos(
+                                Units.degreesToRadians(
+                                    TurretConstants.Pitch.ANGLE_CONSTANT
+                                )
+                            )
                         ) / Math.sqrt(
                             (
                                 (
                                     groundDistance 
-                                    * Math.tan(TurretConstants.Pitch.ANGLE_CONSTANT) 
+                                    * Math.tan(
+                                        Units.degreesToRadians(
+                                            TurretConstants.Pitch.ANGLE_CONSTANT
+                                        )
+                                    )
                                 ) - toTarget.getZ()
                             ) * (2 / FieldConstants.GRAVITY)
-                        )
+                        );
+
+                    SmartDashboard.putNumber(
+                        "Turret/SimpleOptimizer/exit_velocity",
+                        exitVelocity
                     );
+                    SmartDashboard.putNumber(
+                        "Turret/SimpleOptimizer/toX",
+                       toTarget.getX()
+                    );
+                    SmartDashboard.putNumber(
+                        "Turret/SimpleOptimizer/toY",
+                       toTarget.getY()
+                    );
+                    targetVelocity =  calculateExitToLauncherVelocity(exitVelocity);
                 } catch (Exception e) {
                     if (e instanceof MathIllegalStateException) {
                         SmartDashboard.putString(
@@ -578,18 +587,15 @@ public class TurretSubsystem extends SubsystemBase {
             setPitch = targetPitch;
             boolean isFueled = getLauncherCurrent()
                 > TurretConstants.Launcher.FUELED_CURRENT_LIMIT;
-            int setVelocityProfile = isFueled
-                    ? 1 // use a stronger profile when fuel is in the launcher
-                    : 0;
             m_LauncherMotor.setControl(
                 new VelocityTorqueCurrentFOC(setVelocity)
-                    .withSlot(setVelocityProfile)
+                    .withUpdateFreqHz(1000)
             );
 
             m_YawMotor.setControl(
                     new MotionMagicTorqueCurrentFOC(
                         setYaw * TurretConstants.Yaw.GEAR_RATIO
-                        )
+                        ).withUpdateFreqHz(1000)
                     );
 
             // TODO: this
@@ -601,11 +607,6 @@ public class TurretSubsystem extends SubsystemBase {
                )
                );
                */
-
-            SmartDashboard.putNumber(
-                "Turret/Launcher/pid_profile",
-                setVelocityProfile
-            );
             SmartDashboard.putNumber(
                 "Turret/Yaw/Set_yaw",
                 setYaw
@@ -635,7 +636,11 @@ public class TurretSubsystem extends SubsystemBase {
         // launcher
         SmartDashboard.putNumber(
             "Turret/Launcher/output", 
-            m_LauncherMotor.getMotorVoltage().getValueAsDouble()
+            m_LauncherMotor.getDutyCycle().getValueAsDouble()
+        );
+        SmartDashboard.putNumber(
+            "Turret/Launcher/input_current",
+            m_LauncherMotor.getSupplyCurrent().getValueAsDouble()
         );
         SmartDashboard.putBoolean(
             "Turret/Launcher/at_velocity",
@@ -772,7 +777,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private static double calculateExitToLauncherVelocity(double exitVelocity) {
-        return (
+        return 
+        (
             Units.metersToFeet(exitVelocity)
             - TurretConstants.Launcher.VelocityRegression.B
         ) / TurretConstants.Launcher.VelocityRegression.A;
