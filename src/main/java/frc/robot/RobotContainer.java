@@ -99,9 +99,6 @@ public class RobotContainer {
         // Configure the trigger bindings
         configureBindings();
 
-        DataLogManager.logNetworkTables(true);
-        DataLogManager.start();
-
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
