@@ -101,6 +101,6 @@ public class DriveCommand extends Command {
     }
 
     public void resetHeading() {
-        headingOffset = subsystem.getHeading();
+        headingOffset = subsystem.getRotation().getRadians();
     }
 }

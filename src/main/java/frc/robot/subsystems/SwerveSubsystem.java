@@ -338,6 +338,11 @@ public class SwerveSubsystem extends SubsystemBase {
             //RobotContainer.LLContainer.estimateMT1Odometry(this.swerveDrive);
         }
         posePublisher.set(getPose());
+
+        SmartDashboard.putNumber(
+            "Heading",
+            getRotation().getRotations()
+        );
     }
     
 
@@ -411,8 +416,8 @@ public class SwerveSubsystem extends SubsystemBase {
         return getVelocity().omegaRadiansPerSecond;
     }
 
-    public Rotation3d getRotation() {
-        return swerveDrive.getGyroRotation3d();
+    public Rotation2d getRotation() {
+        return getPose().getRotation();
     }
 
     public void setMotorBrake(boolean isBraking) {
@@ -477,10 +482,5 @@ public class SwerveSubsystem extends SubsystemBase {
         double timestamp
     ) {
         swerveDrive.addVisionMeasurement(pose, timestamp);
-    }
-
-    /* in radians */
-    public double getHeading() {
-        return getRotation().getZ();
     }
 }

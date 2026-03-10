@@ -70,12 +70,7 @@ public class LimelightContainer {
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
-        Units.radiansToDegrees(
-          (
-            (Math.PI / 2)
-            + swerve.getRotation().getX()
-          ) % (Math.PI * 2)
-        ),
+        swerve.getRotation().getDegrees(),
         0, 
         0, 
         0, 
@@ -123,12 +118,7 @@ public class LimelightContainer {
       boolean doAddVision = true;
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
-        Units.radiansToDegrees(
-          (
-            (Math.PI / 2)
-            + swerve.getAngularVelocity()
-          ) % (Math.PI * 2)
-        ),
+        swerve.getRotation().getDegrees() ,
         0, 
         0, 
         0, 
@@ -176,6 +166,7 @@ public class LimelightContainer {
       LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getID());
       if (mt1 != null && mt1.tagCount > 0 ) {
         swerve.resetOdometry(mt1.pose);
+        estimateMT1Odometry(swerve);
         return;
       }
     }

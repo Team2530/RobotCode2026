@@ -61,7 +61,7 @@ public class ManualTurretCommand extends Command {
                         operatorXbox.getLeftX(),
                         operatorXbox.getLeftY()
                     ) 
-                    - m_SwerveSubsystem.getRotation().getZ()
+                    - m_SwerveSubsystem.getRotation().getRadians()
                 ) % (2 * Math.PI)
             );
         }
