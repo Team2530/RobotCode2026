@@ -70,8 +70,7 @@ public class RobotContainer {
 
     @Logged
     public static final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-    // public static final AutoChooser autoChooser = new AutoChooser();
-    public static final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
+    public static final AutoChooser autoChooser = new AutoChooser();
     // LimeLightSubsystem();
     @Logged
     public static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
@@ -103,7 +102,7 @@ public class RobotContainer {
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
         // NamedCommands.registerCommand(null, getAutonomousCommand());
-        /* for (String trajectoryName : Choreo.availableTrajectories()) {
+        for (String trajectoryName : Choreo.availableTrajectories()) {
             autoChooser.addRoutine(trajectoryName + "_routine", () -> {
                 AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
                 AutoTrajectory trajectory = routine.trajectory(trajectoryName);
@@ -118,8 +117,9 @@ public class RobotContainer {
                 // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
                 return routine;
             });
-        } */
+        }
 
+        /*
         BooleanSupplier launch = new BooleanSupplier() {
             @Override
             public boolean getAsBoolean() {
@@ -233,7 +233,7 @@ public class RobotContainer {
                     )
                 )
             )
-        );
+        ); */
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -470,7 +470,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // return autoChooser.selectedCommand();
-        return autoChooser.getSelected();
+        return autoChooser.selectedCommand();
     }
 
     public SwerveSubsystem getSwerveSubsystem() {

@@ -142,7 +142,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem);
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -150,16 +149,16 @@ public class Robot extends TimedRobot {
           m_autonomousCommand
         );
     }
+
+    Elastic.selectTab("Autonomous");
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
   }
-
   @Override
   public void teleopInit() {
-    RobotContainer.normalDrive.resetHeading();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

@@ -237,7 +237,7 @@ public final class Constants {
 
         public static final PID Drive = new PID(5, 0, 0, 0, 0);
         /** for the steer motors on the modules */
-        public static final PID Angle = new PID(100, 0, 0, 0, 0);
+        public static final PID Angle = new PID(80, 0, 0, 0, 0);
         /** for angle-based heading control */
         public static final PID Heading = new PID(0.01, 0, 0, 0, 0);
     };
@@ -329,9 +329,9 @@ public final class Constants {
   }
   public static final class choreoConstants {
     public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
-    public static final PID x_CONTROLLER = new PID(10, 0, 0);
-    public static final PID y_CONTROLLER = new PID(10, 0, 0);
-    public static final PID heading_CONTROLLER = new PID(1.4, 0, 0);
+    public static final PID x_CONTROLLER = new PID(1, 0, 0);
+    public static final PID y_CONTROLLER = new PID(1, 0, 0);
+    public static final PID heading_CONTROLLER = new PID(0.5, 0, 0);
   }
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;

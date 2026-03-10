@@ -311,16 +311,6 @@ public class SwerveSubsystem extends SubsystemBase {
         );
         
         
-        setChassisSpeedsAUTO(speeds);
-    }
-
-    public void setChassisSpeedsAUTO(ChassisSpeeds speeds) {
-        double tmp = speeds.vxMetersPerSecond;
-        speeds.vxMetersPerSecond = speeds.vyMetersPerSecond;
-        speeds.vyMetersPerSecond = tmp;
-        tmp = speeds.omegaRadiansPerSecond;
-        speeds.omegaRadiansPerSecond *= -1;
-        
         this.drive(
             new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
             speeds.omegaRadiansPerSecond
