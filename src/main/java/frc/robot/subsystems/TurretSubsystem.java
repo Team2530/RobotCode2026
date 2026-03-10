@@ -901,7 +901,8 @@ public class TurretSubsystem extends SubsystemBase {
         ).plus(
             new Transform3d(
                 TurretConstants.Offsets.TRANSLATION.rotateBy(
-                    swerveSubsystem.getRotation()
+                    new Rotation3d(
+                        swerveSubsystem.getRotation())
                 ),
                 new Rotation3d()
             )
