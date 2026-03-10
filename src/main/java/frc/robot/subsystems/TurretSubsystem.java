@@ -415,40 +415,41 @@ public class TurretSubsystem extends SubsystemBase {
             //   - exit velocity
             //   - time
             // }
-            double boundsAdjustment = 0.00000000001;
-            double[] guess = {
-                MathUtil.clamp(
-                        Math.atan2(
-                            toTarget.getY(),
-                            toTarget.getX()
-                            ),
-                        Units.degreesToRadians(
-                            TurretConstants.Yaw.ANGLE_MIN
-                            ) + boundsAdjustment,
-                        Units.degreesToRadians(
-                            TurretConstants.Yaw.ANGLE_MAX
-                            ) - boundsAdjustment
-                        ),
-                /*
-                   Units.degreesToRadians(
-                   TurretConstants.Pitch.ANGLE_CONSTANT
-                   ), 
-                   */
-                calculateLauncherToExitVelocity(
-                        MathUtil.clamp(
-                            getLauncherVelocity(),
-                            TurretConstants.Launcher.MINIMUM_VELOCITY
-                            + boundsAdjustment,
-                            TurretConstants.Launcher.MAXIMUM_VELOCITY
-                            - boundsAdjustment
-                            )
-                        ),
-                5
-            };
-
             if (targetingMode != targetingMode.MANUAL) {
                 StopWatch optimizerStopWatch = new StopWatch();
                 try {
+                    double boundsAdjustment = 0.00000000001;
+                    double[] guess = {
+                        MathUtil.clamp(
+                                Units.radiansToRotations(((2 * Math.PI)
+                                    + Math.atan2(
+                                            toTarget.getY(),
+                                            toTarget.getX()))
+                                    % (2 * Math.PI)),
+                                Units.degreesToRadians(
+                                    TurretConstants.Yaw.ANGLE_MIN
+                                    ) + boundsAdjustment,
+                                Units.degreesToRadians(
+                                    TurretConstants.Yaw.ANGLE_MAX
+                                    ) - boundsAdjustment
+                                ),
+                        /*
+                        Units.degreesToRadians(
+                        TurretConstants.Pitch.ANGLE_CONSTANT
+                        ), 
+                        */
+                        calculateLauncherToExitVelocity(
+                                MathUtil.clamp(
+                                    getLauncherVelocity(),
+                                    TurretConstants.Launcher.MINIMUM_VELOCITY
+                                    + boundsAdjustment,
+                                    TurretConstants.Launcher.MAXIMUM_VELOCITY
+                                    - boundsAdjustment
+                                    )
+                                ),
+                        5
+                    };
+
                     optimizerStopWatch.start();
                     PointValuePair targetOptimum = targetingOptimizer.optimize(
                             new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
@@ -464,7 +465,9 @@ public class TurretSubsystem extends SubsystemBase {
 
                     targetYaw = Units.radiansToRotations(optimalControls[0])
                         % 1;
-                    targetVelocity = optimalControls[1];
+                    targetVelocity = calculateExitToLauncherVelocity(
+                        optimalControls[1]
+                    );
                     targetPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
                     targetTime = optimalControls[2];
 
