@@ -286,9 +286,12 @@ public class RobotContainer {
 
         operatorXbox.rightTrigger(0.3)
         .whileTrue(
-            new IntakeCommand(
-                intakeSubsystem,
-                IntakePreset.AGITATING
+            new ParallelCommandGroup(
+                new IntakeCommand(
+                    intakeSubsystem,
+                    IntakePreset.AGITATING
+                ),
+                new RunLoaderCommand(loaderSubsystem)
             )
         )
         .and(
@@ -299,10 +302,7 @@ public class RobotContainer {
                     }
                 }
             ).whileTrue(
-                new ParallelCommandGroup(
-                    new RunLoaderCommand(loaderSubsystem),
-                    new RunIndexerCommand(indexerSubsystem)
-                )
+                new RunIndexerCommand(indexerSubsystem)
             );
 
         operatorXbox.rightBumper()
