@@ -255,7 +255,7 @@ public final class Constants {
         
         // in inches
         public static final double WHEEL_DIAMETER = 4;
-        public static final double WHEEL_FRICTION_COEFFICIENT = 1.19;
+        public static final double WHEEL_FRICTION_COEFFICIENT = 2.255;
 
         public static final double OPTIMAL_VOLTAGE = 12;
         // both in amps
