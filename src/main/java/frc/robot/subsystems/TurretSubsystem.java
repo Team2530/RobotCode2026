@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,6 +18,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -261,62 +266,96 @@ public class TurretSubsystem extends SubsystemBase {
                     break;
             }
 
-            if (targetingMode != targetingMode.MANUAL) {
-                try {
-                    targetYaw = Units.radiansToRotations(((2 * Math.PI)
-                        + Math.atan2(
-                            toTarget.getY(),
-                            toTarget.getX()
-                        ) ) % (2 * Math.PI)) ;
-                    targetPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
-                    
-
-                    double groundDistance = toTarget.toTranslation2d().getNorm();
-                    double exitVelocity = (
-                            groundDistance / Math.cos(
+            if (targetingMode != TargetingMode.MANUAL) {
+                /*
+                 * ok so basically:
+                 *
+                 * 1. compute the total velocity vector is would take for a fuel 
+                 * to score from the position of our launcher
+                 *      a. obviously, for the total velocity vector, the
+                 *      direction in the xy plane is straight line to the
+                 *      target.
+                 *      b. and given that, to calculate speed, we can assume
+                 *      that the fuel travels in a 2d plane that contains both
+                 *      the starting point and the target.
+                 * 2. from there, subtract the velocity of the drivebase
+                 * translation / rotation.
+                 *      a. to do this, convert the total velocity vector to
+                 *      cartesian coordinates, simply subtract, then convert
+                 *      back to polar coordinates for the turret.
+                 *      b. in addition to the translational velocity of the
+                 *      drivebase, the rotational velocity must also be
+                 *      accounted for
+                 *
+                 */
+                Distance groundDistance = Meters.of(
+                        toTarget.toTranslation2d().getNorm()
+                );
+                Angle totalYaw = Radians.of(
+                    Math.atan2(
+                        toTarget.getY(),
+                        toTarget.getX()
+                    )
+                );
+                // this is absolutely not how you use the units classes but i
+                // didn't keep track of the original units in the equation
+                LinearVelocity totalVelocity = (
+                        groundDistance
+                        .div(
+                            Math.cos(
                                 Units.degreesToRadians(
                                     TurretConstants.Pitch.ANGLE_CONSTANT
                                 )
                             )
-                        ) / Math.sqrt(
+                        )
+                    ).per(Seconds)
+                    .div(
+                        Math.sqrt(
                             (
-                                (
-                                    groundDistance 
-                                    * Math.tan(
+                                groundDistance.times(
+                                    Math.tan(
                                         Units.degreesToRadians(
                                             TurretConstants.Pitch.ANGLE_CONSTANT
                                         )
                                     )
-                                ) - toTarget.getZ()
-                            ) * (2 / FieldConstants.GRAVITY)
-                        );
+                                ).minus(
+                                    Meters.of(toTarget.getZ())
+                                )
+                            ).times(
+                                (2 / FieldConstants.GRAVITY)
+                            ).in(Meters)
+                        )
+                    );
+                        
 
-                    SmartDashboard.putNumber(
-                        "Turret/SimpleOptimizer/exit_velocity",
-                        exitVelocity
+
+                LinearVelocity exitVelocityX = (
+                        totalVelocity
+                        .times(
+                            Math.cos(totalYaw.in(Radians))
+                        )
+                    ).minus(getLauncherPositionalVelocityX());
+                LinearVelocity exitVelocityY = (
+                        totalVelocity
+                        .times(Math.sin(totalYaw.in(Radians)))
+                    ).minus(
+                        getLauncherPositionalVelocityY()
                     );
-                    SmartDashboard.putNumber(
-                        "Turret/SimpleOptimizer/toX",
-                       toTarget.getX()
-                    );
-                    SmartDashboard.putNumber(
-                        "Turret/SimpleOptimizer/toY",
-                       toTarget.getY()
-                    );
-                    targetVelocity =  calculateExitToLauncherVelocity(exitVelocity);
-                } catch (Exception e) {
-                    if (e instanceof MathIllegalStateException) {
-                        SmartDashboard.putString(
-                                "Turret/Optimizer/status",
-                                "Caught known error: " + e
-                                );
-                    } else {
-                        SmartDashboard.putString(
-                                "Turret/Optimizer/status",
-                                "Caught unknown error: " + e
-                                );
-                    }
-                }
+
+                targetYaw = (
+                    (2 * Math.PI)
+                    + Math.atan2(
+                        exitVelocityY.in(MetersPerSecond),
+                        exitVelocityX.in(MetersPerSecond)
+                    )
+                ) % (2 * Math.PI);
+                targetPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
+                targetVelocity =  calculateExitToLauncherVelocity(
+                    Math.sqrt(
+                        Math.pow(exitVelocityX.in(MetersPerSecond), 2)
+                        + Math.pow(exitVelocityY.in(MetersPerSecond), 2)
+                    )
+                );
             }
 
             double setYaw;
@@ -402,10 +441,6 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean(
             "Turret/Launcher/at_velocity",
             atVelocity
-        );
-        SmartDashboard.putBoolean(
-            "Turret/Launcher/is_fueled",
-            isFueled
         );
         SmartDashboard.putNumber(
             "Turret/Launcher/Target_velocity",
@@ -664,6 +699,28 @@ public class TurretSubsystem extends SubsystemBase {
                 new Rotation3d()
             )
         );
+    }
+
+    public LinearVelocity getLauncherPositionalVelocityX() {
+        return MetersPerSecond.of(
+                 getLauncherPosition().getY()
+                 * swerveSubsystem.getAngularVelocity()
+            ).plus(
+                MetersPerSecond.of(
+                    swerveSubsystem.getXVelocity()
+                )
+            );
+    }
+
+    public LinearVelocity getLauncherPositionalVelocityY() {
+        return MetersPerSecond.of(
+                 getLauncherPosition().getX()
+                 * swerveSubsystem.getAngularVelocity()
+            ).plus(
+                MetersPerSecond.of(
+                    swerveSubsystem.getYVelocity()
+                )
+            );
     }
 
     public void setTargetVelocity(double target) {
