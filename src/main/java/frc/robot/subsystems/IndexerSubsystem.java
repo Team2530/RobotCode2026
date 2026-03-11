@@ -43,6 +43,16 @@ public class IndexerSubsystem extends SubsystemBase {
             "Indexer/velocity",
             m_IndexerMotor.getEncoder().getVelocity()
         );
+
+        SmartDashboard.putNumber(
+            "Indexer/current",
+            m_IndexerMotor.getOutputCurrent()
+        );
+
+        SmartDashboard.putNumber(
+            "Indexer/output", 
+            m_IndexerMotor.get()
+        );
     }
 
     public void run() {
