@@ -32,18 +32,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import org.apache.commons.math3.analysis.MultivariateFunction;
-import org.apache.commons.math3.exception.MathIllegalStateException;
-import org.apache.commons.math3.optim.InitialGuess;
-import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.SimpleBounds;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.SimplexOptimizer;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.NelderMeadSimplex;
-
 import com.ctre.phoenix6.hardware.CANcoder;
 
 import com.revrobotics.RelativeEncoder;
@@ -153,9 +141,6 @@ public class TurretSubsystem extends SubsystemBase {
     private boolean yawIsZeroed;
     private boolean atVelocity;
 
-    private final boolean isFueled;
-
-    private final SimplexOptimizer targetingOptimizer;
     private double targetYaw;
     private double targetPitch;
     private double targetVelocity;
@@ -251,129 +236,7 @@ public class TurretSubsystem extends SubsystemBase {
         targetVelocity = 0;
 
         atVelocity = false;
-        isFueled = false;
     }
-
-    private double relativeAngularVelocityFromLinear(
-        Translation2d toTarget,
-        Translation2d velocity
-    ) {
-        return Math.acos(
-            toTarget.dot(
-                toTarget.plus(velocity)
-            ) / (
-                toTarget.getNorm() 
-                    * toTarget.plus(velocity).getNorm()
-            )
-        );
-    }
-
-    private interface BoundsSupplier {
-        public double[] atPoint(double[] point);
-    }
-    // TODO: make sure this doesn't return a solution that clips through the hub
-    private MultivariateFunction getOptimizerFunction(
-            BoundsSupplier lowerBoundSupplier,
-            BoundsSupplier upperBoundSupplier,
-            Translation3d toTarget
-    ) {
-        double pitch = Units.degreesToRadians(
-            TurretConstants.Pitch.ANGLE_CONSTANT
-        );
-        return new MultivariateFunction() {
-                @Override
-                // TODO: constant yaw
-                public double value(double[] point) {
-                    double[] lowerBounds = lowerBoundSupplier.atPoint(point);
-                    double[] upperBounds = upperBoundSupplier.atPoint(point);
-
-                    /*
-                     * double yaw = point[0];
-                     * double pitch = point[1];
-                     * double speed = point[2];
-                     * double time = point[3];
-                     */
-                    double yaw = point[0];
-                    double speed = point[1];
-                    double time = point[2];
-
-                    for (int i = 0; i < point.length; i++) {
-                        if (
-                            point[i] < lowerBounds[i]
-                            || point[i] > upperBounds[i]
-                        ) {
-                            return Double.MAX_VALUE / 2;
-                        }
-                    }
-
-                    double dbx = speed
-                        * Math.cos(pitch)
-                        * Math.cos(yaw)
-                        * time;
-                    double dby = speed
-                        //* Math.cos(pitch)
-                        * Math.sin(yaw)
-                        * time;
-                    double dbz = (
-                        -0.5
-                        * FieldConstants.GRAVITY
-                        * Math.pow(time, 2)
-                    ) + (
-                        speed
-                        //* Math.sin(pitch)
-                        * time
-                    );
-
-                    // probably doesnt work
-                    //dby += swerveSubsystem.getYVelocity() * time;
-                    //dbx += swerveSubsystem.getXVelocity() * time;
-                    
-                    // Return error squared to avoid sqrt for optimization.
-                    // For this, minimizing squared error should be equivalent 
-                    // to minimizing error.
-                    return Math.pow(
-                        dbx - toTarget.getX(),
-                        2
-                    ) + Math.pow(
-                        dby - toTarget.getY(),
-                        2
-                    ) + Math.pow(
-                        dbz - toTarget.getZ(),
-                        2
-                    );
-                }
-            };
-    }
-
-    private static BoundsSupplier lowerBoundSupplier = new BoundsSupplier() {
-        public double[] atPoint(double[] point) {
-            return new double[] {
-                Double.MIN_VALUE,
-                // WARNING: overridden for constant pitch
-                /*
-                 * TurretConstants.Pitch.ANGLE_MIN(point[2]),
-                  */
-                calculateLauncherToExitVelocity(
-                    TurretConstants.Launcher.MINIMUM_VELOCITY
-                ),
-                0
-            };
-
-        }
-    };
-
-    private static BoundsSupplier upperBoundSupplier = new BoundsSupplier() {
-        public double[] atPoint(double[] point) {
-            return new double[] {
-                Double.MAX_VALUE,
-                /*TurretConstants.Pitch.ANGLE_MAX,*/
-                calculateLauncherToExitVelocity(
-                    TurretConstants.Launcher.MAXIMUM_VELOCITY
-                ),
-                TurretConstants.TargetingOptimizer.MAXIMUM_TIME
-            };
-        }
-    };
 
     @Override
     public void periodic() {
@@ -398,118 +261,9 @@ public class TurretSubsystem extends SubsystemBase {
                     break;
             }
 
-            MultivariateFunction optimizerFunction = getOptimizerFunction(
-                    lowerBoundSupplier,
-                    upperBoundSupplier,
-                    toTarget
-                    );
-
-            // start guess with pointing straightline to the target, to reduce
-            // optimizer time
-            //
-            // the weird clamping bounds are due to the fact that the 
-            // optimizer crashes when the starting guess is at the bounds
-            // {
-            //   - yaw
-            //   - pitch
-            //   - exit velocity
-            //   - time
-            // }
             if (targetingMode != targetingMode.MANUAL) {
-                StopWatch optimizerStopWatch = new StopWatch();
                 try {
-                    double boundsAdjustment = 0.00000000001;
-                    double[] guess = {
-                        MathUtil.clamp(
-                                Units.radiansToRotations(((2 * Math.PI)
-                                    + Math.atan2(
-                                            toTarget.getY(),
-                                            toTarget.getX()))
-                                    % (2 * Math.PI)),
-                                Units.degreesToRadians(
-                                    TurretConstants.Yaw.ANGLE_MIN
-                                    ) + boundsAdjustment,
-                                Units.degreesToRadians(
-                                    TurretConstants.Yaw.ANGLE_MAX
-                                    ) - boundsAdjustment
-                                ),
-                        /*
-                        Units.degreesToRadians(
-                        TurretConstants.Pitch.ANGLE_CONSTANT
-                        ), 
-                        */
-                        calculateLauncherToExitVelocity(
-                                MathUtil.clamp(
-                                    getLauncherVelocity(),
-                                    TurretConstants.Launcher.MINIMUM_VELOCITY
-                                    + boundsAdjustment,
-                                    TurretConstants.Launcher.MAXIMUM_VELOCITY
-                                    - boundsAdjustment
-                                    )
-                                ),
-                        5
-                    };
-
-                    optimizerStopWatch.start();
-                    PointValuePair targetOptimum = targetingOptimizer.optimize(
-                            new MaxEval(TurretConstants.TargetingOptimizer.MAX_EVALUATIONS),
-                            new ObjectiveFunction(optimizerFunction),
-                            GoalType.MINIMIZE,
-                            new InitialGuess(guess),
-                            // TODO: update this when we add pitch back
-                            new NelderMeadSimplex(3)
-                            );
-                    optimizerStopWatch.stop();
-
-                    double[] optimalControls = targetOptimum.getPoint();
-
-                    targetYaw = Units.radiansToRotations(optimalControls[0])
-                        % 1;
-                    targetVelocity = calculateExitToLauncherVelocity(
-                        optimalControls[1]
-                    );
-                    targetPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
-                    targetTime = optimalControls[2];
-
-                    SmartDashboard.putString(
-                            "Turret/Optimizer/status",
-                            String.format(
-                                "Completed optimization: { %f, %f, %f }",
-                                targetYaw,
-                                targetVelocity,
-                                targetTime
-                                )
-                            );
-                    SmartDashboard.putNumber(
-                            "Turret/Optimizer/ComputeTimeMilliseconds",
-                            optimizerStopWatch.getNanoTime()/1.e6
-                            );
-                    SmartDashboard.putNumber(
-                            "Turret/Optimizer/Yaw",
-                            targetYaw
-                            );
-                    SmartDashboard.putNumber(
-                            "Turret/Optimizer/Pitch",
-                           targetPitch
-                            );
-                    SmartDashboard.putNumber(
-                            "Turret/Optimizer/Speed",
-                           targetVelocity
-                            );
-                    SmartDashboard.putNumber(
-                            "Turret/Optimizer/Time",
-                           targetTime
-                            );
-                    SmartDashboard.putNumber(
-                            "Turret/Optimizer/Error",
-                            targetOptimum.getValue()
-                            );
-                    SmartDashboard.putNumber(
-                            "Turret/Optimizer/LastCompleted",
-                            periodicTimestamp
-                            );
-                    
-                    targetYaw = Units.radiansToRotations(((2 * Math.PI) 
+                    targetYaw = Units.radiansToRotations(((2 * Math.PI)
                         + Math.atan2(
                             toTarget.getY(),
                             toTarget.getX()
