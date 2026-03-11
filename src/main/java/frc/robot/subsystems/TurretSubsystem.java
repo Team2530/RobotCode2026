@@ -223,8 +223,6 @@ public class TurretSubsystem extends SubsystemBase {
         // TODO: this
         // e_PitchEncoder = new CANcoder(TurretConstants.CanIDs.PITCH_ENCODER);
 
-        // dunno what these thresholds are
-        targetingOptimizer = new SimplexOptimizer(1e-10, 1e-30);
         setManualControl(0, 0);
 
         yawIsZeroed = false;
