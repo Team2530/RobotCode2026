@@ -1,17 +1,13 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import org.littletonrobotics.urcl.URCL;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
-
+import frc.robot.util.LimelightContainer;
 import edu.wpi.first.epilogue.EpilogueConfiguration;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -23,15 +19,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.Limelight.LimelightType;
-import frc.robot.util.LimelightHelpers;
-
-/**
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.util.Elastic;
+/*
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the
@@ -42,10 +34,13 @@ import frc.robot.util.LimelightHelpers;
  */
 @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
-
+  public static Orchestra m_orchestra = new Orchestra();
   private Command m_autonomousCommand;
-
-  @Logged
+  //private final SwerveSubsystem swerveDrive = new SwerveSubsystem();
+  //private final AutoFactory autoFactory;
+  /** This is one auto. */
+  //private final Trajectory trajectory;
+  
   private RobotContainer m_robotContainer;
 
   double lastLoopTime = Timer.getFPGATimestamp();
@@ -61,6 +56,8 @@ public class Robot extends TimedRobot {
   
 
   public Robot() {
+
+
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
 
@@ -79,6 +76,7 @@ public class Robot extends TimedRobot {
     config.backend = new FileBackend(DataLogManager.getLog());
 
     // Epilogue.bind(this);
+    
   }
 
   /**
@@ -89,7 +87,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-
     // Put git/code version metadata on networktables
     NetworkTable versionTable = NetworkTableInstance.getDefault().getTable("Version");
     versionTable.putValue("GIT_SHA", NetworkTableValue.makeString(BuildConstants.GIT_SHA));
@@ -98,6 +95,7 @@ public class Robot extends TimedRobot {
     versionTable.putValue("DIRTY", NetworkTableValue.makeBoolean(BuildConstants.DIRTY != 0));
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+    Elastic.selectTab("Autonomous");
   }
 
   /**
@@ -147,20 +145,25 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-       CommandScheduler.getInstance().schedule(m_autonomousCommand);
+       CommandScheduler.getInstance().schedule(
+          m_autonomousCommand
+        );
     }
+
+    Elastic.selectTab("Autonomous");
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
   }
-
   @Override
   public void teleopInit() {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    Elastic.selectTab("Teleoperated");
   }
 
   /** This function is called periodically during operator control. */
@@ -170,8 +173,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem);
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    Elastic.selectTab("Debug");
+    CommandScheduler.getInstance().schedule(
+      RobotContainer.turretSubsystem.zeroYawCommand()
+    );
   }
 
   /** This function is called periodically during test mode. */

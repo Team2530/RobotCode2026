@@ -2,11 +2,16 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.LimelightHelpers.RawFiducial;
+
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * The Limelight Subsystem handles interactions with one Limelight.
@@ -38,18 +43,11 @@ public class Limelight extends SubsystemBase {
     private int counter = 0;
     private double lastFrame = 0;
 
-    private final StructPublisher<Pose2d> publisher;
-
-
     public Limelight(LimelightType limelightType, String name, boolean isEnabled, boolean cropEnabled) {
         this.limelightType = limelightType;
         this.name = name;
         this.isEnabled = isEnabled;
         this.cropEnabled = cropEnabled;
-
-        publisher = NetworkTableInstance.getDefault().getStructTopic(name+" Pose2d", Pose2d.struct).publish();
-
-        LimelightHelpers.SetIMUMode(name, 1);
     }
 
     @Override
@@ -170,9 +168,12 @@ public class Limelight extends SubsystemBase {
     public double getVFOV() {return limelightType.VFOV;}
     public double getHFOV() {return limelightType.HFOV;}
 
-    /** Set the publisher's pose. */
-    public void pushPoseToShuffleboard(String name, Pose2d pose) {
-        publisher.set(pose);
+    @Override
+    public String toString() {
+        return this.name;
     }
 
+    public String getID() {
+        return this.name;
+    }
 }
