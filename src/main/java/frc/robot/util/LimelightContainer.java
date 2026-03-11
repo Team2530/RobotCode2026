@@ -46,6 +46,12 @@ public class LimelightContainer {
     }
   }
 
+  public void setIMUMode(int mode) {
+    for (Limelight limelight : limelights) {
+      limelight.setIMUMode(mode);
+    }
+  }
+
   public static void estimateSimOdometry() {
     for (Limelight limelight : limelights) {
       boolean doRejectUpdate = false;

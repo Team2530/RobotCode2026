@@ -151,6 +151,8 @@ public class Robot extends TimedRobot {
     }
 
     Elastic.selectTab("Autonomous");
+
+    m_robotContainer.LLContainer.setIMUMode(4);
   }
 
   /** This function is called periodically during autonomous. */
@@ -164,6 +166,8 @@ public class Robot extends TimedRobot {
     }
 
     Elastic.selectTab("Teleoperated");
+
+    m_robotContainer.LLContainer.setIMUMode(4);
   }
 
   /** This function is called periodically during operator control. */
