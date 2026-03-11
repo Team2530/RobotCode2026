@@ -225,8 +225,8 @@ public final class Constants {
     public static final class AngularCompensation {
         // correction for heading skew when rotating
         // (see)[https://yet-another-software-suite.github.io/YAGSL/javadocs/swervelib/SwerveDrive.html#setAngularVelocityCompensation(boolean,boolean,double)]
-        public static final boolean ENABLE_IN_TELEOP = true;
-        public static final boolean ENABLE_IN_AUTO = true;
+        public static final boolean ENABLE_IN_TELEOP = false;
+        public static final boolean ENABLE_IN_AUTO = false;
         
         // expected values are between -0.15 and 0.15
         public static final double COMPENSATION_COEFFICIENT = 0.1;
