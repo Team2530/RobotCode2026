@@ -286,7 +286,7 @@ public class TurretSubsystem extends SubsystemBase {
                  *      b. in addition to the translational velocity of the
                  *      drivebase, the rotational velocity must also be
                  *      accounted for
-                 *
+                 * 3. presumably, the robot is flat on the ground
                  */
                 Distance groundDistance = Meters.of(
                         toTarget.toTranslation2d().getNorm()
