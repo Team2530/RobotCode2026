@@ -514,7 +514,7 @@ public final class Constants {
       // TODO: UPDATE BASED ON REAL ROBOT
       public static final boolean REVERSE = true;
       public static final int CAN_ID = 24;
-      public static final double SPEED = 0.80;
+      public static final double SPEED = 0.4;
   }
 
   public static final class LoaderConstants {
