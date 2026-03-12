@@ -34,8 +34,8 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"4.365203380584717 m", "val":4.365203380584717}, "y":{"exp":"7.546766757965088 m", "val":7.546766757965088}, "heading":{"exp":"-1.5880762077786896 rad", "val":-1.5880762077786896}, "intervals":7, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"5.411100387573242 m", "val":5.411100387573242}, "y":{"exp":"7.428160190582275 m", "val":7.428160190582275}, "heading":{"exp":"-1.5707963267948966 rad", "val":-1.5707963267948966}, "intervals":7, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"4.344249248504639 m", "val":4.344249248504639}, "y":{"exp":"7.487218856811523 m", "val":7.487218856811523}, "heading":{"exp":"43.45111827727567 mrad", "val":0.04345111827727567}, "intervals":7, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"5.411100387573242 m", "val":5.411100387573242}, "y":{"exp":"7.428160190582275 m", "val":7.428160190582275}, "heading":{"exp":"33.846311723054846 mrad", "val":0.03384631172305485}, "intervals":7, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"6.4246506690979 m", "val":6.4246506690979}, "y":{"exp":"7.331118106842041 m", "val":7.331118106842041}, "heading":{"exp":"-1.4691076026345717 rad", "val":-1.4691076026345715}, "intervals":7, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"7.322808742523193 m", "val":7.322808742523193}, "y":{"exp":"7.066168785095215 m", "val":7.066168785095215}, "heading":{"exp":"-1.3258176636680326 rad", "val":-1.3258176636680326}, "intervals":9, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"7.6823577880859375 m", "val":7.6823577880859375}, "y":{"exp":"5.864948272705078 m", "val":5.864948272705078}, "heading":{"exp":"-1.588976122583933 rad", "val":-1.588976122583933}, "intervals":7, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
