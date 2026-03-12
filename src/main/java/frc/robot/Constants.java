@@ -259,15 +259,13 @@ public final class Constants {
 
         public static final double OPTIMAL_VOLTAGE = 12;
         // both in amps
-        // TODO: check with someone who does electronics
-        public static final int DRIVE_CURRENT_LIMIT = 70;
-        public static final int STEER_CURRENT_LIMIT = 70;
+        public static final int DRIVE_CURRENT_LIMIT = 120;
+        public static final int STEER_CURRENT_LIMIT = 120;
         // the minimum number of seconds it takes the motor to go from 0 to full 
         // throttle
-        public static final double DRIVE_RAMP_RATE = 0.05;
+        public static final double DRIVE_RAMP_RATE = 0;
         public static final double STEER_RAMP_RATE = 0;
         // the minimum voltage it takes for the given motor to move
-        // TODO: get real values
         public static final double DRIVE_FRICTION_VOLTAGE = 0.23;
         public static final double STEER_FRICTION_VOLTAGE = 0.19;
 
