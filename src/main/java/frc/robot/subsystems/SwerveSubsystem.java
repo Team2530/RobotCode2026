@@ -57,6 +57,10 @@ public class SwerveSubsystem extends SubsystemBase {
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Odometry Pose", Pose2d.struct).publish();
     
+    StructPublisher<SwerveSample> autoSamplePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Auto sample", SwerveSample.struct).publish();
+    StructPublisher<Pose2d> autoPosePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Auto target pose", Pose2d.struct).publish();
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
@@ -309,13 +313,66 @@ public class SwerveSubsystem extends SubsystemBase {
             sample.vy + yController.calculate(pose.getY(), sample.y),
             sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
-        
+
+        autoSamplePublisher.set(
+            sample
+        );
+        autoPosePublisher.set(
+            new Pose2d(
+                new Translation2d(
+                    sample.x,
+                    sample.y
+                ), 
+                new Rotation2d(
+                    sample.heading
+                )
+            )
+        );      
+        SmartDashboard.putNumber(
+            "Auto/x",
+            sample.x
+        );
+        SmartDashboard.putNumber(
+            "Auto/y",
+            sample.y
+        );
+        SmartDashboard.putNumber(
+            "Auto/vx",
+            sample.vx
+        );
+        SmartDashboard.putNumber(
+            "Auto/vy",
+            sample.vy
+        );
+        SmartDashboard.putNumber(
+            "Auto/ax",
+            sample.ax
+        );
+        SmartDashboard.putNumber(
+            "Auto/ay",
+            sample.ay
+        );
+        SmartDashboard.putNumber(
+            "Auto/heading",
+            sample.heading
+        );
+        SmartDashboard.putNumber(
+            "Auto/omega",
+            sample.omega
+        );
+        SmartDashboard.putNumberArray(
+            "Auto/moduleForcesX",
+            sample.moduleForcesX()
+        );
+        SmartDashboard.putNumberArray(
+            "Auto/moduleForcesY",
+            sample.moduleForcesY()
+        );
         
         this.drive(
             new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
             speeds.omegaRadiansPerSecond
         );
-        
     }
 
     @Override
