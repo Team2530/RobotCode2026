@@ -304,22 +304,25 @@ public class TurretSubsystem extends SubsystemBase {
                                 )
                             )
                         )
-                    ).per(Seconds)
-                    .div(
-                        Math.sqrt(
-                            (
-                                groundDistance.times(
-                                    Math.tan(
-                                        Units.degreesToRadians(
-                                            TurretConstants.Pitch.ANGLE_CONSTANT
+                    ).div(
+                        Seconds.of(
+                            Math.sqrt(
+                                (
+                                    groundDistance.times(
+                                        Math.tan(
+                                            Units.degreesToRadians(
+                                                TurretConstants.Pitch.ANGLE_CONSTANT
+                                            )
                                         )
+                                    ).minus(
+                                        Meters.of(toTarget.getZ())
                                     )
-                                ).minus(
-                                    Meters.of(toTarget.getZ())
-                                )
-                            ).times(
-                                (2 / FieldConstants.GRAVITY)
-                            ).in(Meters)
+                                ).times(
+                                    2
+                                ).div(
+                                    FieldConstants.GRAVITY
+                                ).in(Meters)
+                            )
                         )
                     );
                         
@@ -699,7 +702,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public LinearVelocity getLauncherPositionalVelocityX() {
         return MetersPerSecond.of(
-                 getLauncherPosition().getY()
+                 -TurretConstants.Offsets.Y
                  * swerveSubsystem.getAngularVelocity()
             ).plus(
                 MetersPerSecond.of(
@@ -710,7 +713,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public LinearVelocity getLauncherPositionalVelocityY() {
         return MetersPerSecond.of(
-                 getLauncherPosition().getX()
+                 TurretConstants.Offsets.Y
                  * swerveSubsystem.getAngularVelocity()
             ).plus(
                 MetersPerSecond.of(
