@@ -235,7 +235,7 @@ public final class Constants {
     public static final class PIDs {
         // TODO: tune all
 
-        public static final PID Drive = new PID(5, 0, 0, 0, 0);
+        public static final PID Drive = new PID(6, 0, 0.03, 0.2, 0);
         /** for the steer motors on the modules */
         public static final PID Angle = new PID(80, 0, 0, 0, 0);
         /** for angle-based heading control */
