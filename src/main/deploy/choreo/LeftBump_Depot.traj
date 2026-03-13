@@ -14,8 +14,7 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"3.5829758644104004 m", "val":3.5829758644104004}, "y":{"exp":"5.932885646820068 m", "val":5.932885646820068}, "heading":{"exp":"3.141592653589793 rad", "val":3.141592653589793}, "intervals":13, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"0.7355577945709229 m", "val":0.7355577945709229}, "y":{"exp":"5.96139669418335 m", "val":5.96139669418335}, "heading":{"exp":"3.141592653589793 rad", "val":3.141592653589793}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"-2.219209671020508 m", "val":-2.219209671020508}, "y":{"exp":"7.789961814880371 m", "val":7.789961814880371}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"0.7355577945709229 m", "val":0.7355577945709229}, "y":{"exp":"5.96139669418335 m", "val":5.96139669418335}, "heading":{"exp":"3.141592653589793 rad", "val":3.141592653589793}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
@@ -69,5 +68,9 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Shoot", "from":{"target":1, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
+   {"name":"Shoot", "from":{"target":1, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"Marker", "from":{"target":0, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
+       {"type":"named", "data":{"name":"Intake out, Start rollers"}}]}}},
+   {"name":"Marker", "from":{"target":1, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
+       {"type":"named", "data":{"name":"Shoot"}}]}}}]
 }
