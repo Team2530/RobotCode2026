@@ -241,11 +241,12 @@ public class TurretSubsystem extends SubsystemBase {
 
         yawIsZeroed = false;
 
+        /* Remember that NetworkTable Publishers will NOT push with SmartDashboard unless specified.*/
         TargetPositionPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Turret/Target_position", Pose3d.struct)
+            .getStructTopic("SmartDashboard/Turret/Target_position", Pose3d.struct)
             .publish();
         ToTargetPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Turret/to_target", Translation3d.struct)
+            .getStructTopic("SmartDashboard/Turret/to_target", Translation3d.struct)
             .publish();
 
         targetVelocity = 0;
@@ -508,7 +509,7 @@ public class TurretSubsystem extends SubsystemBase {
                             "Turret/Optimizer/LastCompleted",
                             periodicTimestamp
                             );
-                    
+                    // SimpleOptimizer ------------------------------------------------------------
                     targetYaw = Units.radiansToRotations(((2 * Math.PI) 
                         + Math.atan2(
                             toTarget.getY(),
@@ -540,6 +541,10 @@ public class TurretSubsystem extends SubsystemBase {
                     SmartDashboard.putNumber(
                         "Turret/SimpleOptimizer/exit_velocity",
                         exitVelocity
+                    );
+                    SmartDashboard.putNumber(
+                        "Turret/SimpleOptimizer/targetYaw",
+                        targetYaw
                     );
                     SmartDashboard.putNumber(
                         "Turret/SimpleOptimizer/toX",
