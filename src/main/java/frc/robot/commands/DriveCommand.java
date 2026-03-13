@@ -85,7 +85,7 @@ public class DriveCommand extends Command {
                     new Translation2d(x, y),
                     z);
             SmartDashboard.putNumber(
-                    "Swerve/DriveCommand/drive_multiplier",
+                    "swerve/DriveCommand/drive_multiplier",
                     driveMultiplier);
         }
     }

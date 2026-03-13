@@ -227,11 +227,12 @@ public class TurretSubsystem extends SubsystemBase {
 
         yawIsZeroed = false;
 
+        /* Remember that NetworkTable Publishers will NOT push with SmartDashboard unless specified.*/
         TargetPositionPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Turret/Target_position", Pose3d.struct)
+            .getStructTopic("SmartDashboard/Turret/Target_position", Pose3d.struct)
             .publish();
         ToTargetPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Turret/to_target", Translation3d.struct)
+            .getStructTopic("SmartDashboard/Turret/to_target", Translation3d.struct)
             .publish();
 
         targetVelocity = 0;

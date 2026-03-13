@@ -294,12 +294,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
         gearChooser.onChange(gearing -> changeGearing(gearing));
 
-        SmartDashboard.putData("Swerve Drive Gearing", gearChooser);
+        SmartDashboard.putData("swerve/Drive Gearing", gearChooser);
 
         // register sysId commands with smartdashboard
-        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());  
-        SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
-        SmartDashboard.putData("Field", swerveDrive.field);
+        SmartDashboard.putData("swerve/SysId Drive Motors", sysIdDriveCommand());  
+        SmartDashboard.putData("swerve/SysId Angle Motors", sysIdAngleCommand());
+        SmartDashboard.putData("swerve/field", swerveDrive.field);
     };
 
 
@@ -387,7 +387,7 @@ public class SwerveSubsystem extends SubsystemBase {
         posePublisher.set(getPose());
 
         SmartDashboard.putNumber(
-            "Heading",
+            "swerve/heading",
             getRotation().getRotations()
         );
     }
