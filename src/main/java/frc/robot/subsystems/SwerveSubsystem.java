@@ -311,7 +311,13 @@ public class SwerveSubsystem extends SubsystemBase {
         ChassisSpeeds speeds = new ChassisSpeeds(
             sample.vx + xController.calculate(pose.getX(), sample.x),
             sample.vy + yController.calculate(pose.getY(), sample.y),
-            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+            (
+                sample.omega 
+                / Math.pow( // trust
+                    Math.PI * 2,
+                    2
+                )
+            ) + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
 
         autoSamplePublisher.set(
@@ -354,7 +360,7 @@ public class SwerveSubsystem extends SubsystemBase {
         );
         SmartDashboard.putNumber(
             "Auto/heading",
-            sample.heading
+            Units.radiansToRotations(sample.heading)
         );
         SmartDashboard.putNumber(
             "Auto/omega",
@@ -369,9 +375,28 @@ public class SwerveSubsystem extends SubsystemBase {
             sample.moduleForcesY()
         );
         
-        this.drive(
-            new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
-            speeds.omegaRadiansPerSecond
+        
+        ChassisSpeeds robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation());
+        Force[] feedforwards = new Force[4];
+
+        for (int i = 0; i < feedforwards.length; i++) {
+            feedforwards[i] = Newtons.of(
+                Math.sqrt(
+                    Math.pow(
+                        sample.moduleForcesX()[i],
+                        2
+                    ) + Math.pow(
+                        sample.moduleForcesY()[i],
+                        2
+                    )
+                )
+            );
+        }
+
+        swerveDrive.drive(
+            robotRelativeSpeeds, 
+            swerveDrive.toServeModuleStates(robotRelativeSpeeds, false), 
+            feedforwards 
         );
     }
 
@@ -389,6 +414,18 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber(
             "Heading",
             getRotation().getRotations()
+        );
+        SmartDashboard.putNumber(
+            "Swerve/angularVelocity",
+            getAngularVelocity()
+        );
+        SmartDashboard.putNumber(
+            "Swerve/velocity_x",
+            getXVelocity()
+        );
+        SmartDashboard.putNumber(
+            "Swerve/velocity_y",
+            getYVelocity()
         );
     }
     
