@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -258,16 +260,12 @@ public class TurretSubsystem extends SubsystemBase {
             }
 
             if (targetingMode != targetingMode.MANUAL) {
-                    targetYaw = Units.radiansToRotations(((2 * Math.PI)
-                        + Math.atan2(
+                    double totalYaw = Math.atan2(
                             toTarget.getY(),
                             toTarget.getX()
-                        ) ) % (2 * Math.PI)) ;
-                    targetPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
-                    
-
+                        );
                     double groundDistance = toTarget.toTranslation2d().getNorm();
-                    double exitVelocity = (
+                    double totalVelocity = (
                             groundDistance / Math.cos(
                                 Units.degreesToRadians(
                                     TurretConstants.Pitch.ANGLE_CONSTANT
@@ -285,6 +283,33 @@ public class TurretSubsystem extends SubsystemBase {
                                 ) - toTarget.getZ()
                             ) * (2 / FieldConstants.GRAVITY)
                         );
+                    double exitVelocityX = (
+                            totalVelocity
+                            * Math.cos(totalYaw)
+                        ) - getLauncherPositionalVelocityX().in(MetersPerSecond);
+                    double exitVelocityY = (
+                            totalVelocity
+                            * Math.sin(totalYaw)
+                        ) - getLauncherPositionalVelocityY().in(MetersPerSecond);
+
+                    double exitVelocity = Math.sqrt(
+                        Math.pow(
+                            exitVelocityX,
+                            2
+                        ) + Math.pow(
+                            exitVelocityY,
+                            2
+                        )
+                    );
+                    
+                    targetYaw = Units.radiansToRotations(
+                        (
+                            (2 * Math.PI)
+                            + Math.atan2(exitVelocityY, exitVelocityX)
+                        ) % (2 * Math.PI)
+                    );
+                    targetVelocity = calculateExitToLauncherVelocity(exitVelocity);
+                    targetPitch = TurretConstants.Pitch.ANGLE_CONSTANT;
 
                     SmartDashboard.putNumber(
                         "Turret/SimpleOptimizer/exit_velocity",
@@ -497,6 +522,36 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getLauncherVelocity() {
         return m_LauncherMotor.getVelocity().getValueAsDouble();
+    }
+
+    public LinearVelocity getLauncherPositionalVelocityX() {
+        return MetersPerSecond.of(
+            -swerveSubsystem.getAngularVelocity()
+            * (
+                (
+                    Math.sin(swerveSubsystem.getRotation().getRadians()) 
+                    * TurretConstants.Offsets.X
+                ) + (
+                    Math.cos(swerveSubsystem.getRotation().getRadians())
+                    * TurretConstants.Offsets.Y
+                )
+            )
+        );
+    }
+
+    public LinearVelocity getLauncherPositionalVelocityY() {
+        return MetersPerSecond.of(
+            swerveSubsystem.getAngularVelocity()
+            * (
+                (
+                    Math.cos(swerveSubsystem.getRotation().getRadians()) 
+                    * TurretConstants.Offsets.X
+                ) - (
+                    Math.sin(swerveSubsystem.getRotation().getRadians())
+                    * TurretConstants.Offsets.Y
+                )
+            )
+        );
     }
 
     // WARNING: oh baby talonfx i don't know if this is the right calls
