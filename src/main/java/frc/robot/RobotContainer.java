@@ -101,139 +101,9 @@ public class RobotContainer {
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
-        // NamedCommands.registerCommand(null, getAutonomousCommand());
-        for (String trajectoryName : Choreo.availableTrajectories()) {
-            autoChooser.addRoutine(trajectoryName + "_routine", () -> {
-                AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
-                AutoTrajectory trajectory = routine.trajectory(trajectoryName);
+        configureAutoFactory(autoFactory);
+        configureAutoChooser(autoChooser);
 
-                routine.active().onTrue(
-                    Commands.sequence(
-                        trajectory.resetOdometry(),
-                        trajectory.cmd()
-                    )
-                );
-
-                // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
-                return routine;
-            });
-        }
-
-        /*
-        BooleanSupplier launch = new BooleanSupplier() {
-            @Override
-            public boolean getAsBoolean() {
-                return turretSubsystem.isAtVelocity();
-            }
-        };
-        autoChooser.addOption(
-            "trench left",
-            new SequentialCommandGroup(
-                turretSubsystem.zeroYawCommand(),
-                new ParallelCommandGroup(
-                    new InstantCommand(
-                        () -> {
-                            turretSubsystem.setManualControl(295.5, 36.5);
-                        }
-                    ),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        launch,
-                        false
-                    ),
-                    new RunLoaderCommand(
-                        loaderSubsystem,
-                        launch,
-                        false
-                    ),
-                    new IntakeCommand(
-                        intakeSubsystem,
-                        IntakePreset.AGITATING
-                    )
-                )
-            )
-        );
-        autoChooser.addOption(
-            "trench right",
-            new SequentialCommandGroup(
-                turretSubsystem.zeroYawCommand(),
-                new ParallelCommandGroup(
-                    new InstantCommand(
-                        () -> {
-                            turretSubsystem.setManualControl(69,35);
-                        }
-                    ),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        launch,
-                        false
-                    ),
-                    new RunLoaderCommand(
-                        loaderSubsystem,
-                        launch,
-                        false
-                    ),
-                    new IntakeCommand(
-                        intakeSubsystem,
-                        IntakePreset.AGITATING
-                    )
-                )
-            )
-        );
-        autoChooser.addOption(
-            "inner trench left",
-            new SequentialCommandGroup(
-                turretSubsystem.zeroYawCommand(),
-                new ParallelCommandGroup(
-                    new InstantCommand(
-                        () -> {
-                        turretSubsystem.setManualControl(28.8, 30);
-                        }
-                    ),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        launch,
-                        false
-                    ),
-                    new RunLoaderCommand(
-                        loaderSubsystem,
-                        launch,
-                        false
-                    ),
-                    new IntakeCommand(
-                        intakeSubsystem,
-                        IntakePreset.AGITATING
-                    )
-                )
-            )
-        );
-        autoChooser.addOption(
-            "inner trench right",
-            new SequentialCommandGroup(
-                turretSubsystem.zeroYawCommand(),
-                new ParallelCommandGroup(
-                    new InstantCommand(
-                        () -> {
-                            turretSubsystem.setManualControl(331.2, 30);
-                        }
-                    ),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        launch,
-                        false
-                    ),
-                    new RunLoaderCommand(
-                        loaderSubsystem,
-                        launch,
-                        false
-                    ),
-                    new IntakeCommand(
-                        intakeSubsystem,
-                        IntakePreset.AGITATING
-                    )
-                )
-            )
-        ); */
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -462,6 +332,61 @@ public class RobotContainer {
     }
 
 
+    private void configureAutoFactory(AutoFactory factory) {
+        factory
+            .bind(
+                "Intake", 
+                new IntakeCommand(intakeSubsystem)
+            )
+            .bind(
+                "Shoot", 
+                new ParallelCommandGroup(
+                    new IntakeCommand(
+                        intakeSubsystem,
+                        IntakePreset.AGITATING
+                    ),
+                    new RunLoaderCommand(loaderSubsystem),
+                    new RunIndexerCommand(
+                        indexerSubsystem,
+                        new BooleanSupplier() {
+                            @Override
+                            public boolean getAsBoolean() {
+                                return turretSubsystem.isAtVelocity();
+                            }
+                        }
+                    )
+                )
+            )
+            .bind(
+                "Hub",
+                new InstantCommand(
+                    () -> {
+                        turretSubsystem.setTarget(TurretTargets.HUB);
+                    }
+                )
+            )
+            ;
+    }
+
+    private void configureAutoChooser(AutoChooser chooser) {
+        // NamedCommands.registerCommand(null, getAutonomousCommand());
+        for (String trajectoryName : Choreo.availableTrajectories()) {
+            chooser.addRoutine(trajectoryName + "_routine", () -> {
+                AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
+                AutoTrajectory trajectory = routine.trajectory(trajectoryName);
+
+                routine.active().onTrue(
+                    Commands.sequence(
+                        trajectory.resetOdometry(),
+                        trajectory.cmd()
+                    )
+                );
+
+                // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
+                return routine;
+            });
+        }
+    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
