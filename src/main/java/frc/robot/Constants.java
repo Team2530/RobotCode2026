@@ -367,13 +367,13 @@ public final class Constants {
         /** In Rotations/s */
         public static final double MINIMUM_VELOCITY = 15;
 
-        public static final double MAXIMUM_VELOCITY_ERROR = 2;
+        public static final double MAXIMUM_VELOCITY_ERROR = 1;
 
         // TODO: find this
         public static final double FUELED_CURRENT_LIMIT = 35;
 
         public static final class PID {
-            public static final double P = 26.50;
+            public static final double P = 27;
             public static final double I = 0.025;
             public static final double D = 0.06; // max .5
         }
@@ -384,8 +384,8 @@ public final class Constants {
         }
 
         public static final class VelocityRegression {
-            public static final double A = 0.825772;
-            public static final double B = -1.53633; // 0.33633; //-1.03633;
+            public static final double A = 0.823772;
+            public static final double B = -1.73633; // 0.33633; //-1.03633;
         }
     }
 
@@ -400,7 +400,7 @@ public final class Constants {
         public static final double ANGLE_MAX = 340;
         
         // rps
-        public static final double MAX_VELOCITY = 50;
+        public static final double MAX_VELOCITY = 80;
         public static final double MAX_ACCELERATION= 800;
 
 
@@ -415,7 +415,7 @@ public final class Constants {
         }
 
         public static final class PID {
-            public static final double P = 12;
+            public static final double P = 20;
             public static final double I = 0;
             public static final double D = 0;
         }
