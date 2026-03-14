@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import java.lang.annotation.Target;
 import java.util.function.BooleanSupplier;
 
@@ -12,8 +14,10 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
@@ -56,10 +60,70 @@ import frc.robot.util.LimelightContainer;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
-    private static final Limelight LL_BT = new Limelight(LimelightType.LL4, "limelight-bt", false, true);
-    private static final Limelight LL_FL = new Limelight(LimelightType.LL4, "limelight-fl", true, true);
-    private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
-    private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
+    private static final Limelight LL_BT = new Limelight(
+            LimelightType.LL4, 
+            "limelight-bt", 
+            false, 
+            true,
+            new Pose3d(
+                new Translation3d(
+
+                ),
+                new Rotation3d(
+                    Degrees.of(0),
+                    Degrees.of(0),
+                    Degrees.of(0)
+                )
+            )
+        );
+    private static final Limelight LL_FL = new Limelight(
+            LimelightType.LL4, 
+            "limelight-fl", 
+            true, 
+            true,
+            new Pose3d(
+                new Translation3d(
+
+                ),
+                new Rotation3d(
+                    Degrees.of(0),
+                    Degrees.of(0),
+                    Degrees.of(55)
+                )
+            )
+        );
+    private static final Limelight LL_FR = new Limelight(
+            LimelightType.LL4, 
+            "limelight-fr", 
+            true, 
+            true,
+            new Pose3d(
+                new Translation3d(
+
+                ),
+                new Rotation3d(
+                    Degrees.of(0),
+                    Degrees.of(0),
+                    Degrees.of(-38)
+                )
+            )
+        );
+    private static final Limelight LL_BL = new Limelight(
+            LimelightType.LL4, 
+            "limelight-bl", 
+            true, 
+            true,
+            new Pose3d(
+                new Translation3d(
+
+                ),
+                new Rotation3d(
+                    Degrees.of(0),
+                    Degrees.of(0),
+                    Degrees.of(160.7)
+                )
+            )
+        );
 
     //initalizing limelight container (Group)
     public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_FL, LL_FR); // remove the turret limelight, should not be used for odometry.
