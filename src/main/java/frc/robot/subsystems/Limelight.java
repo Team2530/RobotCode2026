@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -63,9 +64,15 @@ public class Limelight extends SubsystemBase {
             pose.getX(),
             pose.getY(),
             pose.getZ(),
-            pose.getRotation().getX(),
-            pose.getRotation().getY(),
-            pose.getRotation().getZ()
+            Units.radiansToDegrees(
+                pose.getRotation().getX()
+            ),
+            Units.radiansToDegrees(
+                pose.getRotation().getY()
+            ),
+            Units.radiansToDegrees(
+                pose.getRotation().getZ()
+            )
         );
     }
 
