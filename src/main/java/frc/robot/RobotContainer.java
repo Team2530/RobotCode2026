@@ -3,6 +3,9 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import java.lang.annotation.Target;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.BooleanSupplier;
 
 import javax.naming.PartialResultException;
@@ -171,9 +174,7 @@ public class RobotContainer {
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
-        configureAutoFactory(autoFactory);
         configureAutoChooser(autoChooser);
-
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -388,13 +389,14 @@ public class RobotContainer {
     }
 
 
-    private void configureAutoFactory(AutoFactory factory) {
-        factory
-            .bind(
-                "Intake", 
+    private void configureAutoChooser(AutoChooser chooser) {
+        // add named commands for the paths
+        Map<String, Command> namedCommands = new HashMap<>() {{
+            put(
+                "Intake",
                 new IntakeCommand(intakeSubsystem)
-            )
-            .bind(
+            );
+            put(
                 "Shoot", 
                 new ParallelCommandGroup(
                     new IntakeCommand(
@@ -412,20 +414,25 @@ public class RobotContainer {
                         }
                     )
                 )
-            )
-            .bind(
+            );
+            put(
                 "Hub",
                 new InstantCommand(
-                    () -> {
-                        turretSubsystem.setTarget(TurretTargets.HUB);
+                    () -> { 
+                        turretSubsystem.setTarget(TurretTargets.HUB); 
                     }
                 )
-            )
-            ;
-    }
+            );
+        }}; 
 
-    private void configureAutoChooser(AutoChooser chooser) {
-        // NamedCommands.registerCommand(null, getAutonomousCommand());
+        for (Entry<String, Command> pair : namedCommands.entrySet()) {
+            chooser.addCmd(
+                pair.getKey(),
+                () -> { return pair.getValue(); }
+            );
+        }
+        
+        // load paths
         for (String trajectoryName : Choreo.availableTrajectories()) {
             chooser.addRoutine(trajectoryName + "_routine", () -> {
                 AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
@@ -450,7 +457,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // return autoChooser.selectedCommand();
+        // return autoChooser.getSelected();
         return autoChooser.selectedCommand();
     }
 
