@@ -407,7 +407,7 @@ public final class Constants {
         public static final class Zeroing {
             // amps
             public static final double ROUGHPASS_CURRENT_LIMIT = 45;
-            public static final double ROUGHPASS_VOLTAGE = -2;
+            public static final double ROUGHPASS_VOLTAGE = -3;
             public static final double FINEPASS_CURRENT_LIMIT = 35;
             public static final double FINEPASS_VOLTAGE = -1;
             // time above current limit to register as hitting the hard limit

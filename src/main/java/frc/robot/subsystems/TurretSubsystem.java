@@ -628,7 +628,7 @@ public class TurretSubsystem extends SubsystemBase {
             new InstantCommand(() -> {
                 m_YawMotor.setVoltage(3);
             }),
-            new WaitCommand(0.2),
+            new WaitCommand(0.1),
             // move to zero, fine pass
             new zeroingPassCommand(
                 TurretConstants.Yaw.Zeroing.FINEPASS_VOLTAGE,
