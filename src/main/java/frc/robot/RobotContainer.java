@@ -83,11 +83,13 @@ public class RobotContainer {
             true,
             new Pose3d(
                 new Translation3d(
-
+                    Meters.of(-0.31513),
+                    Meters.of(-0.25669),
+                    Meters.of(0.261315)
                 ),
                 new Rotation3d(
-                    Degrees.of(0),
-                    Degrees.of(0),
+                    Degrees.of(-1.6),
+                    Degrees.of(-14.8),
                     Degrees.of(55)
                 )
             )
@@ -99,11 +101,13 @@ public class RobotContainer {
             true,
             new Pose3d(
                 new Translation3d(
-
+                    Meters.of(-0.31729),
+                    Meters.of(0.268869),
+                    Meters.of(0.408635)
                 ),
                 new Rotation3d(
                     Degrees.of(0),
-                    Degrees.of(0),
+                    Degrees.of(-14.30),
                     Degrees.of(-38)
                 )
             )
@@ -115,11 +119,13 @@ public class RobotContainer {
             true,
             new Pose3d(
                 new Translation3d(
-
+                    Meters.of(-0.1919),
+                    Meters.of(-0.25003),
+                    Meters.of(0.351561)
                 ),
                 new Rotation3d(
-                    Degrees.of(0),
-                    Degrees.of(0),
+                    Degrees.of(3.4),
+                    Degrees.of(-13),
                     Degrees.of(160.7)
                 )
             )
