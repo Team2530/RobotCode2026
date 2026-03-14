@@ -202,11 +202,11 @@ public class RobotContainer {
                     normalDrive.resetHeading();
                 })
             );
-        driverXbox.back()
+        driverXbox.leftBumper()
             .onTrue(
-                new ParallelCommandGroup(
-                    turretSubsystem.zeroYawCommand()
-                )
+                new InstantCommand(() -> {
+                    LLContainer.snapToVision(swerveDriveSubsystem);
+                })
             );
 
         operatorXbox.leftTrigger(0.1)
@@ -254,7 +254,6 @@ public class RobotContainer {
                 )
             );
         
-        /*
         operatorXbox.x()
             .whileTrue(
                 new InstantCommand(
@@ -271,10 +270,17 @@ public class RobotContainer {
                     }
                 )
             );
-        */
         operatorXbox.start()
             .onTrue(
                 turretSubsystem.zeroYawCommand()
+            );
+        operatorXbox.rightStick()
+            .onTrue(
+                    new InstantCommand(
+                        () -> {
+                            LLContainer.snapToVision(swerveDriveSubsystem);
+                        }
+                    )
             );
 
         operatorXbox.back()
@@ -325,26 +331,6 @@ public class RobotContainer {
 
 
         
-        // LEFT CORNER
-        operatorXbox.x()
-            .onTrue(
-                new InstantCommand( 
-                    () -> {
-                        turretSubsystem.setManualControl(47.5, 40.5);
-                    }
-                )
-            );
-
-        // RIGHT CORNER
-        operatorXbox.b()
-            .onTrue(
-                new InstantCommand( 
-                    () -> {
-                        turretSubsystem.setManualControl(318, 40);
-                    }
-                )
-            );
-
         // SHUTTLE
         operatorXbox.a()
             .onTrue(
