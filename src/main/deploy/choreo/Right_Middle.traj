@@ -218,14 +218,7 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Shoot", "from":{"target":8, "targetTimestamp":2.81372, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Shoot"}}]}}},
-   {"name":"Intake Out", "from":{"target":1, "targetTimestamp":0.37295, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Intake Out"}}]}}},
-   {"name":"Start Intake Rollers", "from":{"target":3, "targetTimestamp":0.82905, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Start Intake Rollers"}}]}}},
-   {"name":"Start Intake Rollers", "from":{"target":11, "targetTimestamp":3.71619, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Start Intake Rollers"}}]}}},
-   {"name":"Shoot", "from":{"target":15, "targetTimestamp":5.26906, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Shoot"}}]}}}]
+   {"name":"Shoot", "from":{"target":8, "targetTimestamp":2.81372, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"Intake", "from":{"target":1, "targetTimestamp":0.37295, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"Shoot", "from":{"target":15, "targetTimestamp":5.26906, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
