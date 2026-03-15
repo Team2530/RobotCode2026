@@ -393,8 +393,8 @@ public class RobotContainer {
         // add named commands for the paths
         Map<String, Command> namedCommands = new HashMap<>() {{
             put(
-                "Intake",
-                new IntakeCommand(intakeSubsystem)
+                "Zero",
+                turretSubsystem.zeroYawCommand()
             );
             put(
                 "Shoot", 
@@ -423,14 +423,31 @@ public class RobotContainer {
                     }
                 )
             );
+            put(
+                "Start Intake",
+                new InstantCommand(() -> {
+                    intakeSubsystem.setPreset(IntakePreset.INTAKING);
+                })
+            );
+            put(
+                "Stop Intake",
+                new InstantCommand(() -> {
+                    intakeSubsystem.setPreset(IntakePreset.OUT);
+                })
+            );
         }}; 
 
         for (Entry<String, Command> pair : namedCommands.entrySet()) {
-            chooser.addCmd(
+            autoFactory.bind(
                 pair.getKey(),
-                () -> { return pair.getValue(); }
+                pair.getValue()
+            );
+            SmartDashboard.putBoolean(
+                "Auto/Event Bindings/" + pair.getKey() + "/available",
+                true
             );
         }
+
         
         // load paths
         for (String trajectoryName : Choreo.availableTrajectories()) {

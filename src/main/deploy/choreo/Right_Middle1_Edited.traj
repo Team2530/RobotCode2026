@@ -138,7 +138,5 @@
    {"name":"Shoot", "from":{"target":7, "targetTimestamp":5.49123, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
        {"type":"named", "data":{"name":"Shoot"}}]}}},
    {"name":"Intake Out", "from":{"target":1, "targetTimestamp":0.60044, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Intake Out"}}]}}},
-   {"name":"Start Intake Rollers", "from":{"target":2, "targetTimestamp":1.29449, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Start Intake Rollers"}}]}}}]
+       {"type":"named", "data":{"name":"Intake"}}]}}}]
 }
