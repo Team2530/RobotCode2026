@@ -4,18 +4,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
+import frc.robot.RobotContainer;
 import frc.robot.Constants.IndexerConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
 
     private final SparkMax m_IndexerMotor;
+
+    private double speed;
 
     public IndexerSubsystem() {
         m_IndexerMotor = new SparkMax(
@@ -53,6 +54,14 @@ public class IndexerSubsystem extends SubsystemBase {
             "Indexer/output", 
             m_IndexerMotor.get()
         );
+
+        if (
+            RobotContainer.turretSubsystem.isAtVelocity()
+        ) {
+            m_IndexerMotor.set(speed);
+        } else {
+            m_IndexerMotor.set(0);
+        }
     }
 
     public void run() {
@@ -66,7 +75,7 @@ public class IndexerSubsystem extends SubsystemBase {
      * @param speed - a value between -1 and 1 to set the motor to
      */
     public void run(double speed) {
-        m_IndexerMotor.set(speed);
+        this.speed = speed;
 
         SmartDashboard.putNumber(
             "Indexer/speed",
