@@ -3,6 +3,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import java.lang.annotation.Target;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -477,7 +478,6 @@ public class RobotContainer {
             );
         }
 
-
         autoChooser.onChange(new Consumer<Command>() {
             @Override
             public void accept(Command command) {
@@ -494,12 +494,23 @@ public class RobotContainer {
         // named commands must be registerd before paths are created / loaded
         //
         // load paths
-        /*
         for (String trajectoryName : Choreo.availableTrajectories()) {
-            PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(trajectoryName);
-        }*/
-    
+            try {
+                PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(
+                        trajectoryName
+                    );
 
+                autoChooser.addOption(
+                        trajectoryName,
+                        AutoBuilder.followPath(path)
+                );
+            } catch (Exception e) {
+                System.out.print(
+                    "Caught exception during autochooser configuration: "
+                    + e
+                );
+            }
+        }
     }
 
     /**
@@ -508,8 +519,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // return autoChooser.getSelected();
-        return autoChooser.selectedCommand();
+        return autoChooser.getSelected();
     }
 
     public SwerveSubsystem getSwerveSubsystem() {
