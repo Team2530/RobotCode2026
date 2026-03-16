@@ -143,7 +143,7 @@ public class RobotContainer {
 
     @Logged
     public static final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-    public static final AutoChooser autoChooser = new AutoChooser();
+    public final AutoChooser autoChooser;
     // LimeLightSubsystem();
     @Logged
     public static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
@@ -154,14 +154,7 @@ public class RobotContainer {
     public static final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
-    private final AutoFactory autoFactory = new AutoFactory(
-          swerveDriveSubsystem::getPose, // A function that returns the current robot pose
-          swerveDriveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
-          swerveDriveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
-          true, // If alliance flipping should be enabled 
-          swerveDriveSubsystem // The drive subsystem
-    );
-
+    private final AutoFactory autoFactory;
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -174,7 +167,16 @@ public class RobotContainer {
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
-        configureAutoChooser(autoChooser);
+        configureNamedCommands();
+        autoFactory = new AutoFactory(
+              swerveDriveSubsystem::getPose, // A function that returns the current robot pose
+              swerveDriveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+              swerveDriveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
+              true, // If alliance flipping should be enabled 
+              swerveDriveSubsystem // The drive subsystem
+        );
+        autoChooser = new AutoChooser();
+        configureAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -389,7 +391,7 @@ public class RobotContainer {
     }
 
 
-    private void configureAutoChooser(AutoChooser chooser) {
+    private void configureNamedCommands() {
         // add named commands for the paths
         Map<String, Command> namedCommands = new HashMap<>() {{
             put(
@@ -447,11 +449,12 @@ public class RobotContainer {
                 true
             );
         }
+    }
 
-        
+    public void configureAutoChooser() {
         // load paths
         for (String trajectoryName : Choreo.availableTrajectories()) {
-            chooser.addRoutine(trajectoryName + "_routine", () -> {
+            autoChooser.addRoutine(trajectoryName + "_routine", () -> {
                 AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
                 AutoTrajectory trajectory = routine.trajectory(trajectoryName);
 
