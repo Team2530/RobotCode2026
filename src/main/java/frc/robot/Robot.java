@@ -96,6 +96,8 @@ public class Robot extends TimedRobot {
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     Elastic.selectTab("Autonomous");
+
+    RobotContainer.LLContainer.setIMUMode(1);
   }
 
   /**

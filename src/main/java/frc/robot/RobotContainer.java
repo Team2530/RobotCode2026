@@ -1,6 +1,11 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import java.lang.annotation.Target;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.BooleanSupplier;
 
 import javax.naming.PartialResultException;
@@ -12,8 +17,10 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
@@ -56,10 +63,76 @@ import frc.robot.util.LimelightContainer;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
-    private static final Limelight LL_BT = new Limelight(LimelightType.LL4, "limelight-bt", false, true);
-    private static final Limelight LL_FL = new Limelight(LimelightType.LL4, "limelight-fl", true, true);
-    private static final Limelight LL_FR = new Limelight(LimelightType.LL4, "limelight-fr", true, true);
-    private static final Limelight LL_BL = new Limelight(LimelightType.LL4, "limelight-bl", true, true);
+    private static final Limelight LL_BT = new Limelight(
+            LimelightType.LL4, 
+            "limelight-bt", 
+            false, 
+            true,
+            new Pose3d(
+                new Translation3d(
+
+                ),
+                new Rotation3d(
+                    Degrees.of(0),
+                    Degrees.of(0),
+                    Degrees.of(0)
+                )
+            )
+        );
+    private static final Limelight LL_FL = new Limelight(
+            LimelightType.LL4, 
+            "limelight-fl", 
+            true, 
+            true,
+            new Pose3d(
+                new Translation3d(
+                    Meters.of(-0.31513),
+                    Meters.of(-0.25669),
+                    Meters.of(0.261315)
+                ),
+                new Rotation3d(
+                    Degrees.of(-1.6),
+                    Degrees.of(-14.8),
+                    Degrees.of(55)
+                )
+            )
+        );
+    private static final Limelight LL_FR = new Limelight(
+            LimelightType.LL4, 
+            "limelight-fr", 
+            true, 
+            true,
+            new Pose3d(
+                new Translation3d(
+                    Meters.of(-0.31729),
+                    Meters.of(0.268869),
+                    Meters.of(0.408635)
+                ),
+                new Rotation3d(
+                    Degrees.of(0),
+                    Degrees.of(-14.30),
+                    Degrees.of(-38)
+                )
+            )
+        );
+    private static final Limelight LL_BL = new Limelight(
+            LimelightType.LL4, 
+            "limelight-bl", 
+            true, 
+            true,
+            new Pose3d(
+                new Translation3d(
+                    Meters.of(-0.1919),
+                    Meters.of(-0.25003),
+                    Meters.of(0.351561)
+                ),
+                new Rotation3d(
+                    Degrees.of(3.4),
+                    Degrees.of(-13),
+                    Degrees.of(160.7)
+                )
+            )
+        );
 
     //initalizing limelight container (Group)
     public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_FL, LL_FR); // remove the turret limelight, should not be used for odometry.
@@ -101,139 +174,7 @@ public class RobotContainer {
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
 
-        // NamedCommands.registerCommand(null, getAutonomousCommand());
-        for (String trajectoryName : Choreo.availableTrajectories()) {
-            autoChooser.addRoutine(trajectoryName + "_routine", () -> {
-                AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
-                AutoTrajectory trajectory = routine.trajectory(trajectoryName);
-
-                routine.active().onTrue(
-                    Commands.sequence(
-                        trajectory.resetOdometry(),
-                        trajectory.cmd()
-                    )
-                );
-
-                // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
-                return routine;
-            });
-        }
-
-        /*
-        BooleanSupplier launch = new BooleanSupplier() {
-            @Override
-            public boolean getAsBoolean() {
-                return turretSubsystem.isAtVelocity();
-            }
-        };
-        autoChooser.addOption(
-            "trench left",
-            new SequentialCommandGroup(
-                turretSubsystem.zeroYawCommand(),
-                new ParallelCommandGroup(
-                    new InstantCommand(
-                        () -> {
-                            turretSubsystem.setManualControl(295.5, 36.5);
-                        }
-                    ),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        launch,
-                        false
-                    ),
-                    new RunLoaderCommand(
-                        loaderSubsystem,
-                        launch,
-                        false
-                    ),
-                    new IntakeCommand(
-                        intakeSubsystem,
-                        IntakePreset.AGITATING
-                    )
-                )
-            )
-        );
-        autoChooser.addOption(
-            "trench right",
-            new SequentialCommandGroup(
-                turretSubsystem.zeroYawCommand(),
-                new ParallelCommandGroup(
-                    new InstantCommand(
-                        () -> {
-                            turretSubsystem.setManualControl(69,35);
-                        }
-                    ),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        launch,
-                        false
-                    ),
-                    new RunLoaderCommand(
-                        loaderSubsystem,
-                        launch,
-                        false
-                    ),
-                    new IntakeCommand(
-                        intakeSubsystem,
-                        IntakePreset.AGITATING
-                    )
-                )
-            )
-        );
-        autoChooser.addOption(
-            "inner trench left",
-            new SequentialCommandGroup(
-                turretSubsystem.zeroYawCommand(),
-                new ParallelCommandGroup(
-                    new InstantCommand(
-                        () -> {
-                        turretSubsystem.setManualControl(28.8, 30);
-                        }
-                    ),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        launch,
-                        false
-                    ),
-                    new RunLoaderCommand(
-                        loaderSubsystem,
-                        launch,
-                        false
-                    ),
-                    new IntakeCommand(
-                        intakeSubsystem,
-                        IntakePreset.AGITATING
-                    )
-                )
-            )
-        );
-        autoChooser.addOption(
-            "inner trench right",
-            new SequentialCommandGroup(
-                turretSubsystem.zeroYawCommand(),
-                new ParallelCommandGroup(
-                    new InstantCommand(
-                        () -> {
-                            turretSubsystem.setManualControl(331.2, 30);
-                        }
-                    ),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        launch,
-                        false
-                    ),
-                    new RunLoaderCommand(
-                        loaderSubsystem,
-                        launch,
-                        false
-                    ),
-                    new IntakeCommand(
-                        intakeSubsystem,
-                        IntakePreset.AGITATING
-                    )
-                )
-            )
-        ); */
+        configureAutoChooser(autoChooser);
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -262,11 +203,11 @@ public class RobotContainer {
                     normalDrive.resetHeading();
                 })
             );
-        driverXbox.back()
+        driverXbox.leftBumper()
             .onTrue(
-                new ParallelCommandGroup(
-                    turretSubsystem.zeroYawCommand()
-                )
+                new InstantCommand(() -> {
+                    LLContainer.snapToVision(swerveDriveSubsystem);
+                })
             );
 
         operatorXbox.leftTrigger(0.1)
@@ -314,7 +255,6 @@ public class RobotContainer {
                 )
             );
         
-        /*
         operatorXbox.x()
             .whileTrue(
                 new InstantCommand(
@@ -331,10 +271,17 @@ public class RobotContainer {
                     }
                 )
             );
-        */
         operatorXbox.start()
             .onTrue(
                 turretSubsystem.zeroYawCommand()
+            );
+        operatorXbox.rightStick()
+            .onTrue(
+                    new InstantCommand(
+                        () -> {
+                            LLContainer.snapToVision(swerveDriveSubsystem);
+                        }
+                    )
             );
 
         operatorXbox.back()
@@ -385,26 +332,6 @@ public class RobotContainer {
 
 
         
-        // LEFT CORNER
-        operatorXbox.x()
-            .onTrue(
-                new InstantCommand( 
-                    () -> {
-                        turretSubsystem.setManualControl(47.5, 40.5);
-                    }
-                )
-            );
-
-        // RIGHT CORNER
-        operatorXbox.b()
-            .onTrue(
-                new InstantCommand( 
-                    () -> {
-                        turretSubsystem.setManualControl(318, 40);
-                    }
-                )
-            );
-
         // SHUTTLE
         operatorXbox.a()
             .onTrue(
@@ -462,6 +389,84 @@ public class RobotContainer {
     }
 
 
+    private void configureAutoChooser(AutoChooser chooser) {
+        // add named commands for the paths
+        Map<String, Command> namedCommands = new HashMap<>() {{
+            put(
+                "Zero",
+                turretSubsystem.zeroYawCommand()
+            );
+            put(
+                "Shoot", 
+                new ParallelCommandGroup(
+                    new IntakeCommand(
+                        intakeSubsystem,
+                        IntakePreset.AGITATING
+                    ),
+                    new RunLoaderCommand(loaderSubsystem),
+                    new RunIndexerCommand(
+                        indexerSubsystem,
+                        new BooleanSupplier() {
+                            @Override
+                            public boolean getAsBoolean() {
+                                return turretSubsystem.isAtVelocity();
+                            }
+                        }
+                    )
+                )
+            );
+            put(
+                "Hub",
+                new InstantCommand(
+                    () -> { 
+                        turretSubsystem.setTarget(TurretTargets.HUB); 
+                    }
+                )
+            );
+            put(
+                "Start Intake",
+                new InstantCommand(() -> {
+                    intakeSubsystem.setPreset(IntakePreset.INTAKING);
+                })
+            );
+            put(
+                "Stop Intake",
+                new InstantCommand(() -> {
+                    intakeSubsystem.setPreset(IntakePreset.OUT);
+                })
+            );
+        }}; 
+
+        for (Entry<String, Command> pair : namedCommands.entrySet()) {
+            autoFactory.bind(
+                pair.getKey(),
+                pair.getValue()
+            );
+            SmartDashboard.putBoolean(
+                "Auto/Event Bindings/" + pair.getKey() + "/available",
+                true
+            );
+        }
+
+        
+        // load paths
+        for (String trajectoryName : Choreo.availableTrajectories()) {
+            chooser.addRoutine(trajectoryName + "_routine", () -> {
+                AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
+                AutoTrajectory trajectory = routine.trajectory(trajectoryName);
+
+                routine.active().onTrue(
+                    Commands.sequence(
+                        trajectory.resetOdometry(),
+                        trajectory.cmd()
+                    )
+                );
+
+                // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
+                return routine;
+            });
+        }
+    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -469,7 +474,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // return autoChooser.selectedCommand();
+        // return autoChooser.getSelected();
         return autoChooser.selectedCommand();
     }
 

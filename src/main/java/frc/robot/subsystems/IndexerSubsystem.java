@@ -12,11 +12,14 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
+import frc.robot.RobotContainer;
 import frc.robot.Constants.IndexerConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
 
     private final SparkMax m_IndexerMotor;
+
+    private double speed;
 
     public IndexerSubsystem() {
         m_IndexerMotor = new SparkMax(
@@ -51,9 +54,17 @@ public class IndexerSubsystem extends SubsystemBase {
         );
 
         SmartDashboard.putNumber(
-            "Indexer/output", 
+            "Indexer/output",
             m_IndexerMotor.get()
         );
+
+        if (
+            RobotContainer.turretSubsystem.isAtVelocity()
+        ) {
+            m_IndexerMotor.set(speed);
+        } else {
+            m_IndexerMotor.set(0);
+        }
     }
 
     public void run() {

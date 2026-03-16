@@ -262,7 +262,7 @@ public final class Constants {
             public static final class PID {
                 // for the drive motors on the modules
                 public static final class Drive {
-                    public static final double P = 6;
+                    public static final double P = 6.5;
                     public static final double I = 0;
                     public static final double D = 0.03;
                     public static final double F = 0.2;
@@ -348,7 +348,7 @@ public final class Constants {
                 RotationsPerSecond.of(2);
 
             public static final class PID {
-                public static final double P = 26.5;
+                public static final double P = 27;
                 public static final double I = 0.025;
                 public static final double D = 0.06;
             }
@@ -360,7 +360,7 @@ public final class Constants {
 
             public static final class VelocityRegression {
                 public static final double A = 0.825772;
-                public static final double B = -1.53633; // 0.33633; //-1.03633;
+                public static final double B = -1.73633; // 0.33633; //-1.03633;
             }
         }
 
@@ -375,14 +375,14 @@ public final class Constants {
             public static final Angle ANGLE_MAX = Degrees.of(340);
 
             // rps
-            public static final double MAX_VELOCITY = 50;
+            public static final double MAX_VELOCITY = 80;
             public static final double MAX_ACCELERATION= 800;
 
 
             public static final class Zeroing {
                 public static final Current ROUGHPASS_CURRENT_LIMIT =
                     Amps.of(45);
-                public static final Voltage ROUGHPASS_VOLTAGE = Volts.of(-2);
+                public static final Voltage ROUGHPASS_VOLTAGE = Volts.of(-3);
 
                 public static final Current FINEPASS_CURRENT_LIMIT = Amps.of(35);
                 public static final Voltage FINEPASS_VOLTAGE = Volts.of(-1);
@@ -392,7 +392,7 @@ public final class Constants {
             }
 
             public static final class PID {
-                public static final double P = 12;
+                public static final double P = 20;
                 public static final double I = 0;
                 public static final double D = 0;
             }
@@ -494,21 +494,21 @@ public final class Constants {
 
         public static final class PID {
             public static final class X {
-                public static final double P = 1.0;
+                public static final double P = 9.0;
                 public static final double I = 0.0;
                 public static final double D = 0.0;
             }
 
             public static final class Y {
-                public static final double P = 1.0;
+                public static final double P = 9.0;
                 public static final double I = 0.0;
                 public static final double D = 0.0;
             }
 
             public static final class Heading {
-                public static final double P = 0.5;
+                public static final double P = 7.0;
                 public static final double I = 0.0;
-                public static final double D = 0.0;
+                public static final double D = 0.02;
             }
         }
     }
@@ -516,7 +516,7 @@ public final class Constants {
   public static final class IndexerConstants {
       public static final boolean REVERSE = true;
       public static final int CAN_ID = 24;
-      public static final Dimensionless SPEED = Percentage.of(40);
+      public static final Dimensionless SPEED = Percent.of(80);
   }
 
   public static final class LoaderConstants {

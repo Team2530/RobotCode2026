@@ -1,13 +1,13 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
+
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
@@ -17,6 +17,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -296,7 +298,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     driveConfiguration,
                     controllerConfiguration,
                     DriveConstants.MAX_ROBOT_VELOCITY.in(MetersPerSecond),
-                    getPose()
+                    new Pose2d()
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -337,12 +339,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
         gearChooser.onChange(gearing -> changeGearing(gearing));
 
-        SmartDashboard.putData("Swerve Drive Gearing", gearChooser);
+        SmartDashboard.putData("swerve/Drive Gearing", gearChooser);
 
         // register sysId commands with smartdashboard
-        SmartDashboard.putData("SysId Drive Motors", sysIdDriveCommand());
-        SmartDashboard.putData("SysId Angle Motors", sysIdAngleCommand());
-        SmartDashboard.putData("Field", swerveDrive.field);
+        SmartDashboard.putData("swerve/SysId Drive Motors", sysIdDriveCommand());  
+        SmartDashboard.putData("swerve/SysId Angle Motors", sysIdAngleCommand());
+        SmartDashboard.putData("swerve/field", swerveDrive.field);
     };
 
 
@@ -352,8 +354,7 @@ public class SwerveSubsystem extends SubsystemBase {
         
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
-            sample.vx
-                + choreoControllers.XCorrection.calculate(
+            sample.vx + choreoControllers.XCorrection.calculate(
                     pose.getX(),
                     sample.x
                 ),
@@ -362,8 +363,13 @@ public class SwerveSubsystem extends SubsystemBase {
                     pose.getY(),
                     sample.y
                 ),
-            sample.omega
-                + choreoControllers.HeadingCorrection.calculate(
+            (
+                sample.omega
+                / Math.pow( // trust
+                    Math.PI * 2,
+                    2
+                )
+            ) + choreoControllers.HeadingCorrection.calculate(
                     pose.getRotation().getRadians(),
                     sample.heading
                 )
@@ -409,7 +415,7 @@ public class SwerveSubsystem extends SubsystemBase {
         );
         SmartDashboard.putNumber(
             "Auto/heading",
-            sample.heading
+            Units.radiansToRotations(sample.heading)
         );
         SmartDashboard.putNumber(
             "Auto/omega",
@@ -424,9 +430,28 @@ public class SwerveSubsystem extends SubsystemBase {
             sample.moduleForcesY()
         );
         
-        this.drive(
-            new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
-            speeds.omegaRadiansPerSecond
+        
+        ChassisSpeeds robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation());
+        Force[] feedforwards = new Force[4];
+
+        for (int i = 0; i < feedforwards.length; i++) {
+            feedforwards[i] = Newtons.of(
+                Math.sqrt(
+                    Math.pow(
+                        sample.moduleForcesX()[i],
+                        2
+                    ) + Math.pow(
+                        sample.moduleForcesY()[i],
+                        2
+                    )
+                )
+            );
+        }
+
+        swerveDrive.drive(
+            robotRelativeSpeeds,
+            swerveDrive.toServeModuleStates(robotRelativeSpeeds, false),
+            feedforwards
         );
     }
 
@@ -442,8 +467,20 @@ public class SwerveSubsystem extends SubsystemBase {
         posePublisher.set(getPose());
 
         SmartDashboard.putNumber(
-            "Heading",
+            "Swerve/Heading",
             getRotation().getRotations()
+        );
+        SmartDashboard.putNumber(
+            "Swerve/angularVelocity",
+            getAngularVelocity()
+        );
+        SmartDashboard.putNumber(
+            "Swerve/velocity_x",
+            getXVelocity().in(MetersPerSecond)
+        );
+        SmartDashboard.putNumber(
+            "Swerve/velocity_y",
+            getYVelocity().in(MetersPerSecond)
         );
     }
     
@@ -518,7 +555,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /*
      * angular velocity in radians per second
      */
-    public double getAngularVelocity() {
+    public AngularVelocity getAngularVelocity() {
         return getVelocity().omegaRadiansPerSecond;
     }
 

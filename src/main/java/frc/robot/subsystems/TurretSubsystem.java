@@ -177,11 +177,12 @@ public class TurretSubsystem extends SubsystemBase {
 
         yawIsZeroed = false;
 
+        /* Remember that NetworkTable Publishers will NOT push with SmartDashboard unless specified.*/
         TargetPositionPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Turret/Target_position", Pose3d.struct)
+            .getStructTopic("SmartDashboard/Turret/Target_position", Pose3d.struct)
             .publish();
         ToTargetPublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Turret/to_target", Translation3d.struct)
+            .getStructTopic("SmartDashboard/Turret/to_target", Translation3d.struct)
             .publish();
 
         atVelocity = false;
@@ -249,57 +250,54 @@ public class TurretSubsystem extends SubsystemBase {
                             Math.cos(
                                 TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)
                             )
-                        )
-                    ).div(
-                        Seconds.of(
-                            Math.sqrt(
-                                (
+                        ).div(
+                            Seconds.of(
+                                Math.sqrt(
                                     (
-                                        groundDistance.in(Meters)
-                                        * Math.tan(
-                                                TurretConstants.Pitch
-                                                .ANGLE_CONSTANT.in(Radians)
+                                        (
+                                            (
+                                                groundDistance.in(Meters)
+                                                * Math.tan(
+                                                        TurretConstants.Pitch
+                                                        .ANGLE_CONSTANT.in(Radians)
+                                                )
+                                            ) - toTarget.getZ()
+                                        ) * (
+                                            2
+                                            / MetaConstants.Field.GRAVITY
+                                                .in(MetersPerSecondPerSecond)
                                         )
-                                    ) - toTarget.getZ()
-                                ) * (
-                                    2
-                                    / MetaConstants.Field.GRAVITY
-                                        .in(MetersPerSecondPerSecond)
+                                    )
                                 )
                             )
                         )
                     );
-                        
-
-
                 LinearVelocity exitVelocityX = (
                         totalVelocity
-                        .times(
-                            Math.cos(totalYaw.in(Radians))
-                        )
+                        .times(Math.cos(totalYaw.in(Radians)))
                     ).minus(getLauncherPositionalVelocityX());
                 LinearVelocity exitVelocityY = (
                         totalVelocity
                         .times(Math.sin(totalYaw.in(Radians)))
-                    ).minus(
-                        getLauncherPositionalVelocityY()
-                    );
+                    ).minus(getLauncherPositionalVelocityY());
 
-                targetYaw = Radians.of((
-                    (2 * Math.PI)
-                    + Math.atan2(
-                        exitVelocityY.in(MetersPerSecond),
-                        exitVelocityX.in(MetersPerSecond)
-                    )
-                ) % (2 * Math.PI));
-                targetVelocity =  RotationsPerSecond.of(
-                    calculateExitToLauncherVelocity(
-                        Math.sqrt(
-                            Math.pow(exitVelocityX.in(MetersPerSecond), 2)
-                            + Math.pow(exitVelocityY.in(MetersPerSecond), 2)
+                targetYaw = Radians.of(
+                    (
+                        (2 * Math.PI)
+                        + Math.atan2(
+                            exitVelocityY.in(MetersPerSecond),
+                            exitVelocityX.in(MetersPerSecond)
                         )
-                    )
+                    ) % (2 * Math.PI)
                 );
+                targetVelocity = calculateExitToLauncherVelocity(
+                        MetersPerSecond.of(
+                            Math.sqrt(
+                                Math.pow(exitVelocityX.in(MetersPerSecond), 2)
+                                + Math.pow(exitVelocityY.in(MetersPerSecond), 2)
+                            )
+                        )
+                    );
             }
 
             Angle setYaw;
@@ -338,6 +336,10 @@ public class TurretSubsystem extends SubsystemBase {
                         setYaw.times(TurretConstants.Yaw.GEAR_RATIO)
                         ).withUpdateFreqHz(1000)
                     );
+
+            ToTargetPublisher.set(
+                toTarget
+            );
 
             SmartDashboard.putNumber(
                 "Turret/Yaw/Set_yaw",
@@ -452,23 +454,80 @@ public class TurretSubsystem extends SubsystemBase {
         );
     }
 
+    public LinearVelocity getLauncherPositionalVelocityX() {
+        return MetersPerSecond.of(
+            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                .in(RadiansPerSecond)
+            * (
+                (
+                    TurretConstants.Offsets.X
+                    .times(
+                        Math.sin(
+                            RobotContainer.swerveDriveSubsystem.getRotation().getRadians()
+                        )
+                    )
+                ).plus(
+                    TurretConstants.Offsets.Y
+                    .times(
+                        Math.cos(
+                            RobotContainer.swerveDriveSubsystem.getRotation().getRadians()
+                        )
+                    )
+                )
+            ).in(Meters)
+        );
+    }
+
+    public LinearVelocity getLauncherPositionalVelocityY() {
+        return MetersPerSecond.of(
+            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                .in(RadiansPerSecond)
+            * (
+                (
+                    TurretConstants.Offsets.X
+                    .times(
+                        Math.cos(
+                            RobotContainer.swerveDriveSubsystem.getRotation().getRadians()
+                        )
+                    )
+                ).minus(
+                    TurretConstants.Offsets.Y
+                    .times(
+                        Math.sin(
+                            RobotContainer.swerveDriveSubsystem.getRotation().getRadians()
+                        )
+                    )
+                )
+            ).in(Meters)
+        );
+    }
+
     // WARNING: oh baby talonfx i don't know if this is the right calls
     public double getLauncherCurrent() {
         return m_LauncherMotor.getTorqueCurrent().getValueAsDouble();
     }
 
-    private static double calculateLauncherToExitVelocity(double launcherVelocity) {
-        return Units.feetToMeters(
-            (TurretConstants.Launcher.VelocityRegression.A * launcherVelocity)
+    private static LinearVelocity calculateLauncherToExitVelocity(
+        AngularVelocity launcherVelocity
+    ) {
+        return FeetPerSecond.of(
+            (
+                TurretConstants.Launcher.VelocityRegression.A 
+                * launcherVelocity.in(RotationsPerSecond)
+            )
             + TurretConstants.Launcher.VelocityRegression.B
         );
     }
 
-    private static double calculateExitToLauncherVelocity(double exitVelocity) {
-        return (
-            Units.metersToFeet(exitVelocity)
-            - TurretConstants.Launcher.VelocityRegression.B
-        ) / TurretConstants.Launcher.VelocityRegression.A;
+    private static AngularVelocity calculateExitToLauncherVelocity(
+            LinearVelocity exitVelocity
+    ) {
+        return RotationsPerSecond.of(
+                (
+                    exitVelocity.in(FeetPerSecond)
+                    - TurretConstants.Launcher.VelocityRegression.B
+                ) / TurretConstants.Launcher.VelocityRegression.A
+            );
     }
     
     public Command zeroYawCommand() {
@@ -524,7 +583,7 @@ public class TurretSubsystem extends SubsystemBase {
             new InstantCommand(() -> {
                 m_YawMotor.setVoltage(3);
             }),
-            new WaitCommand(0.2),
+            new WaitCommand(0.1),
             // move to zero, fine pass
             new zeroingPassCommand(
                 TurretConstants.Yaw.Zeroing.FINEPASS_VOLTAGE.in(Volts),
@@ -594,24 +653,6 @@ public class TurretSubsystem extends SubsystemBase {
                 new Rotation3d()
             )
         );
-    }
-
-    public LinearVelocity getLauncherPositionalVelocityX() {
-        return MetersPerSecond.of(
-                 TurretConstants.Offsets.Y.in(Meters)
-                 * -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
-            ).plus(
-                RobotContainer.swerveDriveSubsystem.getXVelocity()
-            );
-    }
-
-    public LinearVelocity getLauncherPositionalVelocityY() {
-        return MetersPerSecond.of(
-                 TurretConstants.Offsets.Y.in(Meters)
-                 * RobotContainer.swerveDriveSubsystem.getAngularVelocity()
-            ).plus(
-                RobotContainer.swerveDriveSubsystem.getYVelocity()
-            );
     }
 
     public void setTargetVelocity(AngularVelocity target) {
