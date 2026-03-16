@@ -1,15 +1,17 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -28,8 +30,8 @@ public class LoaderSubsystem extends SubsystemBase {
                 new TalonFXConfiguration().withMotorOutput(
                     new MotorOutputConfigs().withInverted(
                         LoaderConstants.REVERSE
-                            ? InvertedValue.Clockwise_Positive    
-                            : InvertedValue.CounterClockwise_Positive        
+                            ? InvertedValue.Clockwise_Positive
+                            : InvertedValue.CounterClockwise_Positive
                     )
                 ).withSlot0(
                     new Slot0Configs()
@@ -46,7 +48,7 @@ public class LoaderSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber(
             "Loader/velocity",
-            getVelocity()
+            getVelocity().in(RotationsPerSecond)
         );
     }
 
@@ -55,19 +57,21 @@ public class LoaderSubsystem extends SubsystemBase {
      * @param velocity - a value between -MAXIMUM_VELOCITY and MAXIMUM_VELOCITY,
      * in rps
      */
-    public void runVelocity(double velocity) {
+    public void runVelocity(AngularVelocity velocity) {
         m_LoaderMotor.setControl(
             new VelocityTorqueCurrentFOC(
                 MathUtil.clamp(
-                    velocity,
-                    -LoaderConstants.MAXIMUM_VELOCITY,
+                    velocity.in(RotationsPerSecond),
                     LoaderConstants.MAXIMUM_VELOCITY
+                        .times(-1)
+                        .in(RotationsPerSecond),
+                    LoaderConstants.MAXIMUM_VELOCITY.in(RotationsPerSecond)
                 )
             )
         );
         SmartDashboard.putNumber(
             "Loader/target_velocity",
-            velocity
+            velocity.in(RotationsPerSecond)
         );
     }
 
@@ -75,18 +79,22 @@ public class LoaderSubsystem extends SubsystemBase {
      * set a custom speed for the loader motor
      * @param speed - a value between -1 and 1 to set the motor to
      */
-    public void run(double speed) {
+    public void run(Dimensionless speed) {
         runVelocity(
-            speed * LoaderConstants.MAXIMUM_VELOCITY
+            LoaderConstants.MAXIMUM_VELOCITY.times(speed)
         );
     }
     
     public void stop() {
-        run(0.0);
+        run(
+            Percent.zero()
+        );
     }
 
-    public double getVelocity() {
-        return m_LoaderMotor.getVelocity()
-            .getValueAsDouble();
+    public AngularVelocity getVelocity() {
+        return RotationsPerSecond.of(
+                m_LoaderMotor.getVelocity()
+                .getValueAsDouble()
+            );
     }
 }

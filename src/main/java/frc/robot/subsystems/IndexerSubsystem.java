@@ -1,11 +1,12 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -65,12 +66,14 @@ public class IndexerSubsystem extends SubsystemBase {
      * set a custom speed for the indexer motor
      * @param speed - a value between -1 and 1 to set the motor to
      */
-    public void run(double speed) {
-        m_IndexerMotor.set(speed);
+    public void run(Dimensionless speed) {
+        m_IndexerMotor.set(
+            speed.in(Value)
+        );
 
         SmartDashboard.putNumber(
             "Indexer/speed",
-            speed
+            speed.in(Value)
         );
     }
 
@@ -84,12 +87,15 @@ public class IndexerSubsystem extends SubsystemBase {
     
     public void runReverse() {
         run(
-            -IndexerConstants.SPEED
+            IndexerConstants.SPEED
+            .times(-1)
         );
     }
 
     public void stop() {
-        run(0.0);
+        run(
+            Percent.of(0)
+        );
     }
 
 }
