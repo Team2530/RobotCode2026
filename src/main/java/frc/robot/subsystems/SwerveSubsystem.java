@@ -472,7 +472,7 @@ public class SwerveSubsystem extends SubsystemBase {
         );
         SmartDashboard.putNumber(
             "Swerve/angularVelocity",
-            getAngularVelocity()
+            getAngularVelocity().in(RadiansPerSecond)
         );
         SmartDashboard.putNumber(
             "Swerve/velocity_x",
@@ -556,7 +556,9 @@ public class SwerveSubsystem extends SubsystemBase {
      * angular velocity in radians per second
      */
     public AngularVelocity getAngularVelocity() {
-        return getVelocity().omegaRadiansPerSecond;
+        return RadiansPerSecond.of(
+            getVelocity().omegaRadiansPerSecond
+        );
     }
 
     public Rotation2d getRotation() {

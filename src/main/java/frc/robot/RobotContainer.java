@@ -2,13 +2,10 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BooleanSupplier;
-
-import javax.naming.PartialResultException;
 
 import choreo.Choreo;
 import choreo.auto.AutoChooser;
@@ -16,25 +13,17 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.MetaConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ManualTurretCommand;
@@ -137,9 +126,9 @@ public class RobotContainer {
     //initalizing limelight container (Group)
     public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_FL, LL_FR); // remove the turret limelight, should not be used for odometry.
     // @Logged
-    public static final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
+    public static final CommandXboxController driverXbox = new CommandXboxController(MetaConstants.Controllers.DRIVER_PORT);
     // @Logged
-    public static final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    public static final CommandXboxController operatorXbox = new CommandXboxController(MetaConstants.Controllers.OPERATOR_PORT);
 
     @Logged
     public static final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
@@ -151,7 +140,7 @@ public class RobotContainer {
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     public static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    public static final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
+    public static final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
     // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
     private final AutoFactory autoFactory = new AutoFactory(
@@ -337,7 +326,10 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(0, 45);
+                        turretSubsystem.setManualControl(
+                            Degrees.of(0), 
+                            RotationsPerSecond.of(45)
+                        );
                         //turretSubsystem.setTarget(TurretTargets.HUB);
                     }
                 )
@@ -349,7 +341,10 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(62, 37.5);
+                        turretSubsystem.setManualControl(
+                            Degrees.of(62), 
+                            RotationsPerSecond.of(37.5)
+                        );
                     }
                 )
             );
@@ -370,7 +365,10 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(295, 36);
+                        turretSubsystem.setManualControl(
+                            Degrees.of(295), 
+                            RotationsPerSecond.of(36)
+                        );
                     }
                 )
             );
@@ -380,7 +378,10 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(69,35);
+                        turretSubsystem.setManualControl(
+                            Degrees.of(69),
+                            RotationsPerSecond.of(35)
+                        );
                     }
                 )
             );
