@@ -7,6 +7,8 @@
 
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,25 +17,37 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.MetaConstants;
 
 public class AllianceFlipUtil {
 
-  public static double applyX(double x) {
+  public static Distance applyX(Distance x) {
     return shouldFlip() 
-        ? FieldConstants.FIELD_LENGTH - x 
+        ? MetaConstants.Field.LENGTH.minus(x)  
         : x;
   }
 
-  public static double applyY(double y) {
+  public static Distance applyY(Distance y) {
     return shouldFlip() 
-        ? FieldConstants.FIELD_WIDTH - y 
+        ? MetaConstants.Field.WIDTH.minus(y)
         : y;
   }
 
   public static Translation2d apply(Translation2d translation) {
-    return new Translation2d(applyX(translation.getX()), applyY(translation.getY()));
+    return new Translation2d(
+      applyX(
+        Meters.of(
+          translation.getX()
+        )
+      ), 
+      applyY(
+        Meters.of(
+          translation.getY()
+        )
+      )
+    );
   }
 
   public static Rotation2d apply(Rotation2d rotation) {
@@ -71,9 +85,17 @@ public class AllianceFlipUtil {
 
   public static Pose3d apply(Pose3d pose) {
       return new Pose3d(
-          applyX(pose.getX()),
-          applyY(pose.getY()),
-          pose.getZ(),
+          applyX(
+            Meters.of(
+              pose.getX()
+            )
+          ),
+          applyY(
+            Meters.of(
+              pose.getY()
+            )
+          ),
+          Meters.of(pose.getZ()),
           apply(pose.getRotation())
       );
   }

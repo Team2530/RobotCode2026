@@ -2,15 +2,11 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.annotation.Target;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-
-import javax.naming.PartialResultException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -20,34 +16,22 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import choreo.Choreo;
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.MetaConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ManualTurretCommand;
@@ -76,22 +60,6 @@ import frc.robot.util.LimelightContainer;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
-    private static final Limelight LL_BT = new Limelight(
-            LimelightType.LL4, 
-            "limelight-bt", 
-            false, 
-            true,
-            new Pose3d(
-                new Translation3d(
-
-                ),
-                new Rotation3d(
-                    Degrees.of(0),
-                    Degrees.of(0),
-                    Degrees.of(0)
-                )
-            )
-        );
     private static final Limelight LL_FL = new Limelight(
             LimelightType.LL4, 
             "limelight-fl", 
@@ -150,9 +118,9 @@ public class RobotContainer {
     //initalizing limelight container (Group)
     public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_FL, LL_FR); // remove the turret limelight, should not be used for odometry.
     // @Logged
-    public static final CommandXboxController driverXbox = new CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
+    public static final CommandXboxController driverXbox = new CommandXboxController(MetaConstants.Controllers.DRIVER_PORT);
     // @Logged
-    public static final CommandXboxController operatorXbox = new CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    public static final CommandXboxController operatorXbox = new CommandXboxController(MetaConstants.Controllers.OPERATOR_PORT);
 
     @Logged
     public static final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
@@ -167,7 +135,7 @@ public class RobotContainer {
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     public static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    public static final TurretSubsystem turretSubsystem = new TurretSubsystem(swerveDriveSubsystem);
+    public static final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -343,7 +311,10 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand( 
                     () -> {
-                        turretSubsystem.setManualControl(0, 45);
+                        turretSubsystem.setManualControl(
+                            Degrees.of(0), 
+                            RotationsPerSecond.of(45)
+                        );
                         //turretSubsystem.setTarget(TurretTargets.HUB);
                     }
                 )
@@ -355,7 +326,10 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(62, 37.5);
+                        turretSubsystem.setManualControl(
+                            Degrees.of(62), 
+                            RotationsPerSecond.of(37.5)
+                        );
                     }
                 )
             );
@@ -376,7 +350,10 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(295, 36);
+                        turretSubsystem.setManualControl(
+                            Degrees.of(295), 
+                            RotationsPerSecond.of(36)
+                        );
                     }
                 )
             );
@@ -386,7 +363,10 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(69,35);
+                        turretSubsystem.setManualControl(
+                            Degrees.of(69),
+                            RotationsPerSecond.of(35)
+                        );
                     }
                 )
             );
@@ -403,20 +383,35 @@ public class RobotContainer {
                 swerveDriveSubsystem::driveRobotRelative,
                 new SwerveSubsystem.AutonomousController(),
                 new RobotConfig(
-                    RobotConstants.TOTAL_MASS_KG,
+                    RobotConstants.TOTAL_MASS,
                     RobotConstants.MOMENT_OF_INERTIA,
                     new ModuleConfig(
-                        DriveConstants.SwerveModules.WHEEL_DIAMETER / 2,
+                        DriveConstants.Modules.WHEEL_DIAMETER.div(2),
                         DriveConstants.MAX_ROBOT_VELOCITY,
-                        DriveConstants.SwerveModules.WHEEL_FRICTION_COEFFICIENT,
+                        DriveConstants.Modules.WHEEL_FRICTION_COEFFICIENT,
                         DCMotor.getKrakenX60Foc(1),
                         swerveDriveSubsystem.getDriveGearRatio(),
-                        DriveConstants.SwerveModules.DRIVE_CURRENT_LIMIT,
+                        DriveConstants.Modules.DRIVE_CURRENT_LIMIT,
                         1
                     ),
-                    DriveConstants.TRACK_WIDTH
+                    new Translation2d(
+                        DriveConstants.Modules.Offsets.FL.X,
+                        DriveConstants.Modules.Offsets.FL.Y
+                    ),
+                    new Translation2d(
+                        DriveConstants.Modules.Offsets.FR.X,
+                        DriveConstants.Modules.Offsets.FR.Y
+                    ),
+                    new Translation2d(
+                        DriveConstants.Modules.Offsets.BL.X,
+                        DriveConstants.Modules.Offsets.BL.Y
+                    ),
+                    new Translation2d(
+                        DriveConstants.Modules.Offsets.BR.X,
+                        DriveConstants.Modules.Offsets.BR.Y
+                    )
                 ),
-                FieldConstants.isRed,
+                MetaConstants.isRed,
                 swerveDriveSubsystem
             );
 
