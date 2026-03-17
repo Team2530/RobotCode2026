@@ -3,6 +3,7 @@ package frc.robot;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -90,6 +91,13 @@ public final class Constants {
 
       return Alliance.Blue;
     }
+
+    public static BooleanSupplier isRed = new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean() {
+                return getAlliance() == Alliance.Red;
+            }
+        };
   }
 
   public static class HopperConstants {
@@ -327,8 +335,7 @@ public final class Constants {
   }
   public static final class choreoConstants {
     public static final File AUTO_PATH_DIRECTORY = new File(Filesystem.getDeployDirectory(), "choreo");
-    public static final PID x_CONTROLLER = new PID(9, 0, 0);
-    public static final PID y_CONTROLLER = new PID(9, 0, 0);
+    public static final PID translation_CONTROLLER = new PID(9, 0, 0);
     public static final PID heading_CONTROLLER = new PID(0.2, 0, 0);
   }
   public static class CommonConstants {
