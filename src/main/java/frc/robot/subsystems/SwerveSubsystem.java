@@ -2,9 +2,13 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
+import com.pathplanner.lib.util.DriveFeedforwards;
+
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,12 +17,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -51,36 +53,60 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 
 public class SwerveSubsystem extends SubsystemBase {
-    //Choreo PID Controllers
 
-    private class ChoreoControllers {
-        public final PIDController XCorrection;
-        public final PIDController YCorrection;
-        public final PIDController HeadingCorrection;
-
-        public ChoreoControllers() {
-            XCorrection = new PIDController(
-                    ChoreoConstants.PID.X.P,
-                    ChoreoConstants.PID.X.I,
-                    ChoreoConstants.PID.X.D
-                );
-            YCorrection = new PIDController(
-                    ChoreoConstants.PID.Y.P,
-                    ChoreoConstants.PID.Y.I,
-                    ChoreoConstants.PID.Y.D
-                );
-            HeadingCorrection = new PIDController(
+    public static class AutonomousController 
+            extends PPHolonomicDriveController
+    {
+        public AutonomousController() {
+            super(
+                new PIDConstants(
+                    ChoreoConstants.PID.Translation.P,
+                    ChoreoConstants.PID.Translation.I,
+                    ChoreoConstants.PID.Translation.D
+                ),
+                new PIDConstants(
                     ChoreoConstants.PID.Heading.P,
                     ChoreoConstants.PID.Heading.I,
                     ChoreoConstants.PID.Heading.D
-                );
-            HeadingCorrection.enableContinuousInput(
-                    -Math.PI,
-                    Math.PI
-                );
+                )
+            );
+        }
+
+        @Override
+        public ChassisSpeeds calculateRobotRelativeSpeeds(
+            Pose2d pose,
+            PathPlannerTrajectoryState target
+        ) {
+            ChassisSpeeds speeds = super.calculateRobotRelativeSpeeds(pose,target);
+
+            SmartDashboard.putNumber(
+                "Auto/x",
+                target.pose.getX()
+            );
+            SmartDashboard.putNumber(
+                "Auto/y",
+                target.pose.getY()
+            );
+            SmartDashboard.putNumber(
+                "Auto/vx",
+                target.fieldSpeeds.vxMetersPerSecond
+            );
+            SmartDashboard.putNumber(
+                "Auto/vy",
+                target.fieldSpeeds.vyMetersPerSecond
+            );
+            SmartDashboard.putNumber(
+                "Auto/heading",
+                target.heading.getRotations()
+            );
+            SmartDashboard.putNumber(
+                "Auto/omega",
+                target.fieldSpeeds.omegaRadiansPerSecond
+            );
+
+            return speeds;
         }
     }
-    private final ChoreoControllers choreoControllers;
     
     private final SwerveDrive swerveDrive;
 
@@ -319,8 +345,6 @@ public class SwerveSubsystem extends SubsystemBase {
         // TODO: idk this seems find
         swerveDrive.setModuleEncoderAutoSynchronize(true, 1);
 
-        choreoControllers = new ChoreoControllers();
-
         // register gearshifter with smartdashboard
         gearChooser = new SendableChooser<>();
 
@@ -346,114 +370,6 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putData("swerve/SysId Angle Motors", sysIdAngleCommand());
         SmartDashboard.putData("swerve/field", swerveDrive.field);
     };
-
-
-     public void followTrajectory(SwerveSample sample) {
-        // Get the current pose of the robot
-        Pose2d pose = getPose();
-        
-        // Generate the next speeds for the robot
-        ChassisSpeeds speeds = new ChassisSpeeds(
-            sample.vx + choreoControllers.XCorrection.calculate(
-                    pose.getX(),
-                    sample.x
-                ),
-            sample.vy
-                + choreoControllers.YCorrection.calculate(
-                    pose.getY(),
-                    sample.y
-                ),
-            (
-                sample.omega
-                / Math.pow( // trust
-                    Math.PI * 2,
-                    2
-                )
-            ) + choreoControllers.HeadingCorrection.calculate(
-                    pose.getRotation().getRadians(),
-                    sample.heading
-                )
-        );
-
-        autoSamplePublisher.set(
-            sample
-        );
-        autoPosePublisher.set(
-            new Pose2d(
-                new Translation2d(
-                    sample.x,
-                    sample.y
-                ),
-                new Rotation2d(
-                    sample.heading
-                )
-            )
-        );
-        SmartDashboard.putNumber(
-            "Auto/x",
-            sample.x
-        );
-        SmartDashboard.putNumber(
-            "Auto/y",
-            sample.y
-        );
-        SmartDashboard.putNumber(
-            "Auto/vx",
-            sample.vx
-        );
-        SmartDashboard.putNumber(
-            "Auto/vy",
-            sample.vy
-        );
-        SmartDashboard.putNumber(
-            "Auto/ax",
-            sample.ax
-        );
-        SmartDashboard.putNumber(
-            "Auto/ay",
-            sample.ay
-        );
-        SmartDashboard.putNumber(
-            "Auto/heading",
-            Units.radiansToRotations(sample.heading)
-        );
-        SmartDashboard.putNumber(
-            "Auto/omega",
-            sample.omega
-        );
-        SmartDashboard.putNumberArray(
-            "Auto/moduleForcesX",
-            sample.moduleForcesX()
-        );
-        SmartDashboard.putNumberArray(
-            "Auto/moduleForcesY",
-            sample.moduleForcesY()
-        );
-        
-        
-        ChassisSpeeds robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation());
-        Force[] feedforwards = new Force[4];
-
-        for (int i = 0; i < feedforwards.length; i++) {
-            feedforwards[i] = Newtons.of(
-                Math.sqrt(
-                    Math.pow(
-                        sample.moduleForcesX()[i],
-                        2
-                    ) + Math.pow(
-                        sample.moduleForcesY()[i],
-                        2
-                    )
-                )
-            );
-        }
-
-        swerveDrive.drive(
-            robotRelativeSpeeds,
-            swerveDrive.toServeModuleStates(robotRelativeSpeeds, false),
-            feedforwards
-        );
-    }
 
     @Override
     public void periodic() {
@@ -504,6 +420,23 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * drive robot-oriented
+     * @param speeds chassis speeds
+     * @param feedforwards module feedforwards
+     */
+    public void driveRobotRelative(
+        ChassisSpeeds speeds,
+        DriveFeedforwards feedforwards
+    ) {
+        swerveDrive.drive(
+            speeds,
+            swerveDrive.toServeModuleStates(speeds, true),
+            // TODO: make sure this is the right call
+            feedforwards.linearForces()
+        );
+    }
+
+    /**
+     * drive robot-oriented
      * @param translation robot-oriented translation; m / s
      * @param rotation angular rate; rads / s
      */
@@ -540,6 +473,9 @@ public class SwerveSubsystem extends SubsystemBase {
         return swerveDrive.getFieldVelocity();
     }
 
+    public ChassisSpeeds getRobotRelativeVelocity() {
+        return swerveDrive.getRobotVelocity();
+    }
     public LinearVelocity getXVelocity() {
         return MetersPerSecond.of(
                 getVelocity().vxMetersPerSecond
@@ -626,5 +562,9 @@ public class SwerveSubsystem extends SubsystemBase {
         double timestamp
     ) {
         swerveDrive.addVisionMeasurement(pose, timestamp);
+    }
+
+    public double getDriveGearRatio() {
+        return gearChooser.getSelected().gearRatio;
     }
 }

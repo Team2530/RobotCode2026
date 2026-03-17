@@ -6,24 +6,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import choreo.Choreo;
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MetaConstants;
+import frc.robot.Constants.RobotConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ManualTurretCommand;
@@ -116,7 +124,10 @@ public class RobotContainer {
 
     @Logged
     public static final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
-    public static final AutoChooser autoChooser = new AutoChooser();
+    // the factory class for this (AutoBuilder) needs to be configured first
+    // before the auto chooser can be built, so this is created in the
+    // constructor
+    public static final SendableChooser<Command> autoChooser;
     // LimeLightSubsystem();
     @Logged
     public static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
@@ -126,29 +137,19 @@ public class RobotContainer {
     public static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
     public static final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
-    // public static final TurretSubsystem TURRET_SUBSYSTEM = new TurretSubsystem();
-    private final AutoFactory autoFactory = new AutoFactory(
-          swerveDriveSubsystem::getPose, // A function that returns the current robot pose
-          swerveDriveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
-          swerveDriveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
-          true, // If alliance flipping should be enabled 
-          swerveDriveSubsystem // The drive subsystem
-    );
-
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
-    public RobotContainer() {
-
-        
+    static {
         // Configure the trigger bindings
         configureBindings();
 
+        configureAutos();
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
-
-        configureAutoChooser(autoChooser);
-        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     
@@ -168,7 +169,7 @@ public class RobotContainer {
      * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
      * joysticks}.
      */
-    private void configureBindings() {
+    private static void configureBindings() {
         driverXbox.start()
             .onTrue(
                 new InstantCommand(() -> {
@@ -374,7 +375,46 @@ public class RobotContainer {
     }
 
 
-    private void configureAutoChooser(AutoChooser chooser) {
+    private static void configureAutos() {
+        AutoBuilder.configure(
+                swerveDriveSubsystem::getPose,
+                swerveDriveSubsystem::resetOdometry,
+                swerveDriveSubsystem::getRobotRelativeVelocity,
+                swerveDriveSubsystem::driveRobotRelative,
+                new SwerveSubsystem.AutonomousController(),
+                new RobotConfig(
+                    RobotConstants.TOTAL_MASS,
+                    RobotConstants.MOMENT_OF_INERTIA,
+                    new ModuleConfig(
+                        DriveConstants.Modules.WHEEL_DIAMETER.div(2),
+                        DriveConstants.MAX_ROBOT_VELOCITY,
+                        DriveConstants.Modules.WHEEL_FRICTION_COEFFICIENT,
+                        DCMotor.getKrakenX60Foc(1),
+                        swerveDriveSubsystem.getDriveGearRatio(),
+                        DriveConstants.Modules.DRIVE_CURRENT_LIMIT,
+                        1
+                    ),
+                    new Translation2d(
+                        DriveConstants.Modules.Offsets.FL.X,
+                        DriveConstants.Modules.Offsets.FL.Y
+                    ),
+                    new Translation2d(
+                        DriveConstants.Modules.Offsets.FR.X,
+                        DriveConstants.Modules.Offsets.FR.Y
+                    ),
+                    new Translation2d(
+                        DriveConstants.Modules.Offsets.BL.X,
+                        DriveConstants.Modules.Offsets.BL.Y
+                    ),
+                    new Translation2d(
+                        DriveConstants.Modules.Offsets.BR.X,
+                        DriveConstants.Modules.Offsets.BR.Y
+                    )
+                ),
+                MetaConstants.isRed,
+                swerveDriveSubsystem
+            );
+
         // add named commands for the paths
         Map<String, Command> namedCommands = new HashMap<>() {{
             put(
@@ -382,7 +422,7 @@ public class RobotContainer {
                 turretSubsystem.zeroYawCommand()
             );
             put(
-                "Shoot", 
+                "Shoot",
                 new ParallelCommandGroup(
                     new IntakeCommand(
                         intakeSubsystem,
@@ -420,36 +460,51 @@ public class RobotContainer {
                     intakeSubsystem.setPreset(IntakePreset.OUT);
                 })
             );
-        }}; 
-
+        }};
         for (Entry<String, Command> pair : namedCommands.entrySet()) {
-            autoFactory.bind(
+            NamedCommands.registerCommand(
                 pair.getKey(),
                 pair.getValue()
             );
+
             SmartDashboard.putBoolean(
                 "Auto/Event Bindings/" + pair.getKey() + "/available",
                 true
             );
         }
 
-        
+        autoChooser.onChange(new Consumer<Command>() {
+            @Override
+            public void accept(Command command) {
+                if (command instanceof PathPlannerAuto) {
+                    swerveDriveSubsystem.resetOdometry(
+                        ((PathPlannerAuto) command).getStartingPose()
+                    );
+                }
+            }
+        });
+
+        // WARNING: as specified by the [pathplanner documentation]
+        // (https://pathplanner.dev/pplib-named-commands.html),
+        // named commands must be registerd before paths are created / loaded
+        //
         // load paths
         for (String trajectoryName : Choreo.availableTrajectories()) {
-            chooser.addRoutine(trajectoryName + "_routine", () -> {
-                AutoRoutine routine = autoFactory.newRoutine(trajectoryName+"_routine");
-                AutoTrajectory trajectory = routine.trajectory(trajectoryName);
+            try {
+                PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(
+                        trajectoryName
+                    );
 
-                routine.active().onTrue(
-                    Commands.sequence(
-                        trajectory.resetOdometry(),
-                        trajectory.cmd()
-                    )
+                autoChooser.addOption(
+                        trajectoryName,
+                        AutoBuilder.followPath(path)
                 );
-
-                // Add all event marker triggers here: https://choreo.autos/choreolib/auto-factory/#using-autoroutine
-                return routine;
-            });
+            } catch (Exception e) {
+                System.out.print(
+                    "Caught exception during autochooser configuration: "
+                    + e
+                );
+            }
         }
     }
 
@@ -459,8 +514,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // return autoChooser.getSelected();
-        return autoChooser.selectedCommand();
+        return autoChooser.getSelected();
     }
 
     public SwerveSubsystem getSwerveSubsystem() {

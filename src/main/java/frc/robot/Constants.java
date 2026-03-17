@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.*;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -22,6 +24,13 @@ public final class Constants {
             DriverStation.getAlliance().isPresent()
                 ? DriverStation.getAlliance().get()
                 : Alliance.Blue;
+
+        public static BooleanSupplier isRed = new BooleanSupplier() {
+                @Override
+                public boolean getAsBoolean() {
+                    return ALLIANCE == Alliance.Red;
+                }
+            };
 
         public static final class Controllers {
             public static final int DRIVER_PORT = 0;
@@ -346,7 +355,7 @@ public final class Constants {
                 RotationsPerSecond.of(15);
 
             public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
-                RotationsPerSecond.of(2);
+                RotationsPerSecond.of(1);
 
             public static final class PID {
                 public static final double P = 27;
@@ -494,13 +503,7 @@ public final class Constants {
         );
 
         public static final class PID {
-            public static final class X {
-                public static final double P = 9.0;
-                public static final double I = 0.0;
-                public static final double D = 0.0;
-            }
-
-            public static final class Y {
+            public static final class Translation {
                 public static final double P = 9.0;
                 public static final double I = 0.0;
                 public static final double D = 0.0;
