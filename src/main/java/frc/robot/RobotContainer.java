@@ -52,22 +52,6 @@ import frc.robot.util.LimelightContainer;
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
     // These are initating the individual Limlight(s). The name should match the limelight internal names.
-    private static final Limelight LL_BT = new Limelight(
-            LimelightType.LL4, 
-            "limelight-bt", 
-            false, 
-            true,
-            new Pose3d(
-                new Translation3d(
-
-                ),
-                new Rotation3d(
-                    Degrees.of(0),
-                    Degrees.of(0),
-                    Degrees.of(0)
-                )
-            )
-        );
     private static final Limelight LL_FL = new Limelight(
             LimelightType.LL4, 
             "limelight-fl", 
