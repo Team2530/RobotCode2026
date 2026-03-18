@@ -127,7 +127,7 @@ public class IntakeSubsystem extends SubsystemBase {
         m_FeederMotor.setControl(
             new VelocityTorqueCurrentFOC(
                 targetFeederVelocity
-            )
+            ).withUpdateFreqHz(1000)
         );
 
         if (!isHolding) {

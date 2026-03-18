@@ -67,7 +67,7 @@ public class LoaderSubsystem extends SubsystemBase {
                         .in(RotationsPerSecond),
                     LoaderConstants.MAXIMUM_VELOCITY.in(RotationsPerSecond)
                 )
-            )
+            ).withUpdateFreqHz(1000)
         );
         SmartDashboard.putNumber(
             "Loader/target_velocity",

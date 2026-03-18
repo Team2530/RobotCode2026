@@ -87,7 +87,7 @@ public final class Constants {
                 RotationsPerSecond.of(100);
 
             public static final class PID {
-                public static final double P = 4;
+                public static final double P = 20;
                 public static final double I = 0;
                 public static final double D = 0;
             }
@@ -476,7 +476,7 @@ public final class Constants {
           RotationsPerSecond.of(100);
 
       public static final class PID {
-        public static final double P = 1;
+        public static final double P = 20;
         public static final double I = 0;
         public static final double D = 0;
       }
