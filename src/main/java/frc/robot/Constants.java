@@ -384,9 +384,10 @@ public final class Constants {
             // public static final double ANGLE_MIN = 0;
             public static final Angle ANGLE_MAX = Degrees.of(340);
 
-            // rps
-            public static final double MAX_VELOCITY = 80;
-            public static final double MAX_ACCELERATION= 800;
+            public static final AngularVelocity MAX_VELOCITY =
+                RotationsPerSecond.of(140);
+            public static final AngularAcceleration MAX_ACCELERATION =
+                RotationsPerSecondPerSecond.of(800);
 
 
             public static final class Zeroing {
