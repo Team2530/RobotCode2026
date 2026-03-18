@@ -415,51 +415,7 @@ public final class Constants {
         }
 
         public static final class Pitch {
-            public static final double GEAR_RATIO = 1;
-
             public static final Angle ANGLE_CONSTANT = Degrees.of(51.5);
-
-            // 90 would have the "face" of the turret as vertical
-            // 0 would have the "face" be horizontal (outputting up)
-            /* 
-             * the minimum angle is dependent on the yaw
-             * @param yaw - the angle of the turret yaw in degrees
-             */
-            public static Angle ANGLE_MIN(Angle yaw) {
-                if (
-                    Math.abs(
-                        yaw.minus(
-                            Degrees.of(180)
-                        ).in(Degrees)
-                    ) > 0
-                ) {
-                    // dependent on the yaw so we can shoot over the hopper
-                    return Radians.of(
-                        Math.atan(
-                            HopperConstants.ABSOLUTE_HEIGHT
-                            .plus(MetaConstants.Game.Fuel.RADIUS)
-                            .minus(TurretConstants.Offsets.Z)
-                            .div(
-                                TurretConstants.Offsets.Y
-                                .minus(HopperConstants.Offsets.Y)
-                                .times(
-                                    Math.tan(yaw.in(Radians))
-                                )
-                            ).in(Value)
-                        )
-                    );
-                } else {
-                    // physical hardstop of the hood
-                    return Degrees.of(90);
-                }
-            }
-            public static final Angle ANGLE_MAX = Degrees.of(180);
-
-            public static final class PID {
-                public static final double P = 1;
-                public static final double I = 0;
-                public static final double D = 0;
-            }
         }
 
         public static final class CANIDs {
@@ -469,14 +425,9 @@ public final class Constants {
             }
 
             public static final int YAW = 14;
-
-            public static final int PITCH = 41;
-            public static final int PITCH_ENCODER = 40;
         }
 
         public static final class Offsets {
-            public static final Angle PITCH_ENCODER = Rotations.of(0);
-
             // position relative to the center of the robot
             public static final Distance X = Inches.of(-8.625);
             public static final Distance Y = Inches.of(1.375);
