@@ -440,14 +440,6 @@ public final class Constants {
                 Z
             );
         }
-
-        public static final class TargetingOptimizer {
-            public static final int INTERPOLATION_POINTS = 9;
-            public static final int MAX_EVALUATIONS = 5000;
-
-            public static final Time MAXIMUM_TIME = Seconds.of(5);
-        }
-
     }
 
     public static final class ChoreoConstants {
