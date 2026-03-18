@@ -29,11 +29,13 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 
@@ -95,7 +97,8 @@ public class TurretSubsystem extends SubsystemBase {
         MANUAL
     }
 
-    private final TalonFX m_LauncherMotor;
+    private final TalonFX m_LauncherPortMotor;
+    private final TalonFX m_LauncherStarboardMotor;
     private final TalonFX m_YawMotor;
     private TurretTargets target = TurretTargets.HUB;
     private TargetingMode targetingMode = TargetingMode.MANUAL;
@@ -115,14 +118,20 @@ public class TurretSubsystem extends SubsystemBase {
 
     public TurretSubsystem() {
         // Initialize Motors and Encoders
-        m_LauncherMotor = new TalonFX(
-            TurretConstants.CanIDs.LAUNCHER
+        m_LauncherPortMotor = new TalonFX(
+            TurretConstants.CANIDs.Launcher.PORT
+        );
+        m_LauncherStarboardMotor = new TalonFX(
+            TurretConstants.CANIDs.Launcher.STARBOARD
         );
         m_YawMotor = new TalonFX(
-            TurretConstants.CanIDs.YAW
+            TurretConstants.CANIDs.YAW
         );
 
-        m_LauncherMotor.getConfigurator()
+        // the output values are directly copied from the leader (`port`) and
+        // replicated by the follower (`starboard`), thus we shouldn't have to
+        // configure the follower motor
+        m_LauncherPortMotor.getConfigurator()
             .apply(
                 new TalonFXConfiguration()
                     .withMotorOutput(
@@ -144,6 +153,14 @@ public class TurretSubsystem extends SubsystemBase {
                             )
                     )
             );
+        // WARNING: this might need to be set in periodic?
+        m_LauncherStarboardMotor.setControl(
+            new Follower(
+                TurretConstants.CANIDs.Launcher.PORT,
+                MotorAlignmentValue.Opposed
+            )
+        );
+
         m_YawMotor.getConfigurator()
             .apply(
                 new TalonFXConfiguration().withMotorOutput(
@@ -326,7 +343,7 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 );
 
-            m_LauncherMotor.setControl(
+            m_LauncherPortMotor.setControl(
                 new VelocityTorqueCurrentFOC(setVelocity)
                     .withUpdateFreqHz(1000)
             );
@@ -346,7 +363,7 @@ public class TurretSubsystem extends SubsystemBase {
                 setYaw.in(Rotations)
             );
         } else {
-            m_LauncherMotor.stopMotor();
+            m_LauncherPortMotor.stopMotor();
         }
 
         TargetPositionPublisher.set(
@@ -370,11 +387,11 @@ public class TurretSubsystem extends SubsystemBase {
         // launcher
         SmartDashboard.putNumber(
             "Turret/Launcher/output", 
-            m_LauncherMotor.getDutyCycle().getValueAsDouble()
+            m_LauncherPortMotor.getDutyCycle().getValueAsDouble()
         );
         SmartDashboard.putNumber(
             "Turret/Launcher/input_current",
-            m_LauncherMotor.getSupplyCurrent().getValueAsDouble()
+            m_LauncherPortMotor.getSupplyCurrent().getValueAsDouble()
         );
         SmartDashboard.putBoolean(
             "Turret/Launcher/at_velocity",
@@ -391,7 +408,7 @@ public class TurretSubsystem extends SubsystemBase {
         ;
         SmartDashboard.putNumber(
             "Turret/Launcher/voltage",
-            m_LauncherMotor.getMotorVoltage().getValueAsDouble()
+            m_LauncherPortMotor.getMotorVoltage().getValueAsDouble()
         );
         SmartDashboard.putNumber(
             "Turret/Launcher/current",
@@ -450,7 +467,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public AngularVelocity getLauncherVelocity() {
         return RotationsPerSecond.of(
-            m_LauncherMotor.getVelocity().getValueAsDouble()
+            m_LauncherPortMotor.getVelocity().getValueAsDouble()
         );
     }
 
@@ -504,7 +521,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // WARNING: oh baby talonfx i don't know if this is the right calls
     public double getLauncherCurrent() {
-        return m_LauncherMotor.getTorqueCurrent().getValueAsDouble();
+        return m_LauncherPortMotor.getTorqueCurrent().getValueAsDouble();
     }
 
     private static LinearVelocity calculateLauncherToExitVelocity(

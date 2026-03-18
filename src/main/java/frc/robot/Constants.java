@@ -462,8 +462,11 @@ public final class Constants {
             }
         }
 
-        public static final class CanIDs {
-            public static final int LAUNCHER = 15;
+        public static final class CANIDs {
+            public static final class Launcher {
+                public static final int PORT = 17;
+                public static final int STARBOARD = 15;
+            }
 
             public static final int YAW = 14;
 
