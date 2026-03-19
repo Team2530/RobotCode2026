@@ -165,8 +165,10 @@ public class RobotContainer {
      * This method schedules and configures all miscellaneous commands / actions
      */
     private static void configureCommands() {
-
-        if (DriverStation.getMatchType() != MatchType.None){
+        SmartDashboard.putString(
+            "Meta/Match_Type",
+            DriverStation.getMatchType().toString()
+        );
             RobotModeTriggers.teleop()
                 .onTrue(
                     new ParallelCommandGroup(
@@ -175,15 +177,11 @@ public class RobotContainer {
                         new HubStatusCommand(),
 
                         new ShiftAlertingCommand(
-                            new BlipControllerCommand(
                                 driverXbox.getHID(),
-                                2
-                            ),
-                            Seconds.of(5)
+                        Seconds.of(0.5)
                         )
                     )
                 );
-        }
     }
     
 

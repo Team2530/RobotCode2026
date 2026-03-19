@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class ShiftAlertingCommand extends ParallelCommandGroup {
     
     public ShiftAlertingCommand(
-        BlipControllerCommand blipCommand,
+        XboxController controller,
         Time alertHead
     ) {
         Time[] timings = {
@@ -28,22 +28,12 @@ public class ShiftAlertingCommand extends ParallelCommandGroup {
                     new WaitCommand(
                         timing.minus(alertHead)
                     ),
-                    blipCommand
+                    new BlipControllerCommand(
+                        controller,
+                        2
+                    )
                 )
             );
         }
-    }
-
-    public ShiftAlertingCommand(
-        XboxController controller,
-        Time alertHead
-    ) {
-        this(
-            new BlipControllerCommand(
-                controller,
-                2
-            ),
-            alertHead
-        );
     }
 }
