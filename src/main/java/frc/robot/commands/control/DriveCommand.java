@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.control;
 
 import static edu.wpi.first.units.Units.*;
 

@@ -22,21 +22,27 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MetaConstants;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.commands.control.DriveCommand;
+import frc.robot.commands.control.IntakeCommand;
+import frc.robot.commands.control.ManualTurretCommand;
+import frc.robot.commands.control.RunIndexerCommand;
+import frc.robot.commands.control.RunLoaderCommand;
+import frc.robot.commands.util.BlipControllerCommand;
+import frc.robot.commands.util.HubStatusCommand;
+import frc.robot.commands.util.ShiftAlertingCommand;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.DriveCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.ManualTurretCommand;
-import frc.robot.commands.RunIndexerCommand;
-import frc.robot.commands.RunLoaderCommand;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.IntakeSubsystem.IntakePreset;
@@ -150,8 +156,35 @@ public class RobotContainer {
 
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
         //turretSubsystem.setDefaultCommand(new TurretCommand(turretSubsystem));
+
+        // i'm running out of names
+        configureCommands();
     }
 
+    /*
+     * This method schedules and configures all miscellaneous commands / actions
+     */
+    private static void configureCommands() {
+
+        if (DriverStation.getMatchType() != MatchType.None){
+            RobotModeTriggers.teleop()
+                .onTrue(
+                    new ParallelCommandGroup(
+                        turretSubsystem.zeroYawCommand(),
+
+                        new HubStatusCommand(),
+
+                        new ShiftAlertingCommand(
+                            new BlipControllerCommand(
+                                driverXbox.getHID(),
+                                2
+                            ),
+                            Seconds.of(5)
+                        )
+                    )
+                );
+        }
+    }
     
 
 

@@ -17,7 +17,7 @@ import frc.robot.Constants.IndexerConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
 
-    private final SparkMax m_IndexerMotor;
+    private final SparkMax m_IndexerMotor; 
 
     private double speed;
 
