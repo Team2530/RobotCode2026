@@ -32,6 +32,28 @@ public final class Constants {
                 }
             };
 
+        public static BooleanSupplier isActive = new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean() {
+                return (
+                    // if in auto or transition period
+                    DriverStatic.getMatchTime() > 130
+                    // if in endgame
+                    || DriverStation.getMatchTime() < 30
+                    || (
+                        ((DriverStation.getMatchTime - 30) % 50) > 25
+                        // if we're inactive first
+                        ) == DriverStation.getGameSpecificMessage()
+                            .charAt(0)
+                            .equals(
+                                isRed.getAsBoolean()
+                                    ? 'R'
+                                    : 'B'
+                            )
+                );
+            }
+        };
+
         public static final class Controllers {
             public static final int DRIVER_PORT = 0;
             public static final int OPERATOR_PORT = 1;
