@@ -24,6 +24,16 @@ public class RunIndexerCommand extends Command {
         
     }
 
+    public RunIndexerCommand(
+        IndexerSubsystem subsystem,
+        BooleanSupplier conditional
+    ) {
+        this(
+            subsystem,
+            conditional,
+            false
+        );
+    }
 
     public RunIndexerCommand(
         IndexerSubsystem indexerSubsystem,

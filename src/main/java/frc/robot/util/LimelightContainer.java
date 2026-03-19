@@ -1,18 +1,13 @@
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.*;
+
 import java.util.ArrayList;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.VecBuilder;
-// import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-// import edu.wpi.first.math.kinematics.ChassisSpeeds;
-// import edu.wpi.first.math.kinematics.Odometry;
-// import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveSubsystem;
-import swervelib.imu.SwerveIMU;
 
 /**
  * The LimelightContainer class manages multiple Limelight cameras and their odometry estimation.
@@ -34,7 +29,6 @@ public class LimelightContainer {
     for (Limelight limelight : limelights) {
       LimelightContainer.limelights.add(limelight);
       LimelightHelpers.SetFiducialIDFiltersOverride(limelight.getID(), validTagIDs); // makes sure the helper only considers the specified valid tag IDs.
-      LimelightHelpers.SetIMUMode(limelight.getID(), 4);
       LimelightHelpers.SetIMUAssistAlpha("limelight", 0.001);
     }
   }
@@ -97,7 +91,7 @@ public class LimelightContainer {
         limelight.isEnabled()
         && mt2Estimation != null
         && mt2Estimation.tagCount >= 3
-        && swerve.getAngularVelocity() > Math.PI
+        && swerve.getAngularVelocity().gt(RadiansPerSecond.of(Math.PI))
       ){
         swerve.setVisionStandardDeviations(
             VecBuilder.fill(0.7, 0.7, 99999)
@@ -146,7 +140,7 @@ public class LimelightContainer {
         limelight.isEnabled()
         && mt1Estimation != null
         && mt1Estimation.tagCount > 0
-        && (swerve.getAngularVelocity() > (Math.PI * 2))
+        && swerve.getAngularVelocity().gt(RadiansPerSecond.of(Math.PI * 2))
       ){
         swerve.setVisionStandardDeviations(
             VecBuilder.fill(0.7, 0.7, 99999)
