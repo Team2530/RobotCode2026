@@ -149,7 +149,7 @@ public final class Constants {
         public static final LinearVelocity MAX_ROBOT_VELOCITY =
             MetersPerSecond.of(4.2);
         public static final AngularVelocity MAX_ROBOT_RAD_VELOCITY =
-            RadiansPerSecond.of(1);
+            RotationsPerSecond.of(1);
 
         public static final class Control {
             public static final Dimensionless REGULAR_DRIVE_MULT =
@@ -295,27 +295,27 @@ public final class Constants {
 
             public static class Modules {
                 public static final class FL {
-                    public static final int DRIVE = 1;
-                    public static final int STEER = 2;
-                    public static final int CANCODER = 3;
+                    public static final int DRIVE = 10;
+                    public static final int STEER = 11;
+                    public static final int CANCODER = 12;
                 }
 
                 public static final class FR {
-                    public static final int DRIVE = 4;
-                    public static final int STEER = 5;
-                    public static final int CANCODER = 6;
-                }
-
-                public static final class BL {
                     public static final int DRIVE = 7;
                     public static final int STEER = 8;
                     public static final int CANCODER = 9;
                 }
 
+                public static final class BL {
+                    public static final int DRIVE = 4;
+                    public static final int STEER = 5;
+                    public static final int CANCODER = 6;
+                }
+
                 public static final class BR {
-                    public static final int DRIVE = 10;
-                    public static final int STEER = 11;
-                    public static final int CANCODER = 12;
+                    public static final int DRIVE = 1;
+                    public static final int STEER = 2;
+                    public static final int CANCODER = 3;
                 }
             }
         }

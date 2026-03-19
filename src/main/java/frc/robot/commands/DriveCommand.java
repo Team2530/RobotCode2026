@@ -87,7 +87,7 @@ public class DriveCommand extends Command {
             // convert to m / s
             x *= DriveConstants.MAX_ROBOT_VELOCITY.in(MetersPerSecond);
             y *= DriveConstants.MAX_ROBOT_VELOCITY.in(MetersPerSecond);
-            z *= DriveConstants.MAX_ROBOT_RAD_VELOCITY.in(RotationsPerSecond);
+            z *= DriveConstants.MAX_ROBOT_RAD_VELOCITY.in(RadiansPerSecond);
 
             // send em off
             subsystem.drive(
