@@ -351,7 +351,7 @@ public class TurretSubsystem extends SubsystemBase {
             m_YawMotor.setControl(
                     new MotionMagicTorqueCurrentFOC(
                         setYaw.times(TurretConstants.Yaw.GEAR_RATIO)
-                        ).withUpdateFreqHz(1000)
+                        ).withUpdateFreqHz(100)
                     );
 
             ToTargetPublisher.set(
