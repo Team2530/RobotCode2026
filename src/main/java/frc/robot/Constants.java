@@ -37,18 +37,19 @@ public final class Constants {
             public boolean getAsBoolean() {
                 return (
                     // if in auto or transition period
-                    DriverStatic.getMatchTime() > 130
+                    DriverStation.getMatchTime() > 130
                     // if in endgame
                     || DriverStation.getMatchTime() < 30
                     || (
-                        ((DriverStation.getMatchTime - 30) % 50) > 25
+                        ((DriverStation.getMatchTime() - 30) % 50) > 25
                         // if we're inactive first
-                        ) == DriverStation.getGameSpecificMessage()
-                            .charAt(0)
-                            .equals(
+                        ) == (
+                        DriverStation.getGameSpecificMessage().charAt(0)
+                            == (
                                 isRed.getAsBoolean()
                                     ? 'R'
                                     : 'B'
+                            )
                             )
                 );
             }
