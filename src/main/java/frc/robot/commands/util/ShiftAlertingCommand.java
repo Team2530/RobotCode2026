@@ -15,6 +15,7 @@ public class ShiftAlertingCommand extends ParallelCommandGroup {
         Time alertHead
     ) {
         Time[] timings = {
+            Seconds.of(10),
             Seconds.of(30),
             Seconds.of(55),
             Seconds.of(80),
