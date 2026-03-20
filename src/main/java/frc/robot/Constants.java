@@ -50,7 +50,7 @@ public final class Constants {
                                     ? 'R'
                                     : 'B'
                             )
-                            )
+                        )
                 );
             }
         };

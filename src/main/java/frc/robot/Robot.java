@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.MetaConstants;
 import frc.robot.util.Elastic;
 /*
@@ -122,9 +121,6 @@ public class Robot extends TimedRobot {
 
     loopPub.set(loopTime);
     csTimePublisher.set(commandSchedulerTime);
-
-    
-
   }
 
 

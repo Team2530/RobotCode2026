@@ -23,7 +23,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,8 +38,8 @@ import frc.robot.commands.control.IntakeCommand;
 import frc.robot.commands.control.ManualTurretCommand;
 import frc.robot.commands.control.RunIndexerCommand;
 import frc.robot.commands.control.RunLoaderCommand;
-import frc.robot.commands.util.BlipControllerCommand;
 import frc.robot.commands.util.HubStatusCommand;
+import frc.robot.commands.util.MatchtimeStatusCommand;
 import frc.robot.commands.util.ShiftAlertingCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -133,7 +132,7 @@ public class RobotContainer {
     // the factory class for this (AutoBuilder) needs to be configured first
     // before the auto chooser can be built, so this is created in the
     // constructor
-    public static final SendableChooser<Command> autoChooser;
+    public static final SendableChooser<Command> autoChooser = new SendableChooser<>();
     // LimeLightSubsystem();
     @Logged
     public static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
@@ -151,7 +150,6 @@ public class RobotContainer {
         configureBindings();
 
         configureAutos();
-        autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         swerveDriveSubsystem.setDefaultCommand(normalDrive);
@@ -169,19 +167,24 @@ public class RobotContainer {
             "Meta/Match_Type",
             DriverStation.getMatchType().toString()
         );
-            RobotModeTriggers.teleop()
-                .onTrue(
-                    new ParallelCommandGroup(
-                        turretSubsystem.zeroYawCommand(),
+        RobotModeTriggers.teleop()
+            .onTrue(
+                new ParallelCommandGroup(
+                    turretSubsystem.zeroYawCommand(),
 
-                        new HubStatusCommand(),
+                    new HubStatusCommand(),
 
-                        new ShiftAlertingCommand(
-                                driverXbox.getHID(),
+                    new ShiftAlertingCommand(
+                        driverXbox.getHID(),
                         Seconds.of(0.5)
-                        )
                     )
-                );
+                )
+            );
+
+        RobotModeTriggers.autonomous()
+            .onTrue(
+                new MatchtimeStatusCommand()
+            );
     }
     
 
@@ -239,17 +242,16 @@ public class RobotContainer {
                 ),
                 new RunLoaderCommand(loaderSubsystem)
             )
-        )
-        .and(
+        ).and(
                 new BooleanSupplier() {
                     @Override
                     public boolean getAsBoolean() {
                         return turretSubsystem.isAtVelocity();
                     }
                 }
-            ).whileTrue(
-                new RunIndexerCommand(indexerSubsystem)
-            );
+        ).whileTrue(
+            new RunIndexerCommand(indexerSubsystem)
+        );
 
         operatorXbox.rightBumper()
             .onTrue(
@@ -316,27 +318,6 @@ public class RobotContainer {
         
         operatorXbox.y().onTrue(turretCommand);
 
-        // operatorXbox.povUp()
-        //         .onTrue(
-        //             new InstantCommand(
-        //                 () -> {
-                            
-        //                     turretCommand.increaseVelocity();
-        //                 }
-        //             )
-        //         );
-
-        // operatorXbox.povDown()
-        //         .onTrue(
-        //             new InstantCommand(
-        //                 () -> {
-        //                     turretCommand.decreaseVelocity();
-        //                 }
-        //             )
-        //         );
-
-
-        
         // SHUTTLE
         operatorXbox.a()
             .onTrue(
