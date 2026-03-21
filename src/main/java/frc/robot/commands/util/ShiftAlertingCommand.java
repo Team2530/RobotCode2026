@@ -1,12 +1,11 @@
 package frc.robot.commands.util;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.MetaConstants;
 
 public class ShiftAlertingCommand extends ParallelCommandGroup {
     
@@ -14,16 +13,7 @@ public class ShiftAlertingCommand extends ParallelCommandGroup {
         XboxController controller,
         Time alertHead
     ) {
-        Time[] timings = {
-            Seconds.of(10),
-            Seconds.of(30),
-            Seconds.of(55),
-            Seconds.of(80),
-            Seconds.of(105),
-            Seconds.of(130)
-        };
-
-        for (Time timing : timings) {
+        for (Time timing : MetaConstants.Game.Timing.SHIFT_TIMINGS) {
             addCommands(
                 new SequentialCommandGroup(
                     new WaitCommand(

@@ -32,29 +32,6 @@ public final class Constants {
                 }
             };
 
-        public static BooleanSupplier isActive = new BooleanSupplier() {
-            @Override
-            public boolean getAsBoolean() {
-                return (
-                    // if in auto or transition period
-                    DriverStation.getMatchTime() > 130
-                    // if in endgame
-                    || DriverStation.getMatchTime() < 30
-                    || (
-                        ((DriverStation.getMatchTime() - 30) % 50) > 25
-                        // if we're inactive first
-                        ) == (
-                        DriverStation.getGameSpecificMessage().charAt(0)
-                            == (
-                                isRed.getAsBoolean()
-                                    ? 'R'
-                                    : 'B'
-                            )
-                        )
-                );
-            }
-        };
-
         public static final class Controllers {
             public static final int DRIVER_PORT = 0;
             public static final int OPERATOR_PORT = 1;
@@ -78,7 +55,92 @@ public final class Constants {
                 public static final Distance DIAMETER = Inches.of(5.9);
                 public static final Distance RADIUS =  DIAMETER.div(2);
             }
-        }
+            
+            public static final class Timing {
+                public static final Time TELEOP_LENGTH = Seconds.of(130);
+                public static final Time ENDGAME_LENGTH = Seconds.of(30);
+                // relative to the end of teleop 
+                public static final Time[] SHIFT_TIMINGS = {
+                    Seconds.of(10), // end of transition
+                    Seconds.of(30),
+                    Seconds.of(55),
+                    Seconds.of(80),
+                    Seconds.of(105),
+                    Seconds.of(130) // end of last shift, start of endgame
+                };
+
+                public static BooleanSupplier isActive = new BooleanSupplier() {
+                    @Override
+                    public boolean getAsBoolean() {
+                        return (
+                            // if in auto or transition period
+                            DriverStation.getMatchTime() > 130
+                            // if in endgame
+                            || DriverStation.getMatchTime() < 30
+                            || (
+                                ((DriverStation.getMatchTime() - 30) % 50) > 25
+                                // if we're inactive first
+                                ) == (
+                                DriverStation.getGameSpecificMessage().charAt(0)
+                                    == (
+                                        isRed.getAsBoolean()
+                                            ? 'R'
+                                            : 'B'
+                                    )
+                                )
+                        );
+                    }
+                };
+
+                public enum ShiftType {
+                    RED_ACTIVE,
+                    BLUE_ACTIVE,
+                    TRANSITION,
+                    ENDGAME,
+                    AUTONOMOUS
+                }
+
+                public static final ShiftType getCurrentShift() {
+                    Time currentTime = Seconds.of(
+                        DriverStation.getMatchTime()
+                    );
+
+                    if (
+                        TELEOP_LENGTH.minus(currentTime)
+                        .lt(SHIFT_TIMINGS[0])
+                    ) {
+                        return ShiftType.TRANSITION;
+                    } else if (
+                        TELEOP_LENGTH.minus(currentTime)     
+                        .gt(SHIFT_TIMINGS[SHIFT_TIMINGS.length - 1])
+                    ) {
+                        return ShiftType.ENDGAME;
+                    } else {
+                        return isActive.getAsBoolean() ^ isRed.getAsBoolean()
+                            ? ShiftType.BLUE_ACTIVE
+                            : ShiftType.RED_ACTIVE;
+                    }
+                }
+
+                public static final Time timeTillShiftChange() {
+                    switch (getCurrentShift()) {
+                        case TRANSITION:
+                            return SHIFT_TIMINGS[0].minus(
+                                Seconds.of(DriverStation.getMatchTime())
+                            );
+                        case ENDGAME:
+                            return Seconds.of(DriverStation.getMatchTime());
+                        case RED_ACTIVE:
+                        case BLUE_ACTIVE:
+                        default:
+                            return Seconds.of(
+                                (DriverStation.getMatchTime() - 30) % 25 
+                            );
+                    }
+                };
+    
+            }
+       }
     }
 
     public static final class RobotConstants {
