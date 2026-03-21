@@ -210,14 +210,17 @@ public class TurretSubsystem extends SubsystemBase {
 
         forceEnableFiringChooser = new SendableChooser<>();
         forceEnableFiringChooser.setDefaultOption(
-            "Force Enabled",
-            true
-        );
-        forceEnableFiringChooser.addOption(
             "Not Force Enabled",
             false
         );
-        SmartDashboard.putData(forceEnableFiringChooser);
+        forceEnableFiringChooser.addOption(
+            "Force Enabled",
+            true
+        );
+        SmartDashboard.putData(
+            "Force Enable Firing",
+            forceEnableFiringChooser
+        );
     }
 
     @Override
