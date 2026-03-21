@@ -57,7 +57,7 @@ public final class Constants {
             }
             
             public static final class Timing {
-                public static final Time TELEOP_LENGTH = Seconds.of(130);
+                public static final Time TELEOP_LENGTH = Seconds.of(140);
                 public static final Time ENDGAME_LENGTH = Seconds.of(30);
                 // relative to the end of teleop 
                 public static final Time[] SHIFT_TIMINGS = {
