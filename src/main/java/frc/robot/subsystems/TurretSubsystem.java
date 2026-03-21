@@ -458,6 +458,10 @@ public class TurretSubsystem extends SubsystemBase {
             "Turret/Yaw/is_zeroed",
             yawIsZeroed
         );
+        SmartDashboard.putBoolean(
+            "Turret/allowFiring",
+            allowFiring()
+        );
     }
     
     public Angle getYaw() {
