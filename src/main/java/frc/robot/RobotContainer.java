@@ -178,7 +178,12 @@ public class RobotContainer {
                     new ShiftAlertingCommand(
                         driverXbox.getHID(),
                         Seconds.of(0.5)
-                    )
+                    ),
+
+                    new InstantCommand(() -> {
+                        intakeSubsystem.setPreset(IntakePreset.OUT);
+                    })
+
                 )
             );
 
