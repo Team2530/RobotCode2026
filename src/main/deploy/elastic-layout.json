@@ -1,6 +1,6 @@
 {
   "version": 1.0,
-  "grid_size": 64,
+  "grid_size": 32,
   "tabs": [
     {
       "name": "Teleoperated",
@@ -11,21 +11,21 @@
             "x": 384.0,
             "y": 384.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 384.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
             },
             "children": [
               {
-                "title": "target_speed",
+                "title": "target_velocity",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/Intake/Feeder/target_speed",
+                  "topic": "/SmartDashboard/Intake/Feeder/target_velocity",
                   "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
@@ -65,6 +65,23 @@
                   "data_type": "double",
                   "show_submit_button": false
                 }
+              },
+              {
+                "title": "hubIsActive",
+                "x": 576.0,
+                "y": 384.0,
+                "width": 768.0,
+                "height": 384.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Meta/Shifts/hubIsActive",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4278255370,
+                  "false_color": 4283700753,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
               }
             ]
           }
@@ -95,8 +112,8 @@
             "title": "Target_velocity",
             "x": 640.0,
             "y": 0.0,
-            "width": 320.0,
-            "height": 320.0,
+            "width": 384.0,
+            "height": 384.0,
             "type": "Radial Gauge",
             "properties": {
               "topic": "/SmartDashboard/Turret/Launcher/Target_velocity",
@@ -115,9 +132,9 @@
           {
             "title": "Current_velocity",
             "x": 640.0,
-            "y": 320.0,
-            "width": 320.0,
-            "height": 320.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 384.0,
             "type": "Radial Gauge",
             "properties": {
               "topic": "/SmartDashboard/Turret/Launcher/Current_velocity",
@@ -134,14 +151,75 @@
             }
           },
           {
-            "title": "Matchtime",
-            "x": 960.0,
+            "title": "is_zeroed",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Turret/Yaw/is_zeroed",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Pigeon 2 (v6) [0]",
+            "x": 128.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Gyro",
+            "properties": {
+              "topic": "/SmartDashboard/Pigeon 2 (v6) [0]",
+              "period": 0.06,
+              "counter_clockwise_positive": false
+            }
+          },
+          {
+            "title": "batteryVoltage",
+            "x": 0.0,
+            "y": 640.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Voltage View",
+            "properties": {
+              "topic": "/SmartDashboard/Meta/batteryVoltage",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 9.0,
+              "max_value": 14.0,
+              "divisions": 6,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "ShiftType",
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 224.0,
+            "height": 224.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Meta/Shifts/ShiftType",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "timeTillChange",
+            "x": 1024.0,
             "y": 0.0,
-            "width": 704.0,
+            "width": 672.0,
             "height": 384.0,
             "type": "Match Time",
             "properties": {
-              "topic": "/SmartDashboard/Matchtime",
+              "topic": "/SmartDashboard/Meta/Shifts/timeTillChange",
               "period": 0.06,
               "data_type": "double",
               "time_display_mode": "Minutes and Seconds",
@@ -151,17 +229,17 @@
           },
           {
             "title": "hubIsActive",
-            "x": 960.0,
+            "x": 1248.0,
             "y": 384.0,
-            "width": 704.0,
+            "width": 448.0,
             "height": 384.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Meta/hubIsActive",
+              "topic": "/SmartDashboard/Meta/Shifts/hubIsActive",
               "period": 0.06,
               "data_type": "boolean",
-              "true_color": 4278255370,
-              "false_color": 4283700753,
+              "true_color": 4283215696,
+              "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
             }
@@ -179,7 +257,7 @@
             "x": 256.0,
             "y": 0.0,
             "width": 1280.0,
-            "height": 576.0,
+            "height": 640.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -198,8 +276,8 @@
           {
             "title": "Auto Chooser",
             "x": 640.0,
-            "y": 576.0,
-            "width": 576.0,
+            "y": 640.0,
+            "width": 640.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -211,7 +289,7 @@
           {
             "title": "is_zeroed",
             "x": 512.0,
-            "y": 576.0,
+            "y": 640.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -269,8 +347,8 @@
           },
           {
             "title": "at_velocity",
-            "x": 1216.0,
-            "y": 576.0,
+            "x": 1280.0,
+            "y": 640.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -295,6 +373,24 @@
               "topic": "/SmartDashboard/Choreo Alerts",
               "period": 0.06
             }
+          },
+          {
+            "title": "batteryVoltage",
+            "x": 512.0,
+            "y": 768.0,
+            "width": 896.0,
+            "height": 128.0,
+            "type": "Voltage View",
+            "properties": {
+              "topic": "/SmartDashboard/Meta/batteryVoltage",
+              "period": 0.033,
+              "data_type": "double",
+              "min_value": 9.0,
+              "max_value": 14.0,
+              "divisions": 6,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
           }
         ]
       }
@@ -306,7 +402,7 @@
         "containers": [
           {
             "title": "GIT_BRANCH",
-            "x": 896.0,
+            "x": 928.0,
             "y": 128.0,
             "width": 128.0,
             "height": 128.0,
@@ -320,7 +416,7 @@
           },
           {
             "title": "GIT_SHA",
-            "x": 640.0,
+            "x": 672.0,
             "y": 0.0,
             "width": 384.0,
             "height": 128.0,
@@ -334,7 +430,7 @@
           },
           {
             "title": "DIRTY",
-            "x": 896.0,
+            "x": 928.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
@@ -351,7 +447,7 @@
           },
           {
             "title": "loopTime",
-            "x": 640.0,
+            "x": 672.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
@@ -365,7 +461,7 @@
           },
           {
             "title": "commandSchedulerTime",
-            "x": 768.0,
+            "x": 800.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
@@ -379,7 +475,7 @@
           },
           {
             "title": "BUILD_DATE",
-            "x": 640.0,
+            "x": 672.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
@@ -393,7 +489,7 @@
           },
           {
             "title": "SysId Angle Motors",
-            "x": 576.0,
+            "x": 608.0,
             "y": 384.0,
             "width": 256.0,
             "height": 128.0,
@@ -407,7 +503,7 @@
           },
           {
             "title": "SysId Angle Motors",
-            "x": 832.0,
+            "x": 864.0,
             "y": 384.0,
             "width": 256.0,
             "height": 128.0,
