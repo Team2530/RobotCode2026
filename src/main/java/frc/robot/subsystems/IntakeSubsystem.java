@@ -119,7 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
         m_PivotPID.setSetpoint(0, ControlType.kPosition);
 
         resetPivotTracking();
-        setPreset(IntakePreset.OUT);
+        setPreset(IntakePreset.STOWED);
     }
 
     @Override
