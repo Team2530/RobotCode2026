@@ -545,7 +545,7 @@ public class TurretSubsystem extends SubsystemBase {
     private static LinearVelocity calculateLauncherToExitVelocity(
         AngularVelocity launcherVelocity
     ) {
-        return FeetPerSecond.of(
+        return MetersPerSecond.of(
             (
                 TurretConstants.Launcher.VelocityRegression.A 
                 * launcherVelocity.in(RotationsPerSecond)
@@ -559,7 +559,7 @@ public class TurretSubsystem extends SubsystemBase {
     ) {
         return RotationsPerSecond.of(
                 (
-                    exitVelocity.in(FeetPerSecond)
+                    exitVelocity.in(MetersPerSecond)
                     - TurretConstants.Launcher.VelocityRegression.B
                 ) / TurretConstants.Launcher.VelocityRegression.A
             );
