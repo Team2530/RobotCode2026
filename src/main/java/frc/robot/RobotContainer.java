@@ -498,7 +498,14 @@ public class RobotContainer {
 
                 autoChooser.addOption(
                         trajectoryName,
-                        AutoBuilder.followPath(path)
+                        new SequentialCommandGroup(
+                            new InstantCommand(() -> {
+                                swerveDriveSubsystem.resetOdometry(
+                                    path.getStartingHolonomicPose().get()
+                                );
+                            }),
+                            AutoBuilder.followPath(path)
+                        )
                 );
             } catch (Exception e) {
                 System.out.print(
