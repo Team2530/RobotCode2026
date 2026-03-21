@@ -438,15 +438,7 @@ public class RobotContainer {
                         IntakePreset.AGITATING
                     ),
                     new RunLoaderCommand(loaderSubsystem),
-                    new RunIndexerCommand(
-                        indexerSubsystem,
-                        new BooleanSupplier() {
-                            @Override
-                            public boolean getAsBoolean() {
-                                return turretSubsystem.isAtVelocity();
-                            }
-                        }
-                    )
+                    new RunIndexerCommand(indexerSubsystem)
                 )
             );
             put(
