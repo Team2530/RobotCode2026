@@ -41,6 +41,7 @@ import frc.robot.commands.control.RunLoaderCommand;
 import frc.robot.commands.util.HubStatusCommand;
 import frc.robot.commands.util.MatchtimeStatusCommand;
 import frc.robot.commands.util.ShiftAlertingCommand;
+import frc.robot.commands.util.VoltageStatusCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -183,7 +184,10 @@ public class RobotContainer {
 
         RobotModeTriggers.autonomous()
             .onTrue(
-                new MatchtimeStatusCommand()
+                new ParallelCommandGroup(
+                    new MatchtimeStatusCommand(),
+                    new VoltageStatusCommand()
+                )
             );
     }
     
