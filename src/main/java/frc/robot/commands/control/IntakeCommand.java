@@ -50,4 +50,9 @@ public class IntakeCommand extends Command {
     public void end(boolean interrupted) {
         subsystem.setPreset(onEnd);
     }
+
+    @Override 
+    public boolean isFinished() {
+        return false;
+    }
 }
