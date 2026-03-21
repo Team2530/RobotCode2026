@@ -59,7 +59,7 @@ public class IndexerSubsystem extends SubsystemBase {
         );
 
         if (
-            RobotContainer.turretSubsystem.isAtVelocity()
+            RobotContainer.turretSubsystem.allowFiring()
         ) {
             m_IndexerMotor.set(speed);
         } else {

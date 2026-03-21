@@ -244,17 +244,9 @@ public class RobotContainer {
                     intakeSubsystem,
                     IntakePreset.AGITATING
                 ),
-                new RunLoaderCommand(loaderSubsystem)
+                new RunLoaderCommand(loaderSubsystem),
+                new RunIndexerCommand(indexerSubsystem)
             )
-        ).and(
-                new BooleanSupplier() {
-                    @Override
-                    public boolean getAsBoolean() {
-                        return turretSubsystem.isAtVelocity();
-                    }
-                }
-        ).whileTrue(
-            new RunIndexerCommand(indexerSubsystem)
         );
 
         operatorXbox.rightBumper()
@@ -522,6 +514,11 @@ public class RobotContainer {
                 );
             }
         }
+        // "do nothing" option
+        autoChooser.setDefaultOption(
+            "Do nothing",
+            null
+        );
     }
 
     /**

@@ -19,6 +19,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -115,6 +116,9 @@ public class TurretSubsystem extends SubsystemBase {
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
     private final StructPublisher<Translation3d> ToTargetPublisher;
+    
+    // debug
+    private final SendableChooser<Boolean> forceEnableFiringChooser;
 
     public TurretSubsystem() {
         // Initialize Motors and Encoders
@@ -203,6 +207,17 @@ public class TurretSubsystem extends SubsystemBase {
             .publish();
 
         atVelocity = false;
+
+        forceEnableFiringChooser = new SendableChooser<>();
+        forceEnableFiringChooser.setDefaultOption(
+            "Force Enabled",
+            true
+        );
+        forceEnableFiringChooser.addOption(
+            "Not Force Enabled",
+            false
+        );
+        SmartDashboard.putData(forceEnableFiringChooser);
     }
 
     @Override
@@ -695,5 +710,11 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void stop() {
         this.yawIsZeroed = false;
+    }
+
+    public boolean allowFiring() {
+        return (
+            isAtVelocity()
+        ) || forceEnableFiringChooser.getSelected();
     }
 }
