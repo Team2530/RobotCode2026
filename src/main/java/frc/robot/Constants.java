@@ -172,15 +172,16 @@ public final class Constants {
                 RotationsPerSecond.of(100);
 
             public static final class PID {
-                public static final double P = 20;
+                public static final double P = 6;
                 public static final double I = 0;
                 public static final double D = 0;
             }
 
             public static final class Feedforward {
-                public static final double kS = 0.7;
+                public static final double kS = 0.3;
                 public static final double kV = 1.04;
             }
+            
         }
 
         // as in the motor that lifts the whole structure
@@ -431,11 +432,11 @@ public final class Constants {
         public static final class Launcher {
             public static final Distance WHEEL_DIAMETER = Inches.of(4);
 
-            public static final boolean REVERSE = true;
+            public static final boolean REVERSE = false;
 
             // in rotations/s
             public static final AngularVelocity MAXIMUM_VELOCITY =
-                RotationsPerSecond.of(80);
+                RotationsPerSecond.of(100);
             public static final AngularVelocity MINIMUM_VELOCITY =
                 RotationsPerSecond.of(15);
 
@@ -443,14 +444,14 @@ public final class Constants {
                 RotationsPerSecond.of(1);
 
             public static final class PID {
-                public static final double P = 27;
-                public static final double I = 0.025;
+                public static final double P = 12;
+                public static final double I = 0.1;
                 public static final double D = 0.06;
             }
 
             public static final class Feedforward {
-                public static final double kS = 13;
-                public static final double kV = 1;
+                public static final double kS = 8.5;
+                public static final double kV = .2;
             }
 
             public static final class VelocityRegression {
@@ -556,13 +557,13 @@ public final class Constants {
   }
 
   public static final class LoaderConstants {
-      public static final boolean REVERSE = true;
+      public static final boolean REVERSE = false;
       public static final int CAN_ID = 16;
       public static final AngularVelocity MAXIMUM_VELOCITY =
           RotationsPerSecond.of(100);
 
       public static final class PID {
-        public static final double P = 20;
+        public static final double P = 6;
         public static final double I = 0;
         public static final double D = 0;
       }

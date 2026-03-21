@@ -244,9 +244,10 @@ public class RobotContainer {
                     intakeSubsystem,
                     IntakePreset.AGITATING
                 ),
-                new RunLoaderCommand(loaderSubsystem),
-                new RunIndexerCommand(indexerSubsystem)
+                new RunLoaderCommand(loaderSubsystem)
             )
+        ).whileTrue(
+            new RunIndexerCommand(indexerSubsystem)
         );
 
         operatorXbox.rightBumper()
@@ -514,11 +515,6 @@ public class RobotContainer {
                 );
             }
         }
-        // "do nothing" option
-        autoChooser.setDefaultOption(
-            "Do nothing",
-            null
-        );
     }
 
     /**
