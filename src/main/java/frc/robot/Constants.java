@@ -471,7 +471,7 @@ public final class Constants {
             public static final Angle ANGLE_MAX = Degrees.of(340);
 
             public static final AngularVelocity MAX_VELOCITY =
-                RotationsPerSecond.of(140);
+                RotationsPerSecond.of(200);
             public static final AngularAcceleration MAX_ACCELERATION =
                 RotationsPerSecondPerSecond.of(800);
 
