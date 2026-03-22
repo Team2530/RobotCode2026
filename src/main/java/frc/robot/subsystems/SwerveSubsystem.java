@@ -57,6 +57,10 @@ public class SwerveSubsystem extends SubsystemBase {
     public static class AutonomousController 
             extends PPHolonomicDriveController
     {
+        private static StructPublisher<Pose2d> autoPosePublisher = NetworkTableInstance
+            .getDefault()
+            .getStructTopic("Auto target pose", Pose2d.struct).publish();
+
         public AutonomousController() {
             super(
                 new PIDConstants(
@@ -103,6 +107,9 @@ public class SwerveSubsystem extends SubsystemBase {
                 "Auto/omega",
                 target.fieldSpeeds.omegaRadiansPerSecond
             );
+            autoPosePublisher.set(
+                target.pose
+            );
 
             return speeds;
         }
@@ -113,12 +120,6 @@ public class SwerveSubsystem extends SubsystemBase {
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Odometry Pose", Pose2d.struct).publish();
     
-    StructPublisher<SwerveSample> autoSamplePublisher = NetworkTableInstance
-        .getDefault()
-        .getStructTopic("Auto sample", SwerveSample.struct).publish();
-    StructPublisher<Pose2d> autoPosePublisher = NetworkTableInstance
-        .getDefault()
-        .getStructTopic("Auto target pose", Pose2d.struct).publish();
 
     private final SendableChooser<SwerveGearing> gearChooser;
 
