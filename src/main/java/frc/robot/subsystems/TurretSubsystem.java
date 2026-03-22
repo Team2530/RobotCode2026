@@ -37,7 +37,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 
 import frc.robot.Constants.TurretConstants;
@@ -187,6 +187,10 @@ public class TurretSubsystem extends SubsystemBase {
                             TurretConstants.Yaw.MAX_VELOCITY
                         ).withMotionMagicAcceleration(
                             TurretConstants.Yaw.MAX_ACCELERATION
+                        ).withMotionMagicExpo_kV(
+                            TurretConstants.Yaw.Magic.kV 
+                        ).withMotionMagicExpo_kA(
+                            TurretConstants.Yaw.Magic.kA 
                         )
                 )
             );
@@ -367,9 +371,9 @@ public class TurretSubsystem extends SubsystemBase {
             );
 
             m_YawMotor.setControl(
-                    new MotionMagicTorqueCurrentFOC(
+                    new MotionMagicExpoTorqueCurrentFOC(
                         setYaw.times(TurretConstants.Yaw.GEAR_RATIO)
-                        ).withUpdateFreqHz(100)
+                        ).withUpdateFreqHz(400)
                     );
 
             ToTargetPublisher.set(
