@@ -456,7 +456,7 @@ public final class Constants {
 
             public static final class VelocityRegression {
                 public static final double A = 0.144814;
-                public static final double B = 3.37481;
+                public static final double B = 0.437481;
             }
         }
 
