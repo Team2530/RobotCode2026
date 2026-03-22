@@ -59,7 +59,7 @@ public class TurretSubsystem extends SubsystemBase {
         SHUTTLE_LEFT(
             new Pose3d(
                 Inches.of(79.3),
-                Inches.of(79.3),
+                Inches.of(238.4),
                 Inches.of(0),
                 new Rotation3d()
             )
@@ -67,7 +67,7 @@ public class TurretSubsystem extends SubsystemBase {
         SHUTTLE_RIGHT(
             new Pose3d(
                 Inches.of(79.3),
-                Inches.of(238.4),
+                Inches.of(79.3),
                 Inches.of(0),
                 new Rotation3d()
             )
@@ -116,6 +116,9 @@ public class TurretSubsystem extends SubsystemBase {
     // logging
     private final StructPublisher<Pose3d> TargetPositionPublisher;
     private final StructPublisher<Translation3d> ToTargetPublisher;
+
+    private final StructPublisher<Pose3d> TotalVelocityPublisher;
+    private final StructPublisher<Pose3d> LauncherExitVelocityPublisher;
     
     // debug
     private final SendableChooser<Boolean> forceEnableFiringChooser;
@@ -208,6 +211,12 @@ public class TurretSubsystem extends SubsystemBase {
             .publish();
         ToTargetPublisher = NetworkTableInstance.getDefault()
             .getStructTopic("SmartDashboard/Turret/to_target", Translation3d.struct)
+            .publish();
+        TotalVelocityPublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("SmartDashboard/Turret/total_velocity", Pose3d.struct)
+            .publish();
+        LauncherExitVelocityPublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("SmartDashboard/Turret/launcher_exit_velocity", Pose3d.struct)
             .publish();
 
         atVelocity = false;
@@ -329,14 +338,45 @@ public class TurretSubsystem extends SubsystemBase {
                         )
                     ) % (2 * Math.PI)
                 );
-                targetVelocity = calculateExitToLauncherVelocity(
-                        MetersPerSecond.of(
-                            Math.sqrt(
-                                Math.pow(exitVelocityX.in(MetersPerSecond), 2)
-                                + Math.pow(exitVelocityY.in(MetersPerSecond), 2)
-                            )
+                LinearVelocity targetExitVelocity = MetersPerSecond.of(
+                        Math.sqrt(
+                            Math.pow(exitVelocityX.in(MetersPerSecond), 2)
+                            + Math.pow(exitVelocityY.in(MetersPerSecond), 2)
                         )
                     );
+                targetVelocity = calculateExitToLauncherVelocity(
+                        targetExitVelocity
+                    );
+                TotalVelocityPublisher.set(
+                    new Pose3d(
+                        new Translation3d(
+                            totalVelocity.in(MetersPerSecond) 
+                                * Math.cos(totalYaw.in(Radians))
+                                * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
+                            totalVelocity.in(MetersPerSecond) 
+                                * Math.sin(totalYaw.in(Radians))
+                                * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
+                            totalVelocity.in(MetersPerSecond) 
+                                * Math.sin(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians))
+                        ),
+                        new Rotation3d()
+                    )
+                );
+                LauncherExitVelocityPublisher.set(
+                    new Pose3d(
+                        new Translation3d(
+                            targetExitVelocity.in(MetersPerSecond) 
+                                * Math.cos(targetYaw.in(Radians))
+                                * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
+                            targetExitVelocity.in(MetersPerSecond) 
+                                * Math.sin(targetYaw.in(Radians))
+                                * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
+                            targetExitVelocity.in(MetersPerSecond) 
+                                * Math.sin(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians))
+                        ),
+                        new Rotation3d()
+                    )
+                );
             }
 
             Angle setYaw;
