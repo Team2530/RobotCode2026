@@ -323,11 +323,11 @@ public class TurretSubsystem extends SubsystemBase {
                 LinearVelocity exitVelocityX = (
                         totalVelocity
                         .times(Math.cos(totalYaw.in(Radians)))
-                    ).minus(getLauncherPositionalVelocityX());
+                    ).plus(getLauncherPositionalVelocityX());
                 LinearVelocity exitVelocityY = (
                         totalVelocity
                         .times(Math.sin(totalYaw.in(Radians)))
-                    ).minus(getLauncherPositionalVelocityY());
+                    ).plus(getLauncherPositionalVelocityY());
 
                 targetYaw = Radians.of(
                     (
