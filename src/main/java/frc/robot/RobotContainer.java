@@ -173,12 +173,12 @@ public class RobotContainer {
                 new ParallelCommandGroup(
                     turretSubsystem.zeroYawCommand(),
 
-                    new HubStatusCommand(),
-
                     new ShiftAlertingCommand(
                         driverXbox.getHID(),
                         Seconds.of(0.5)
                     ),
+
+                    new HubStatusCommand(),
 
                     new InstantCommand(() -> {
                         intakeSubsystem.setPreset(IntakePreset.OUT);
@@ -249,10 +249,9 @@ public class RobotContainer {
                     intakeSubsystem,
                     IntakePreset.AGITATING
                 ),
-                new RunLoaderCommand(loaderSubsystem)
+                new RunLoaderCommand(loaderSubsystem),
+                new RunIndexerCommand(indexerSubsystem)
             )
-        ).whileTrue(
-            new RunIndexerCommand(indexerSubsystem)
         );
 
         operatorXbox.rightBumper()
@@ -295,19 +294,19 @@ public class RobotContainer {
 
         operatorXbox.back()
             .whileTrue(
-                new RunLoaderCommand(
-                    loaderSubsystem, 
-                    true
-                )
-            ).whileTrue(
-                new RunIndexerCommand(
-                    indexerSubsystem, 
-                    true
-                )
-            ).whileTrue(
-                new IntakeCommand(
-                    intakeSubsystem,
-                    IntakePreset.SPITTING
+                new ParallelCommandGroup(
+                    new RunLoaderCommand(
+                        loaderSubsystem, 
+                        true
+                    ),
+                    new RunIndexerCommand(
+                        indexerSubsystem, 
+                        true
+                    ),
+                    new IntakeCommand(
+                        intakeSubsystem,
+                        IntakePreset.SPITTING
+                    )
                 )
             );
         
