@@ -19,7 +19,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
     private final SparkMax m_IndexerMotor; 
 
-    private double speed;
+    private Dimensionless speed;
 
     public IndexerSubsystem() {
         m_IndexerMotor = new SparkMax(
@@ -57,14 +57,20 @@ public class IndexerSubsystem extends SubsystemBase {
             "Indexer/output",
             m_IndexerMotor.get()
         );
+        
 
-        if (
-            RobotContainer.turretSubsystem.allowFiring()
-        ) {
-            m_IndexerMotor.set(speed);
+        Dimensionless setSpeed;
+        if (RobotContainer.turretSubsystem.allowFiring()) {
+            setSpeed = speed;
         } else {
-            m_IndexerMotor.set(0);
+            setSpeed = Percent.of(0);
         }
+
+        SmartDashboard.putNumber(
+            "Indexer/set_output",
+            setSpeed.in(Value)
+        );
+        m_IndexerMotor.set(setSpeed.in(Value));
     }
 
     public void run() {
@@ -78,14 +84,7 @@ public class IndexerSubsystem extends SubsystemBase {
      * @param speed - a value between -1 and 1 to set the motor to
      */
     public void run(Dimensionless speed) {
-        m_IndexerMotor.set(
-            speed.in(Value)
-        );
-
-        SmartDashboard.putNumber(
-            "Indexer/speed",
-            speed.in(Value)
-        );
+        this.speed = speed;
     }
 
     public void run(boolean reverse) {
