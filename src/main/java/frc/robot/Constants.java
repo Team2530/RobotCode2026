@@ -508,8 +508,8 @@ public final class Constants {
             }
             
             public static final class Magic {
-                public static final double kV = 0.055;
-                public static final double kA = 0.035;
+                public static final double kV = 0.05;
+                public static final double kA = 0.03;
             }
         }
 
