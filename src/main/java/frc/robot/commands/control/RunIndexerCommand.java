@@ -29,7 +29,7 @@ public class RunIndexerCommand extends Command {
     }
     
     @Override
-    public void execute() {
+    public void initialize() {
         indexerSubsystem.run(isReversed);
     }
 
