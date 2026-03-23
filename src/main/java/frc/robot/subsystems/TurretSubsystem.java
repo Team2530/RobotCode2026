@@ -108,6 +108,8 @@ public class TurretSubsystem extends SubsystemBase {
     // yaw logic
     private boolean yawIsZeroed;
     private boolean atVelocity;
+    private boolean hasSolution;
+    private boolean atSolution;
 
     private Angle targetYaw;
     private AngularVelocity targetVelocity;
@@ -220,6 +222,8 @@ public class TurretSubsystem extends SubsystemBase {
             .publish();
 
         atVelocity = false;
+        atSolution = false;
+        hasSolution = false;
 
         forceEnableFiringChooser = new SendableChooser<>();
         forceEnableFiringChooser.setDefaultOption(
@@ -386,8 +390,16 @@ public class TurretSubsystem extends SubsystemBase {
                     getLauncherVelocity()
                     .minus(targetVelocity)
                 ).abs(RotationsPerSecond)
-                > TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR
+                < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR
                     .in(RotationsPerSecond);
+            atSolution = (
+                    getYaw()
+                    .minus(targetYaw)   
+                ).abs(Degrees)
+                < TurretConstants.Yaw.MAXIMUM_ANGLE_ERROR
+                    .in(Degrees);
+            // TODO: this
+            hasSolution = true; 
 
             /** targetVelocity Clamped in Rot/s */
             setVelocity = RotationsPerSecond.of(
@@ -506,6 +518,14 @@ public class TurretSubsystem extends SubsystemBase {
             "Turret/allowFiring",
             allowFiring()
         );
+        SmartDashboard.putBoolean(
+            "Turret/atSolution",
+            atSolution()
+        );
+        SmartDashboard.putBoolean(
+            "Turret/hasSolution",
+            hasSolution()
+        );
     }
     
     public Angle getYaw() {
@@ -590,27 +610,27 @@ public class TurretSubsystem extends SubsystemBase {
         return m_LauncherPortMotor.getTorqueCurrent().getValueAsDouble();
     }
 
-    private static LinearVelocity calculateLauncherToExitVelocity(
-        AngularVelocity launcherVelocity
-    ) {
-        return MetersPerSecond.of(
-            (
-                TurretConstants.Launcher.VelocityRegression.A 
-                * launcherVelocity.in(RotationsPerSecond)
-            )
-            + TurretConstants.Launcher.VelocityRegression.B
-        );
-    }
-
     private static AngularVelocity calculateExitToLauncherVelocity(
             LinearVelocity exitVelocity
     ) {
         return RotationsPerSecond.of(
-                (
-                    exitVelocity.in(MetersPerSecond)
-                    - TurretConstants.Launcher.VelocityRegression.B
-                ) / TurretConstants.Launcher.VelocityRegression.A
-            );
+            (
+                TurretConstants.Launcher.VelocityRegression.A
+                * Math.pow(exitVelocity.in(MetersPerSecond),3)
+            )+
+            (
+                TurretConstants.Launcher.VelocityRegression.B
+                * Math.pow(exitVelocity.in(MetersPerSecond),2)
+            )+
+            (
+                TurretConstants.Launcher.VelocityRegression.C
+                * Math.pow(exitVelocity.in(MetersPerSecond),1)
+            )+
+                        (
+                TurretConstants.Launcher.VelocityRegression.D
+                * Math.pow(exitVelocity.in(MetersPerSecond),0)
+            )
+        );
     }
     
     public Command zeroYawCommand() {
@@ -766,6 +786,16 @@ public class TurretSubsystem extends SubsystemBase {
     public boolean allowFiring() {
         return (
             isAtVelocity()
+            && atSolution()
         ) || forceEnableFiringChooser.getSelected();
+    }
+
+    public boolean atSolution() {
+        return atSolution
+            && hasSolution;
+    }
+
+    public boolean hasSolution() {
+        return hasSolution;
     }
 }

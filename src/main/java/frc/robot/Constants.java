@@ -447,19 +447,21 @@ public final class Constants {
                 RotationsPerSecond.of(1);
 
             public static final class PID {
-                public static final double P = 12;
-                public static final double I = 0.1;
-                public static final double D = 0.06;
+                public static final double P = 13.5;
+                public static final double I = 0.12;
+                public static final double D = 0.04;
             }
 
             public static final class Feedforward {
                 public static final double kS = 8.5;
-                public static final double kV = .2;
+                public static final double kV = 0.2;
             }
 
             public static final class VelocityRegression {
-                public static final double A = 0.144814;
-                public static final double B = 0.437481;
+                public static final double A = -0.03151;
+                public static final double B = 0.664388;
+                public static final double C = 3.14192;
+                public static final double D = 2.439991;
             }
         }
 
