@@ -243,16 +243,29 @@ public class RobotContainer {
             );
 
         operatorXbox.rightTrigger(0.3)
-        .whileTrue(
-            new ParallelCommandGroup(
+            .whileTrue(
+                new ParallelCommandGroup(
+                    new RunLoaderCommand(loaderSubsystem),
+                    new RunIndexerCommand(indexerSubsystem)
+                )
+            );
+
+        operatorXbox.rightTrigger(0.3)
+            .and(
+                new BooleanSupplier() {
+                    @Override
+                    public boolean getAsBoolean() {
+                        return !(
+                            operatorXbox.getHID().getLeftTriggerAxis() > 0.3
+                        );
+                    }
+                }
+            ).whileTrue(
                 new IntakeCommand(
                     intakeSubsystem,
                     IntakePreset.AGITATING
-                ),
-                new RunLoaderCommand(loaderSubsystem),
-                new RunIndexerCommand(indexerSubsystem)
-            )
-        );
+                )
+            );
 
         operatorXbox.rightBumper()
             .onTrue(
