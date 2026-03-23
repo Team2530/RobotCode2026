@@ -77,17 +77,19 @@ public final class Constants {
                             DriverStation.getMatchTime() > 130
                             // if in endgame
                             || DriverStation.getMatchTime() < 30
-                            || (
-                                ((DriverStation.getMatchTime() - 30) % 50) > 25
-                                // if we're inactive first
+                            || (DriverStation.getGameSpecificMessage().length() > 0
+                                && ((
+                                    ((DriverStation.getMatchTime() - 30) % 50) > 25
+                                    // if we're inactive first
                                 ) == (
-                                DriverStation.getGameSpecificMessage().charAt(0)
+                                    DriverStation.getGameSpecificMessage().charAt(0)
                                     == (
                                         isRed.getAsBoolean()
                                             ? 'R'
                                             : 'B'
                                     )
-                                )
+                                ))
+                            )
                         );
                     }
                 };
