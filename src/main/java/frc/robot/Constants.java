@@ -127,9 +127,10 @@ public final class Constants {
                 public static final Time timeTillShiftChange() {
                     switch (getCurrentShift()) {
                         case TRANSITION:
-                            return SHIFT_TIMINGS[0].minus(
-                                Seconds.of(DriverStation.getMatchTime())
-                            );
+                            return Seconds.of(DriverStation.getMatchTime())
+                                .minus(
+                                    SHIFT_TIMINGS[0]
+                                );
                         case ENDGAME:
                             return Seconds.of(DriverStation.getMatchTime());
                         case RED_ACTIVE:
