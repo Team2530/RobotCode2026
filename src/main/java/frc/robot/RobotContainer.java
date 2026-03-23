@@ -2,11 +2,15 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -16,6 +20,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import choreo.Choreo;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -26,8 +31,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -401,6 +410,31 @@ public class RobotContainer {
     }
 
 
+    private static class Flagpole {
+        private ArrayList<Command> flags = new ArrayList<>();
+
+        public InstantCommand raiseFlaggedCommand(Supplier<Command> supplier) {
+            return new InstantCommand(() -> {
+                flags.add(
+                    supplier.get() 
+                );
+            });
+        }
+        
+        
+        public Command catchFlags() {
+            Command command = new ParallelRaceGroup(
+                    flags.toArray(
+                        new Command[flags.size()]
+                    )
+                );
+
+            flags.clear();
+
+            return command;
+        }
+    }    
+
     private static void configureAutos() {
         AutoBuilder.configure(
                 swerveDriveSubsystem::getPose,
@@ -442,6 +476,7 @@ public class RobotContainer {
             );
 
         // add named commands for the paths
+        Flagpole flagpole = new Flagpole();
         Map<String, Command> namedCommands = new HashMap<>() {{
             put(
                 "Zero",
@@ -478,6 +513,21 @@ public class RobotContainer {
                     intakeSubsystem.setPreset(IntakePreset.OUT);
                 })
             );
+            put(
+                "Intake",
+                new IntakeCommand(intakeSubsystem)
+            );
+            put(
+                "Raise Shoot",
+                flagpole.raiseFlaggedCommand(
+                    () -> new ParallelRaceGroup(
+                        new WaitCommand(Seconds.of(5)),
+                        new RunIndexerCommand(indexerSubsystem),
+                        new RunLoaderCommand(loaderSubsystem),
+                        new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING)
+                    )
+                )
+            );
         }};
         for (Entry<String, Command> pair : namedCommands.entrySet()) {
             NamedCommands.registerCommand(
@@ -509,20 +559,41 @@ public class RobotContainer {
         // load paths
         for (String trajectoryName : Choreo.availableTrajectories()) {
             try {
-                PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(
-                        trajectoryName
-                    );
+                SequentialCommandGroup routine = new SequentialCommandGroup();
 
-                autoChooser.addOption(
-                        trajectoryName,
-                        new SequentialCommandGroup(
+                // find event markers that are placed at a trajectory split, 
+                // remove them from the path,
+                Trajectory choreoTrajectory = Choreo.loadTrajectory(trajectoryName).get();
+                List<Integer> splitIndices = choreoTrajectory.splits();
+                for (int i = 0; i < splitIndices.size(); i++) {
+                    PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(
+                            trajectoryName,
+                            i
+                        );
+                    
+                    if (i == 0) {
+                        routine.addCommands(
                             new InstantCommand(() -> {
                                 swerveDriveSubsystem.resetOdometry(
                                     path.getStartingHolonomicPose().get()
                                 );
-                            }),
-                            AutoBuilder.followPath(path)
+                            })
+                        );
+                    }
+
+                    routine.addCommands(
+                        AutoBuilder.followPath(path),
+                        new DeferredCommand(
+                            flagpole::catchFlags,
+                            new HashSet<>() 
                         )
+                    );
+
+                }
+
+                autoChooser.addOption(
+                        trajectoryName,
+                        routine
                 );
             } catch (Exception e) {
                 System.out.print(
@@ -530,6 +601,12 @@ public class RobotContainer {
                     + e
                 );
             }
+
+            // extra option
+            autoChooser.addOption(
+                "Do nothing",
+                null
+            );
         }
     }
 
