@@ -458,10 +458,17 @@ public final class Constants {
             }
 
             public static final class VelocityRegression {
-                public static final double A = -0.03151;
-                public static final double B = 0.664388;
-                public static final double C = 3.14192;
-                public static final double D = 2.439991;
+                // Last Working, needs Tuning if used. 
+                // public static final double A = -0.03151;
+                // public static final double B = 0.664388;
+                // public static final double C = 3.14192;
+                // public static final double D = 2.439991;
+
+                // Untested but should be more accurate.
+                public static final double A = 0.000106093;
+                public static final double B = -0.0184498;;
+                public static final double C = 1.17832;
+                public static final double D = -18.24819;  
             }
         }
 
