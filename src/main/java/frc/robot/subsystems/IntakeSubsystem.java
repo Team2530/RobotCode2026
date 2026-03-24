@@ -36,7 +36,7 @@ public class IntakeSubsystem extends SubsystemBase {
         STOWED(true, RotationsPerSecond.of(0)),
         OUT(false, RotationsPerSecond.of(0)),
         INTAKING(false, RotationsPerSecond.of(32)),
-        AGITATING(false, RotationsPerSecond.of(40)),
+        AGITATING(true, RotationsPerSecond.of(40)),
         SPITTING(false, IntakeConstants.Feeder.MAXIMUM_VELOCITY.times(-1)),
         CUSTOM(false, RotationsPerSecond.of(Double.MAX_VALUE));
 
@@ -163,20 +163,32 @@ public class IntakeSubsystem extends SubsystemBase {
             isHolding
             && intakePreset == IntakePreset.AGITATING
         ) {
-            m_PivotMotor.getClosedLoopController()
-                .setSetpoint(
-                    Math.cos(
-                        (
-                            (Timer.getFPGATimestamp() - waveStart.in(Seconds))
-                            * (2 * Math.PI)
+            Dimensionless waveProgress = waveStart.minus(
+                        Seconds.of(
+                            Timer.getFPGATimestamp()
                         )
-                        / (
-                            IntakeConstants.Pivot.Waving.PERIOD.in(Seconds)
-                        )
-                    ) * IntakeConstants.Pivot.Waving.HEIGHT,
-                    ControlType.kPosition,
-                    ClosedLoopSlot.kSlot1
-                );
+                    ).div(
+                        IntakeConstants.Pivot.Waving.PERIOD
+                    );
+
+            if (
+                waveProgress.gt(Percent.of(100))
+            ) {
+                resetPivotTracking();
+            } else {
+                m_PivotMotor.getClosedLoopController()
+                    .setSetpoint(
+                        Math.cos(
+                            (
+                                waveProgress.in(Value)
+                                * (2 * Math.PI)
+                            )
+                        ) * IntakeConstants.Pivot.Waving.HEIGHT,
+                        ControlType.kPosition,
+                        ClosedLoopSlot.kSlot1
+                    );
+            }
+
         }
 
 
