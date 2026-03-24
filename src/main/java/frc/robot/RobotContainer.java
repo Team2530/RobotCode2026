@@ -62,6 +62,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.TurretSubsystem.TurretTargets;
 import frc.robot.util.LimelightContainer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -79,7 +81,7 @@ public class RobotContainer {
             LimelightType.LL4, 
             "limelight-fl", 
             true, 
-            true,
+            false,
             new Pose3d(
                 new Translation3d(
                     Meters.of(-0.31513),
@@ -97,7 +99,7 @@ public class RobotContainer {
             LimelightType.LL4, 
             "limelight-fr", 
             true, 
-            true,
+            false,
             new Pose3d(
                 new Translation3d(
                     Meters.of(-0.31729),
@@ -115,7 +117,7 @@ public class RobotContainer {
             LimelightType.LL4, 
             "limelight-bl", 
             true, 
-            true,
+            false,
             new Pose3d(
                 new Translation3d(
                     Meters.of(-0.1919),
@@ -191,8 +193,8 @@ public class RobotContainer {
 
                     new InstantCommand(() -> {
                         intakeSubsystem.setPreset(IntakePreset.OUT);
+                        //LLContainer.setIMUMode(4);
                     })
-
                 )
             );
 
@@ -200,7 +202,20 @@ public class RobotContainer {
             .onTrue(
                 new ParallelCommandGroup(
                     new MatchtimeStatusCommand(),
-                    new VoltageStatusCommand()
+                    new VoltageStatusCommand(),
+                
+                    new InstantCommand(() -> {
+                        //LLContainer.setIMUMode(4);
+                    })
+                )
+            );
+
+        RobotModeTriggers.disabled()
+            .onTrue(
+                new ParallelCommandGroup(
+                    new InstantCommand(() -> {
+                        LLContainer.setIMUMode(1);
+                    })
                 )
             );
     }

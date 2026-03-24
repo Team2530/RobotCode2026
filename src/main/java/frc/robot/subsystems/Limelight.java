@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -9,6 +12,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.LimelightHelpers.RawFiducial;
@@ -44,7 +48,7 @@ public class Limelight extends SubsystemBase {
     private double lastPoseEstimate = 0;
     private int counter = 0;
     private double lastFrame = 0;
-    private Pose3d pose;
+    private StructPublisher<Pose2d> posePublisher;
 
     public Limelight(
         LimelightType limelightType, 
@@ -57,7 +61,10 @@ public class Limelight extends SubsystemBase {
         this.id = id;
         this.isEnabled = isEnabled;
         this.cropEnabled = cropEnabled;
-        this.pose = pose;
+
+        posePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("SmartDashboard/Odometry/" + getID() + "/pose", Pose2d.struct)
+            .publish();
 
         LimelightHelpers.setCameraPose_RobotSpace(
             id,
@@ -74,6 +81,11 @@ public class Limelight extends SubsystemBase {
                 pose.getRotation().getZ()
             )
         );
+    
+        LimelightHelpers.SetIMUAssistAlpha(
+            id, 
+            0.1
+        );
     }
 
     @Override
@@ -87,6 +99,21 @@ public class Limelight extends SubsystemBase {
                 }
             }
         }
+
+        if (
+            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            .gt(
+                DegreesPerSecond.of(5)
+            )
+        ) {
+            RobotContainer.LLContainer.setIMUMode(4);
+        } else {
+            RobotContainer.LLContainer.setIMUMode(1);
+        }
+    }
+
+    public void publish(Pose2d pose) {
+        posePublisher.set(pose);
     }
 
     public int numTargets() {

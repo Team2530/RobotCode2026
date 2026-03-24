@@ -22,6 +22,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -379,13 +380,13 @@ public class SwerveSubsystem extends SubsystemBase {
             LimelightContainer.estimateSimOdometry();
         } else {
             RobotContainer.LLContainer.estimateMT2Odometry(this);
-            //RobotContainer.LLContainer.estimateMT1Odometry(this.swerveDrive);
+            //RobotContainer.LLContainer.estimateMT1Odometry(this);
         }
         posePublisher.set(getPose());
 
         SmartDashboard.putNumber(
             "Swerve/Heading",
-            getRotation().getRotations()
+            getHeading().getRotations() 
         );
         SmartDashboard.putNumber(
             "Swerve/angularVelocity",
@@ -502,6 +503,10 @@ public class SwerveSubsystem extends SubsystemBase {
         return getPose().getRotation();
     }
 
+    public Rotation2d getHeading() {
+        return swerveDrive.getOdometryHeading();
+    }
+
     public void setMotorBrake(boolean isBraking) {
         swerveDrive.setMotorIdleMode(isBraking);
     }
@@ -552,15 +557,10 @@ public class SwerveSubsystem extends SubsystemBase {
         return swerveDrive.field;
     }
 
-    public void setVisionStandardDeviations(
-        Matrix<N3, N1> standardDeviations
-    ) {
-        swerveDrive.setVisionMeasurementStdDevs(standardDeviations);
-    }
-
     public void addVisionMeasurement(
         Pose2d pose,
-        double timestamp
+        double timestamp,
+        Matrix<N3, N1> standardDeviations
     ) {
         swerveDrive.addVisionMeasurement(pose, timestamp);
     }
