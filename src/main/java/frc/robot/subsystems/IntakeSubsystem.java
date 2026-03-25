@@ -150,7 +150,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 m_PivotMotor.getEncoder()
                     .setPosition(IntakeConstants.Pivot.Waving.HEIGHT);
                 m_PivotMotor.getClosedLoopController().setSetpoint(
-                    IntakeConstants.Pivot.Waving.HEIGHT,
+                    -IntakeConstants.Pivot.Waving.HEIGHT,
                     ControlType.kPosition,
                     ClosedLoopSlot.kSlot0
                 );
