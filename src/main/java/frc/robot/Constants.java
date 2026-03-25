@@ -549,14 +549,9 @@ public final class Constants {
     }
 
     public static final class ChoreoConstants {
-        public static final File AUTO_PATH_DIRECTORY = new File(
-            Filesystem.getDeployDirectory(),
-            "choreo"
-        );
-
         public static final class PID {
             public static final class Translation {
-                public static final double P = 9.0;
+                public static final double P = 7.0;
                 public static final double I = 0.0;
                 public static final double D = 0.0;
             }
