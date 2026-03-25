@@ -465,10 +465,10 @@ public final class Constants {
                 // public static final double D = 2.439991;
 
                 // Untested but should be more accurate.
-                public static final double A = 0.000106093;
-                public static final double B = -0.0184498;;
-                public static final double C = 1.17832;
-                public static final double D = -18.24819;  
+                public static final double A = 0.0213843;
+                public static final double B = -0.881393;;
+                public static final double C = 18.03142;
+                public static final double D = -46.36686;  
             }
         }
 
