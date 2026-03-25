@@ -219,5 +219,7 @@
  "events":[
    {"name":"Shoot", "from":{"target":3, "targetTimestamp":7.20365, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Raise Shoot"}}},
    {"name":"Start Intake", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Start Intake"}}]}}}]
+       {"type":"named", "data":{"name":"Start Intake"}},
+       {"type":"named", "data":{"name":"Zero"}},
+       {"type":"named", "data":{"name":"Hub"}}]}}}]
 }
