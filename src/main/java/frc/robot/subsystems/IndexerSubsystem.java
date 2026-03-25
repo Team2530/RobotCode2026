@@ -24,7 +24,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
     private Dimensionless targetSpeed;
 
-    enum IndexerFuelState {
+    public enum IndexerFuelState {
         FUELED,
         EMPTY,
         UNKNOWN

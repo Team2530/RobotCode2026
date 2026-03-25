@@ -194,7 +194,9 @@ public class RobotContainer {
                     new InstantCommand(() -> {
                         intakeSubsystem.setPreset(IntakePreset.OUT);
                         //LLContainer.setIMUMode(4);
-                    })
+                    }),
+
+                    new FuelAlertingCommand(operatorXbox)
                 )
             );
 
