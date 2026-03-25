@@ -14,12 +14,14 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.RobotContainer;
 import frc.robot.Constants.LoaderConstants;
 
 public class LoaderSubsystem extends SubsystemBase {
 
     private final TalonFX m_LoaderMotor;
+
+    private AngularVelocity targetVelocity;
 
     public LoaderSubsystem() {
         m_LoaderMotor = new TalonFX(
@@ -41,11 +43,42 @@ public class LoaderSubsystem extends SubsystemBase {
                 )
             );
 
-        stop();
+        targetVelocity = RotationsPerSecond.of(0);
     }
 
     @Override
     public void periodic() {
+
+
+        AngularVelocity setVelocity;
+        if (RobotContainer.turretSubsystem.allowFiring()) {
+            setVelocity = RotationsPerSecond.of(
+                MathUtil.clamp(
+                    targetVelocity.in(RotationsPerSecond),
+                    LoaderConstants.MAXIMUM_VELOCITY
+                        .times(-1)
+                        .in(RotationsPerSecond),
+                    LoaderConstants.MAXIMUM_VELOCITY.in(RotationsPerSecond)
+                )
+            );
+        } else {
+            setVelocity = RotationsPerSecond.of(0);
+        }
+
+        m_LoaderMotor.setControl(
+            new VelocityTorqueCurrentFOC(
+                setVelocity.in(RotationsPerSecond)
+            ).withUpdateFreqHz(20)
+        );
+
+        SmartDashboard.putNumber(
+            "Loader/target_velocity",
+            targetVelocity.in(RotationsPerSecond)
+        );
+        SmartDashboard.putNumber(
+            "Loader/set_velocity",
+            setVelocity.in(RotationsPerSecond)
+        );
         SmartDashboard.putNumber(
             "Loader/velocity",
             getVelocity().in(RotationsPerSecond)
@@ -58,21 +91,7 @@ public class LoaderSubsystem extends SubsystemBase {
      * in rps
      */
     public void runVelocity(AngularVelocity velocity) {
-        m_LoaderMotor.setControl(
-            new VelocityTorqueCurrentFOC(
-                MathUtil.clamp(
-                    velocity.in(RotationsPerSecond),
-                    LoaderConstants.MAXIMUM_VELOCITY
-                        .times(-1)
-                        .in(RotationsPerSecond),
-                    LoaderConstants.MAXIMUM_VELOCITY.in(RotationsPerSecond)
-                )
-            ).withUpdateFreqHz(20)
-        );
-        SmartDashboard.putNumber(
-            "Loader/target_velocity",
-            velocity.in(RotationsPerSecond)
-        );
+        targetVelocity = velocity;
     }
 
     /*
