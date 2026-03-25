@@ -1,0 +1,40 @@
+{
+ "name":"Testing",
+ "version":3,
+ "snapshot":{
+  "waypoints":[],
+  "constraints":[],
+  "targetDt":0.05
+ },
+ "params":{
+  "waypoints":[
+    {"x":{"exp":"3.5394935607910156 m", "val":3.5394935607910156}, "y":{"exp":"0.6910176277160645 m", "val":0.6910176277160645}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"5.777336120605469 m", "val":5.777336120605469}, "y":{"exp":"0.7087782621383667 m", "val":0.7087782621383667}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"7.8020501136779785 m", "val":7.802050113677979}, "y":{"exp":"1.2771191596984863 m", "val":1.2771191596984863}, "heading":{"exp":"90 deg", "val":1.5707963267948966}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"7.8020501136779785 m", "val":7.802050113677979}, "y":{"exp":"3.319594144821167 m", "val":3.319594144821167}, "heading":{"exp":"90 deg", "val":1.5707963267948966}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"5.795096397399902 m", "val":5.795096397399902}, "y":{"exp":"0.7265389561653137 m", "val":0.7265389561653137}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"3.521733045578003 m", "val":3.521733045578003}, "y":{"exp":"0.6910176277160645 m", "val":0.6910176277160645}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"3.308605194091797 m", "val":3.308605194091797}, "y":{"exp":"0.744299590587616 m", "val":0.744299590587616}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+  "constraints":[
+    {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
+    {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
+    {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"0 m", "val":0.0}, "w":{"exp":"16.541 m", "val":16.541}, "h":{"exp":"8.0692 m", "val":8.0692}}}, "enabled":false},
+    {"from":5, "to":6, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"1e-5 m / s", "val":0.00001}}}, "enabled":true}],
+  "targetDt":{
+   "exp":"0.05 s",
+   "val":0.05
+  }
+ },
+ "trajectory":{
+  "config":null,
+  "sampleType":null,
+  "waypoints":[],
+  "samples":[],
+  "splits":[]
+ },
+ "events":[
+   {"name":"Start Intake", "from":{"target":4, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
+   {"name":"Shoot", "from":{"target":5, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
+       {"type":"wait", "data":{"waitTime":{"exp":"7 s", "val":7.0}}},
+       {"type":"named", "data":{"name":"Shoot"}}]}}}]
+}
