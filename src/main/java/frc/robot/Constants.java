@@ -568,6 +568,18 @@ public final class Constants {
       public static final boolean REVERSE = true;
       public static final int CAN_ID = 24;
       public static final Dimensionless SPEED = Percent.of(80);
+
+    
+      public static final class Fueling {
+        public static final Current STATIC_LIMIT = Amps.of(10);
+        public static final Dimensionless STATIC_SPEED = Percent.of(2);
+
+
+        public static final Current RUN_LIMIT = Amps.of(20);
+
+        public static final Time DEBOUNCE_TIME = Seconds.of(0.2);
+      }
+
   }
 
   public static final class LoaderConstants {
