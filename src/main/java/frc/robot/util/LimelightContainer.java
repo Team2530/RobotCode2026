@@ -110,13 +110,14 @@ public class LimelightContainer {
         limelight.isEnabled()
         && mt2Estimation != null
         && mt2Estimation.tagCount >= 2
-        && swerve.getAngularVelocity().lt(RadiansPerSecond.of(Math.PI))
+        && swerve.getAngularVelocity().lt(RadiansPerSecond.of(Math.PI / 2))
       ){
         double[] stddevs = NetworkTableInstance.getDefault()
           .getTable(limelight.getID())
           .getEntry("stddevs")
           .getDoubleArray(new double[6]);
 
+        int imuMode = NetworkTableInstance.getDefault().getTable(limelight.getID()).getEntry("imumode_set").getNumber(0).intValue();
             /* VecBuilder.fill(
               0.7,
               0.7,
@@ -128,7 +129,9 @@ public class LimelightContainer {
             VecBuilder.fill(
               stddevs[6],
               stddevs[7],
-              999999
+              imuMode != 1
+                ? stddevs[11]
+                : 999999
             )
         );
         // add set vision measurments and add vision measurments here instead of the else statment. 
@@ -170,10 +173,19 @@ public class LimelightContainer {
         && mt1Estimation.tagCount > 0
         && swerve.getAngularVelocity().lt(RadiansPerSecond.of(Math.PI * 2))
       ){
+
+        double[] stddevs = NetworkTableInstance.getDefault()
+          .getTable(limelight.getID())
+          .getEntry("stddevs")
+          .getDoubleArray(new double[6]);
         swerve.addVisionMeasurement(
             mt1Estimation.pose,
             mt1Estimation.timestampSeconds,
-            VecBuilder.fill(0.7, 0.7, 99999)
+            VecBuilder.fill(
+              stddevs[0],
+              stddevs[1],
+              stddevs[5]
+            )
         );
         added = true;
       } else {
@@ -196,11 +208,10 @@ public class LimelightContainer {
       }
     }
     estimateMT1Odometry(swerve);
-    //setIMUMode(1);
+    setIMUMode(1);
     for (Limelight limelight : limelights) {
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
-        //swerve.getRotation().getDegrees(),
         swerve.getHeading().getDegrees(),
         0, 
         0, 
@@ -209,6 +220,5 @@ public class LimelightContainer {
         0
       );
     }
-    //setIMUMode(4);
   }
 }

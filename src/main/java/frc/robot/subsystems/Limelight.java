@@ -84,7 +84,7 @@ public class Limelight extends SubsystemBase {
     
         LimelightHelpers.SetIMUAssistAlpha(
             id, 
-            0.1
+            0.02
         );
     }
 
@@ -102,13 +102,12 @@ public class Limelight extends SubsystemBase {
 
         if (
             RobotContainer.swerveDriveSubsystem.getAngularVelocity()
-            .gt(
-                DegreesPerSecond.of(5)
-            )
+                .abs(DegreesPerSecond)
+            > 2 
         ) {
             RobotContainer.LLContainer.setIMUMode(4);
         } else {
-            RobotContainer.LLContainer.setIMUMode(1);
+            RobotContainer.LLContainer.setIMUMode(3);
         }
     }
 
