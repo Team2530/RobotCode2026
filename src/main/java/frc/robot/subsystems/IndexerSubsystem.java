@@ -101,7 +101,7 @@ public class IndexerSubsystem extends SubsystemBase {
         );
         SmartDashboard.putNumber(
             "Indexer/current",
-            m_IndexerMotor.getOutputCurrent()
+            getCurrent().in(Amps)
         );
         SmartDashboard.putNumber(
             "Indexer/output",

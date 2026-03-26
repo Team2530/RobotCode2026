@@ -47,6 +47,7 @@ import frc.robot.commands.control.IntakeCommand;
 import frc.robot.commands.control.ManualTurretCommand;
 import frc.robot.commands.control.RunIndexerCommand;
 import frc.robot.commands.control.RunLoaderCommand;
+import frc.robot.commands.util.FuelAlertingCommand;
 import frc.robot.commands.util.HubStatusCommand;
 import frc.robot.commands.util.MatchtimeStatusCommand;
 import frc.robot.commands.util.ShiftAlertingCommand;
@@ -61,6 +62,7 @@ import frc.robot.subsystems.LoaderSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.TurretSubsystem.TurretTargets;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LimelightContainer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -196,7 +198,7 @@ public class RobotContainer {
                         //LLContainer.setIMUMode(4);
                     }),
 
-                    new FuelAlertingCommand(operatorXbox)
+                    new FuelAlertingCommand(operatorXbox.getHID())
                 )
             );
 
@@ -538,7 +540,7 @@ public class RobotContainer {
                 "Raise Shoot",
                 flagpole.raiseFlaggedCommand(
                     () -> new ParallelRaceGroup(
-                        new WaitCommand(Seconds.of(5)),
+                        new WaitCommand(Seconds.of(9)),
                         new RunIndexerCommand(indexerSubsystem),
                         new RunLoaderCommand(loaderSubsystem),
                         new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING)
@@ -592,7 +594,9 @@ public class RobotContainer {
                         routine.addCommands(
                             new InstantCommand(() -> {
                                 swerveDriveSubsystem.resetOdometry(
-                                    path.getStartingHolonomicPose().get()
+                                    AllianceFlipUtil.apply(
+                                        path.getStartingHolonomicPose().get()
+                                    )
                                 );
                             })
                         );

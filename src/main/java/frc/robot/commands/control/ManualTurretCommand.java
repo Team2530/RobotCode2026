@@ -2,6 +2,7 @@ package frc.robot.commands.control;
 
 import static edu.wpi.first.units.Units.*;
 
+import frc.robot.Constants.MetaConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.TurretSubsystem;
 
@@ -68,6 +69,10 @@ public class ManualTurretCommand extends Command {
                         operatorXbox.getLeftY()
                     ) 
                     - m_SwerveSubsystem.getRotation().getRadians()
+                    + (MetaConstants.isRed.getAsBoolean()
+                        ? Math.PI
+                        : 0
+                    )
                 ) % (2 * Math.PI)
             );
         }

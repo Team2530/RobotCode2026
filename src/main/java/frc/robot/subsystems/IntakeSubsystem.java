@@ -148,7 +148,7 @@ public class IntakeSubsystem extends SubsystemBase {
             ) {
                 isHolding = true;
                 m_PivotMotor.getEncoder()
-                    .setPosition(IntakeConstants.Pivot.Waving.HEIGHT);
+                    .setPosition(-IntakeConstants.Pivot.Waving.HEIGHT);
                 m_PivotMotor.getClosedLoopController().setSetpoint(
                     -IntakeConstants.Pivot.Waving.HEIGHT,
                     ControlType.kPosition,
@@ -163,13 +163,12 @@ public class IntakeSubsystem extends SubsystemBase {
             isHolding
             && intakePreset == IntakePreset.AGITATING
         ) {
-            Dimensionless waveProgress = waveStart.minus(
-                        Seconds.of(
-                            Timer.getFPGATimestamp()
-                        )
-                    ).div(
-                        IntakeConstants.Pivot.Waving.PERIOD
-                    );
+            Dimensionless waveProgress = 
+                Seconds.of(
+                    Timer.getFPGATimestamp()
+                )
+                .minus(waveStart)
+                .div(IntakeConstants.Pivot.Waving.PERIOD);
 
             if (
                 waveProgress.gt(Percent.of(100))
@@ -178,7 +177,7 @@ public class IntakeSubsystem extends SubsystemBase {
             } else {
                 m_PivotMotor.getClosedLoopController()
                     .setSetpoint(
-                        Math.cos(
+                        -Math.cos(
                             (
                                 waveProgress.in(Value)
                                 * (2 * Math.PI)

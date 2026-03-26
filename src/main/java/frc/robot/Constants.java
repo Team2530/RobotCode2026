@@ -46,8 +46,8 @@ public final class Constants {
             public static final LinearAcceleration GRAVITY =
                 MetersPerSecondPerSecond.of(9.81);
 
-            public static final Distance LENGTH = Inches.of(690.876);
-            public static final Distance WIDTH = Inches.of(317);
+            public static final Distance LENGTH = Inches.of(651.22);
+            public static final Distance WIDTH = Inches.of(317.69);
         }
 
         public static final class Game {
@@ -211,12 +211,12 @@ public final class Constants {
 
 
             public static final class Waving {
-                public static final Time PERIOD = Seconds.of(0.4);
+                public static final Time PERIOD = Seconds.of(1);
                 // an arbitrary value
                 //
                 // i think this is dependent on the gear ratio of the pivot, but
                 // i really don't know what units this is in
-                public static final double HEIGHT = 0.5;
+                public static final double HEIGHT = 3;
 
                 public static final class PID {
                     public static final double P = 0.25;
@@ -245,6 +245,8 @@ public final class Constants {
                 Percent.of(100);
             public static final Dimensionless TURTLE_DRIVE_MULT =
                 Percent.of(25);
+            public static final Dimensionless ROCK_DRIVE_MULT =
+                Percent.of(10);
             public static final Frequency MULTIPLIER_SLEW_RATE =
                 Percent
                 .of(25)
@@ -465,8 +467,8 @@ public final class Constants {
                 // public static final double D = 2.439991;
 
                 // Untested but should be more accurate.
-                public static final double A = 0.0213843;
-                public static final double B = -0.881393;;
+                public static final double A = 0.0223843;
+                public static final double B = -0.820693;;
                 public static final double C = 18.03142;
                 public static final double D = -46.36686;  
             }

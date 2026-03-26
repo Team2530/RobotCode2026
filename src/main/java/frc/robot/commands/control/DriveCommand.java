@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.MetaConstants;
 
 public class DriveCommand extends Command {
 
@@ -36,7 +37,9 @@ public class DriveCommand extends Command {
                 DriveConstants.Control.TURTLE_DRIVE_MULT.in(Value)
         );
 
-        headingOffset = 0;
+        headingOffset = MetaConstants.isRed.getAsBoolean()
+            ? Math.PI
+            : 0;
     }
 
     @Override
@@ -70,19 +73,31 @@ public class DriveCommand extends Command {
 
 
             // trigger-base slow / fast mode
-            double driveMultiplier = driveMultiplierSlewLimiter.calculate(
-                    (
-                        DriveConstants.Control.REGULAR_DRIVE_MULT
-                        .minus(DriveConstants.Control.TURTLE_DRIVE_MULT)
-                    ).times(
-                        Value.of(driverXbox.getRightTriggerAxis())
-                        .plus(DriveConstants.Control.TURTLE_DRIVE_MULT)
-                    ).in(Value)
-                );
+            double driveMultiplier;
+            if (driverXbox.getLeftTriggerAxis() > 0.1) {
+                driveMultiplier = (
+                            DriveConstants.Control.TURTLE_DRIVE_MULT
+                            .minus(DriveConstants.Control.ROCK_DRIVE_MULT)
+                        ).times(
+                            Value.of(1 - driverXbox.getLeftTriggerAxis())
+                        ).plus(DriveConstants.Control.ROCK_DRIVE_MULT)
+                        .in(Value);
+                z *= DriveConstants.Control.TURTLE_DRIVE_MULT.in(Value);
+            } else {
+                driveMultiplier = driveMultiplierSlewLimiter.calculate(
+                        (
+                            DriveConstants.Control.REGULAR_DRIVE_MULT
+                            .minus(DriveConstants.Control.TURTLE_DRIVE_MULT)
+                        ).times(
+                            Value.of(driverXbox.getRightTriggerAxis())
+                        ).plus(DriveConstants.Control.TURTLE_DRIVE_MULT)
+                        .in(Value)
+                    );
+                z *= driveMultiplier;
+            }
 
             x *= driveMultiplier;
             y *= driveMultiplier;
-            z *= driveMultiplier;
 
             // convert to m / s
             x *= DriveConstants.MAX_ROBOT_VELOCITY.in(MetersPerSecond);
