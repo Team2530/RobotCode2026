@@ -484,7 +484,7 @@ public final class Constants {
             // public static final double ANGLE_MIN = 0;
             public static final Angle ANGLE_MAX = Degrees.of(340);
 
-            public static final Angle MAXIMUM_ANGLE_ERROR = Degrees.of(10);
+            public static final Angle MAXIMUM_ANGLE_ERROR = Degrees.of(3);
 
             public static final AngularVelocity MAX_VELOCITY =
                 RotationsPerSecond.of(200);
