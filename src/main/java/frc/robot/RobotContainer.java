@@ -390,7 +390,7 @@ public class RobotContainer {
 
 
         // KILL
-        operatorXbox.leftStick()
+        driverXbox.x()
             .onTrue(
                 new InstantCommand(
                     () -> {
@@ -541,6 +541,16 @@ public class RobotContainer {
                 flagpole.raiseFlaggedCommand(
                     () -> new ParallelRaceGroup(
                         new WaitCommand(Seconds.of(9)),
+                        new RunIndexerCommand(indexerSubsystem),
+                        new RunLoaderCommand(loaderSubsystem),
+                        new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING)
+                    )
+                )
+            );
+            put(
+                "Raise Shoot Until",
+                flagpole.raiseFlaggedCommand(
+                    () -> new ParallelCommandGroup(
                         new RunIndexerCommand(indexerSubsystem),
                         new RunLoaderCommand(loaderSubsystem),
                         new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING)
