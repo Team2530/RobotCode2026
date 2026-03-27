@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.measure.Angle;
 
 
 /**
@@ -116,6 +117,10 @@ public class LimelightContainer {
           .getTable(limelight.getID())
           .getEntry("stddevs")
           .getDoubleArray(new double[6]);
+        
+        if (stddevs.length < 12) {
+          continue;
+        }
 
         int imuMode = NetworkTableInstance.getDefault().getTable(limelight.getID()).getEntry("imumode_set").getNumber(0).intValue();
             /* VecBuilder.fill(
@@ -158,26 +163,25 @@ public class LimelightContainer {
         Timer.getTimestamp()
       );
 
+      boolean added;
       if (mt1Estimation != null) {
+        double[] stddevs = NetworkTableInstance.getDefault().getTable(limelight.getID()).getEntry("stddevs").getDoubleArray(new double[6]);
+
+        if (stddevs.length < 12) {
+          continue;
+        }
         SmartDashboard.putNumberArray(
           "Odometry/mt1/" + limelight.getID() + "/stddevs", Arrays.copyOfRange(
-              NetworkTableInstance.getDefault().getTable(limelight.getID()).getEntry("stddevs").getDoubleArray(new double[6]), 0, 5
+            stddevs, 0, 5
             )
         );
-      }
 
-      boolean added;
       if (
         limelight.isEnabled()
-        && mt1Estimation != null
         && mt1Estimation.tagCount > 0
         && swerve.getAngularVelocity().lt(RadiansPerSecond.of(Math.PI * 2))
       ){
 
-        double[] stddevs = NetworkTableInstance.getDefault()
-          .getTable(limelight.getID())
-          .getEntry("stddevs")
-          .getDoubleArray(new double[6]);
         swerve.addVisionMeasurement(
             mt1Estimation.pose,
             mt1Estimation.timestampSeconds,
@@ -190,8 +194,10 @@ public class LimelightContainer {
         added = true;
       } else {
         added = false;
+      } 
+      } else {
+        added = false;
       }
-
       SmartDashboard.putBoolean(
         "Odometry/mt1/" + limelight.getID() + "/added",
         added
@@ -203,9 +209,16 @@ public class LimelightContainer {
     for (Limelight limelight : limelights) {
       LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getID());
       if (mt1 != null && mt1.tagCount > 0 ) {
+        setIMUMode(1);
         swerve.resetOdometry(mt1.pose);
+        SetRobotOrientation(
+         
+        Degrees.of(swerve.getHeading().getDegrees())
+        );
+
         break;
       }
+    
     }
     estimateMT1Odometry(swerve);
     setIMUMode(1);
@@ -213,6 +226,21 @@ public class LimelightContainer {
       LimelightHelpers.SetRobotOrientation(
         limelight.getID(), 
         swerve.getHeading().getDegrees(),
+        0, 
+        0, 
+        0, 
+        0, 
+        0
+      );
+    }
+  }
+
+  public void SetRobotOrientation(Angle yaw) {
+    for (Limelight limelight: limelights) {
+      LimelightHelpers.SetRobotOrientation(
+        limelight.getID(), 
+        //swerve.getRotation().getDegrees(),
+        yaw.in(Degrees),
         0, 
         0, 
         0, 
