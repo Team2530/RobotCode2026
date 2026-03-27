@@ -20,15 +20,16 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public final class Constants {
 
     public static final class MetaConstants {
-        public static Alliance ALLIANCE =
-            DriverStation.getAlliance().isPresent()
+        public static Alliance getAlliance() {
+            return DriverStation.getAlliance().isPresent()
                 ? DriverStation.getAlliance().get()
                 : Alliance.Blue;
+        }
 
         public static BooleanSupplier isRed = new BooleanSupplier() {
                 @Override
                 public boolean getAsBoolean() {
-                    return ALLIANCE == Alliance.Red;
+                    return getAlliance() == Alliance.Red;
                 }
             };
 

@@ -619,7 +619,6 @@ public class RobotContainer {
                             new HashSet<>() 
                         )
                     );
-
                 }
 
                 autoChooser.addOption(
