@@ -36,7 +36,7 @@ public class IntakeSubsystem extends SubsystemBase {
         STOWED(true, RotationsPerSecond.of(0)),
         OUT(false, RotationsPerSecond.of(0)),
         INTAKING(false, RotationsPerSecond.of(32)),
-        AGITATING(true, RotationsPerSecond.of(40)),
+        AGITATING(false, RotationsPerSecond.of(40)),
         SPITTING(false, IntakeConstants.Feeder.MAXIMUM_VELOCITY.times(-1)),
         CUSTOM(false, RotationsPerSecond.of(Double.MAX_VALUE));
 
@@ -148,9 +148,9 @@ public class IntakeSubsystem extends SubsystemBase {
             ) {
                 isHolding = true;
                 m_PivotMotor.getEncoder()
-                    .setPosition(-IntakeConstants.Pivot.Waving.HEIGHT);
+                    .setPosition(IntakeConstants.Pivot.Waving.HEIGHT);
                 m_PivotMotor.getClosedLoopController().setSetpoint(
-                    -IntakeConstants.Pivot.Waving.HEIGHT,
+                    IntakeConstants.Pivot.Waving.HEIGHT,
                     ControlType.kPosition,
                     ClosedLoopSlot.kSlot0
                 );
@@ -177,7 +177,7 @@ public class IntakeSubsystem extends SubsystemBase {
             } else {
                 m_PivotMotor.getClosedLoopController()
                     .setSetpoint(
-                        -Math.cos(
+                        Math.cos(
                             (
                                 waveProgress.in(Value)
                                 * (2 * Math.PI)

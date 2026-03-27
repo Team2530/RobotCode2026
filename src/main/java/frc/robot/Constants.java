@@ -216,7 +216,7 @@ public final class Constants {
                 //
                 // i think this is dependent on the gear ratio of the pivot, but
                 // i really don't know what units this is in
-                public static final double HEIGHT = 3;
+                public static final double HEIGHT = 4.5;
 
                 public static final class PID {
                     public static final double P = 0.25;
