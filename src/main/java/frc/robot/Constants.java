@@ -446,7 +446,7 @@ public final class Constants {
                 RotationsPerSecond.of(15);
 
             public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
-                RotationsPerSecond.of(1);
+                RotationsPerSecond.of(2);
 
             public static final class PID {
                 public static final double P = 13.5;
@@ -467,7 +467,7 @@ public final class Constants {
                 // public static final double D = 2.439991;
 
                 // Untested but should be more accurate.
-                public static final double A = 0.0223843;
+                public static final double A = 0.0220843;
                 public static final double B = -0.820693;;
                 public static final double C = 18.03142;
                 public static final double D = -46.36686;  
