@@ -81,12 +81,16 @@ public class TurretSubsystem extends SubsystemBase {
             )
         );
 
-        public Pose3d position;
+        private Pose3d position;
+
+        public Pose3d getPosition() {
+            return AllianceFlipUtil.apply(position);
+        }
 
         private TurretTargets(
             Pose3d position
         ) {
-            this.position = AllianceFlipUtil.apply(position);
+            this.position = position;
         }
     }
 
@@ -704,7 +708,7 @@ public class TurretSubsystem extends SubsystemBase {
     public void setTarget(TurretTargets target) {
         this.targetingMode = TargetingMode.ABSOLUTE;
         this.target = target;
-        this.targetPosition = target.position;
+        this.targetPosition = target.getPosition();
     }
 
     public void setTarget(Pose3d target) {
