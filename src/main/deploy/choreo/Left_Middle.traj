@@ -387,5 +387,6 @@
    {"name":"Aim hub", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
        {"type":"named", "data":{"name":"Hub"}},
        {"type":"named", "data":{"name":"Zero"}}]}}},
-   {"name":"Start Intake 2", "from":{"target":5, "targetTimestamp":6.97076, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}}]
+   {"name":"Start Intake 2", "from":{"target":5, "targetTimestamp":6.97076, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
+   {"name":"Shoot 2", "from":{"target":10, "targetTimestamp":13.41268, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":{"type":"named", "data":{"name":"Raise Shoot Until"}}}]
 }
