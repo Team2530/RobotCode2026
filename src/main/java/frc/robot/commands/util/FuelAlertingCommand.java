@@ -21,7 +21,7 @@ public class FuelAlertingCommand extends Command {
     public void execute() {
         double rumbleStrength = indexerSubsystem.getFuelState()
                 == IndexerFuelState.FUELED
-            ? 0.5
+            ? 1
             : 0;
 
         controller.setRumble(
