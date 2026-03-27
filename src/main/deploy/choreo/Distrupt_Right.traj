@@ -239,9 +239,9 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Start Intake", "from":{"target":4, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
-   {"name":"Shoot", "from":{"target":7, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Raise Shoot Until"}}},
-   {"name":"Zero", "from":{"target":0, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
+   {"name":"Start Intake", "from":{"target":4, "targetTimestamp":3.60712, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
+   {"name":"Shoot", "from":{"target":7, "targetTimestamp":7.23369, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":{"type":"named", "data":{"name":"Raise Shoot Until"}}},
+   {"name":"Zero", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
        {"type":"named", "data":{"name":"Zero"}},
        {"type":"named", "data":{"name":"Hub"}}]}}}]
 }
