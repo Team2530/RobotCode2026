@@ -84,7 +84,7 @@ public class Limelight extends SubsystemBase {
     
         LimelightHelpers.SetIMUAssistAlpha(
             id, 
-            0.02
+            0.03
         );
     }
 
