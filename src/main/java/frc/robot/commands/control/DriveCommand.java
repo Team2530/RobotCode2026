@@ -1,4 +1,6 @@
-package frc.robot.commands;
+package frc.robot.commands.control;
+
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.MathUtil;
@@ -9,7 +11,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.DriveConstants.ControlConstants;
+import frc.robot.Constants.MetaConstants;
 
 public class DriveCommand extends Command {
 
@@ -20,7 +22,8 @@ public class DriveCommand extends Command {
 
     /** Limit the speed of change */
     private SlewRateLimiter driveMultiplierSlewLimiter = new SlewRateLimiter(
-            ControlConstants.DRIVE_MULTIPLIER_SLEW_RATE);
+            DriveConstants.Control.MULTIPLIER_SLEW_RATE.in(Percent.per(Seconds))
+        );
 
     public DriveCommand(
             SwerveSubsystem subsystem,
@@ -31,9 +34,12 @@ public class DriveCommand extends Command {
         this.driverXbox = driverXbox;
 
         driveMultiplierSlewLimiter.reset(
-                ControlConstants.TURTLE_DRIVE_MULT);
+                DriveConstants.Control.TURTLE_DRIVE_MULT.in(Value)
+        );
 
-        headingOffset = 0;
+        headingOffset = MetaConstants.isRed.getAsBoolean()
+            ? Math.PI
+            : 0;
     }
 
     @Override
@@ -50,11 +56,11 @@ public class DriveCommand extends Command {
             // controller) corresponds to a negative value
             double rawX = MathUtil.applyDeadband(
                 -driverXbox.getLeftY(),
-                ControlConstants.Deadband.X
+                DriveConstants.Control.Deadband.X
             );
             double rawY = MathUtil.applyDeadband(
                 -driverXbox.getLeftX(),
-                ControlConstants.Deadband.Y
+                DriveConstants.Control.Deadband.Y
             );
 
             // to yagsl, a positive rotation value corresponds to a ccw 
@@ -63,29 +69,47 @@ public class DriveCommand extends Command {
             double y = (rawX * Math.sin(headingOffset)) + (rawY * Math.cos(headingOffset));
             double z = MathUtil.applyDeadband(
                     -driverXbox.getRightX(),
-                    ControlConstants.Deadband.Z);
+                    DriveConstants.Control.Deadband.Z);
 
 
             // trigger-base slow / fast mode
-            double driveMultiplier = driveMultiplierSlewLimiter
-                    .calculate((ControlConstants.REGULAR_DRIVE_MULT - ControlConstants.TURTLE_DRIVE_MULT)
-                            * driverXbox.getRightTriggerAxis() + ControlConstants.TURTLE_DRIVE_MULT);
+            double driveMultiplier;
+            if (driverXbox.getLeftTriggerAxis() > 0.1) {
+                driveMultiplier = (
+                            DriveConstants.Control.TURTLE_DRIVE_MULT
+                            .minus(DriveConstants.Control.ROCK_DRIVE_MULT)
+                        ).times(
+                            Value.of(1 - driverXbox.getLeftTriggerAxis())
+                        ).plus(DriveConstants.Control.ROCK_DRIVE_MULT)
+                        .in(Value);
+                z *= DriveConstants.Control.TURTLE_DRIVE_MULT.in(Value);
+            } else {
+                driveMultiplier = driveMultiplierSlewLimiter.calculate(
+                        (
+                            DriveConstants.Control.REGULAR_DRIVE_MULT
+                            .minus(DriveConstants.Control.TURTLE_DRIVE_MULT)
+                        ).times(
+                            Value.of(driverXbox.getRightTriggerAxis())
+                        ).plus(DriveConstants.Control.TURTLE_DRIVE_MULT)
+                        .in(Value)
+                    );
+                z *= driveMultiplier;
+            }
 
             x *= driveMultiplier;
             y *= driveMultiplier;
-            z *= driveMultiplier;
 
             // convert to m / s
-            x *= DriveConstants.MAX_ROBOT_VELOCITY;
-            y *= DriveConstants.MAX_ROBOT_VELOCITY;
-            z *= DriveConstants.MAX_ROBOT_RAD_VELOCITY;
+            x *= DriveConstants.MAX_ROBOT_VELOCITY.in(MetersPerSecond);
+            y *= DriveConstants.MAX_ROBOT_VELOCITY.in(MetersPerSecond);
+            z *= DriveConstants.MAX_ROBOT_RAD_VELOCITY.in(RadiansPerSecond);
 
             // send em off
             subsystem.drive(
                     new Translation2d(x, y),
                     z);
             SmartDashboard.putNumber(
-                    "Swerve/DriveCommand/drive_multiplier",
+                    "swerve/DriveCommand/drive_multiplier",
                     driveMultiplier);
         }
     }

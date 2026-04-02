@@ -1,4 +1,6 @@
-package frc.robot.commands;
+package frc.robot.commands.control;
+
+import static edu.wpi.first.units.Units.*;
 
 import frc.robot.subsystems.LoaderSubsystem;
 
@@ -46,10 +48,10 @@ public class RunLoaderCommand extends Command {
     public void execute() {
         if (conditional.getAsBoolean()) {
             if (m_Reversed){
-                loaderSubsystem.runVelocity(-100);
+                loaderSubsystem.run(Percent.of(100));
             }
             else{
-                loaderSubsystem.runVelocity(100);
+                loaderSubsystem.run(Percent.of(-100));
             }
         } else {
             loaderSubsystem.stop();

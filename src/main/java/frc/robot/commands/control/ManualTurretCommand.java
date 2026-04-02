@@ -1,9 +1,16 @@
-package frc.robot.commands;
+package frc.robot.commands.control;
 
+import static edu.wpi.first.units.Units.*;
+
+import frc.robot.Constants.MetaConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.TurretSubsystem;
+
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -13,8 +20,8 @@ public class ManualTurretCommand extends Command {
     private final SwerveSubsystem m_SwerveSubsystem;
     private final XboxController operatorXbox;
 
-    private double targetVelocity;
-    private double targetYaw;
+    private AngularVelocity targetVelocity;
+    private Angle targetYaw;
 
     private boolean analogClick;
 
@@ -27,8 +34,8 @@ public class ManualTurretCommand extends Command {
         m_SwerveSubsystem = SwerveSubsystem;
         this.operatorXbox = operatorXbox;
     
-        this.targetVelocity = 40;
-        this.targetYaw = 0;
+        this.targetVelocity = RotationsPerSecond.of(40);
+        this.targetYaw = Degrees.of(0);
 
         addRequirements(LauncherSubsystem);
 
@@ -54,7 +61,7 @@ public class ManualTurretCommand extends Command {
 
             ) > 0.2
         ) {
-            targetYaw = Units.radiansToDegrees(
+            targetYaw = Radians.of(
                 (
                     (3 * Math.PI) 
                     + Math.atan2(
@@ -62,6 +69,10 @@ public class ManualTurretCommand extends Command {
                         operatorXbox.getLeftY()
                     ) 
                     - m_SwerveSubsystem.getRotation().getRadians()
+                    + (MetaConstants.isRed.getAsBoolean()
+                        ? Math.PI
+                        : 0
+                    )
                 ) % (2 * Math.PI)
             );
         }
@@ -69,7 +80,11 @@ public class ManualTurretCommand extends Command {
         if (operatorXbox.getRightY() > 0.2 || operatorXbox.getRightY() < -0.2) {
             if (!analogClick) {
                 analogClick = true;
-                changeVelocity(-Math.signum(operatorXbox.getRightY()));
+                changeVelocity(
+                    RotationsPerSecond.of(
+                        -Math.signum(operatorXbox.getRightY())
+                    )
+                );
             }            
         } else {
             analogClick = false;
@@ -96,19 +111,25 @@ public class ManualTurretCommand extends Command {
     }
 
     public void increaseVelocity() {
-        changeVelocity(1);        
+        changeVelocity(
+            RotationsPerSecond.of(1)
+        );        
     }
 
     public void decreaseVelocity() { //Dpad velocity decrease step
-        changeVelocity(-1);        
+        changeVelocity(
+            RotationsPerSecond.of(-1)
+        );        
     }
 
-    public void changeVelocity(double amount) {
-        targetVelocity = MathUtil.clamp(
-            targetVelocity + amount,
-            TurretConstants.Launcher.MINIMUM_VELOCITY,
-            TurretConstants.Launcher.MAXIMUM_VELOCITY
-        );
+    public void changeVelocity(AngularVelocity amount) {
+        targetVelocity = RotationsPerSecond.of(
+                MathUtil.clamp(
+                    targetVelocity.plus(amount).in(RotationsPerSecond),
+                    TurretConstants.Launcher.MINIMUM_VELOCITY.in(RotationsPerSecond),
+                    TurretConstants.Launcher.MAXIMUM_VELOCITY.in(RotationsPerSecond)
+                )
+            );
     }
 }
 

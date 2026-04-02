@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.control;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -26,7 +26,7 @@ public class IntakeCommand extends Command {
         this(
             subsystem,
             preset,
-            subsystem.getPreset()
+            IntakePreset.OUT
         );
     }
     
@@ -49,5 +49,10 @@ public class IntakeCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         subsystem.setPreset(onEnd);
+    }
+
+    @Override 
+    public boolean isFinished() {
+        return false;
     }
 }

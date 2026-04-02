@@ -4,7 +4,6 @@ import org.littletonrobotics.urcl.URCL;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
-import frc.robot.util.LimelightContainer;
 import edu.wpi.first.epilogue.EpilogueConfiguration;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.Constants.MetaConstants;
 import frc.robot.util.Elastic;
 /*
  * The VM is configured to automatically run this class, and to call the
@@ -65,7 +64,7 @@ public class Robot extends TimedRobot {
     SignalLogger.start();
 
     // URCL (REV) Logging
-    if (Constants.CommonConstants.LOG_TO_NETWORKTABLES) {
+    if (MetaConstants.Logging.LOG_TO_NETWORKTABLES) {
       URCL.start();
     } else {
       URCL.start(DataLogManager.getLog());
@@ -96,6 +95,8 @@ public class Robot extends TimedRobot {
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     Elastic.selectTab("Autonomous");
+
+    RobotContainer.LLContainer.setIMUMode(1);
   }
 
   /**
@@ -120,9 +121,6 @@ public class Robot extends TimedRobot {
 
     loopPub.set(loopTime);
     csTimePublisher.set(commandSchedulerTime);
-
-    
-
   }
 
 
@@ -173,14 +171,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    RobotContainer.LLContainer.snapToVision(m_robotContainer.swerveDriveSubsystem);
+    RobotContainer.LLContainer.snapToVision(RobotContainer.swerveDriveSubsystem);
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
     Elastic.selectTab("Debug");
-    CommandScheduler.getInstance().schedule(
-      RobotContainer.turretSubsystem.zeroYawCommand()
-    );
   }
 
   /** This function is called periodically during test mode. */

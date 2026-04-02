@@ -1,12 +1,18 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.LimelightHelpers.RawFiducial;
@@ -36,18 +42,50 @@ public class Limelight extends SubsystemBase {
     }
 
     private final LimelightType limelightType;
-    private final String name;
+    private final String id;
     private boolean isEnabled;
     private boolean cropEnabled;
     private double lastPoseEstimate = 0;
     private int counter = 0;
     private double lastFrame = 0;
+    private StructPublisher<Pose2d> posePublisher;
 
-    public Limelight(LimelightType limelightType, String name, boolean isEnabled, boolean cropEnabled) {
+    public Limelight(
+        LimelightType limelightType, 
+        String id, 
+        boolean isEnabled, 
+        boolean cropEnabled,
+        Pose3d pose
+    ) {
         this.limelightType = limelightType;
-        this.name = name;
+        this.id = id;
         this.isEnabled = isEnabled;
         this.cropEnabled = cropEnabled;
+
+        posePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("SmartDashboard/Odometry/" + getID() + "/pose", Pose2d.struct)
+            .publish();
+
+        LimelightHelpers.setCameraPose_RobotSpace(
+            id,
+            pose.getX(),
+            pose.getY(),
+            pose.getZ(),
+            Units.radiansToDegrees(
+                pose.getRotation().getX()
+            ),
+            Units.radiansToDegrees(
+                pose.getRotation().getY()
+            ),
+            Units.radiansToDegrees(
+                pose.getRotation().getZ()
+            )
+        );
+    
+        LimelightHelpers.SetIMUAssistAlpha(
+            id, 
+            0.03
+        );
     }
 
     @Override
@@ -61,14 +99,28 @@ public class Limelight extends SubsystemBase {
                 }
             }
         }
+
+        if (
+            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                .abs(DegreesPerSecond)
+            > 2 
+        ) {
+            RobotContainer.LLContainer.setIMUMode(4);
+        } else {
+            RobotContainer.LLContainer.setIMUMode(3);
+        }
+    }
+
+    public void publish(Pose2d pose) {
+        posePublisher.set(pose);
     }
 
     public int numTargets() {
-        return LimelightHelpers.getRawFiducials(name).length;
+        return LimelightHelpers.getRawFiducials(id).length;
     }
 
     public void smartCrop() {
-        LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+        LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(id);
 
         if(poseEstimate == null) {
             return;
@@ -82,7 +134,7 @@ public class Limelight extends SubsystemBase {
             }
             
             lastPoseEstimate = poseEstimate.timestampSeconds; //making sure we're only running this process on new frames
-            RawFiducial[] targets = LimelightHelpers.getRawFiducials(name); //get our targets
+            RawFiducial[] targets = LimelightHelpers.getRawFiducials(id); //get our targets
             boolean useCrop = true; //we are currently using it, more changes will be implemented
             Translation2d[] targetTranslations = new Translation2d[targets.length]; 
             double area = 0;
@@ -145,17 +197,17 @@ public class Limelight extends SubsystemBase {
             double ylim2 = (yc - bordery > 1) ? 1 : xc + borderx;
 
             if (useCrop) {
-                LimelightHelpers.setCropWindow(name, xlim, xlim2, ylim, ylim2);
+                LimelightHelpers.setCropWindow(id, xlim, xlim2, ylim, ylim2);
                 // Finds the center of the targets, tries to build a big enough box from there
             }
         }
     }
     
     public void restoreCrop() {
-        LimelightHelpers.setCropWindow(name, -1, 1, -1, 1);
+        LimelightHelpers.setCropWindow(id, -1, 1, -1, 1);
     }
 
-    public void setIMUMode(int mode) {LimelightHelpers.SetIMUMode(name, mode);}
+    public void setIMUMode(int mode) {LimelightHelpers.SetIMUMode(id, mode);}
 
     public void setEnabled(boolean enabled) {this.isEnabled = enabled;}
     public void setCropEnabled(boolean enabled) {this.cropEnabled = enabled;}
@@ -170,10 +222,10 @@ public class Limelight extends SubsystemBase {
 
     @Override
     public String toString() {
-        return this.name;
+        return this.id;
     }
 
     public String getID() {
-        return this.name;
+        return this.id;
     }
 }
