@@ -266,7 +266,9 @@ public class TurretSubsystem extends SubsystemBase {
                     toTarget = targetPosition.getTranslation();
                     break;
             }
-
+            Angle setYaw;
+            AngularVelocity setVelocity;
+            
             if (targetingMode != TargetingMode.MANUAL) {
                 /*
                  * ok so basically:
@@ -289,137 +291,165 @@ public class TurretSubsystem extends SubsystemBase {
                  *      accounted for
                  * 3. presumably, the robot is flat on the ground
                  */
-                Distance groundDistance = Meters.of(
-                        toTarget.toTranslation2d().getNorm()
-                );
-                Angle totalYaw = Radians.of(
-                    Math.atan2(
-                        toTarget.getY(),
-                        toTarget.getX()
-                    )
-                );
-                // this is absolutely not how you use the units classes but i
-                // didn't keep track of the original units in the equation
-                LinearVelocity totalVelocity = (
-                        groundDistance
-                        .div(
-                            Math.cos(
-                                TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)
-                            )
-                        ).div(
-                            Seconds.of(
-                                Math.sqrt(
-                                    (
+
+                /*
+                 * 1. compute the total velocity vector is would take for a fuel 
+                 * to score from the position of our launcher
+                 *      a. obviously, for the total velocity vector, the
+                 *      direction in the xy plane is straight line to the
+                 *      target.
+                 *      b. and given that, to calculate speed, we can assume
+                 *      that the fuel travels in a 2d plane that contains both
+                 *      the starting point and the target.
+                 * 2. Using the time it takes for the fuel to reach the hub,
+                 *   calculate the position of the robot at that time, and adjust the
+                 *     target differnet to account for the movement of the robot during the fuel's flight.
+                */
+
+
+
+                for(int i=0; i<1; i++) {
+                    Distance groundDistance = Meters.of(
+                            toTarget.toTranslation2d().getNorm()
+                    );
+                    Angle totalYaw = Radians.of(
+                        Math.atan2(
+                            toTarget.getY(),
+                            toTarget.getX()
+                        )
+                    );
+                    // this is absolutely not how you use the units classes but i
+                    // didn't keep track of the original units in the equation
+
+                    Time timeOfFlight = Seconds.of(
+                                    Math.sqrt(
                                         (
                                             (
-                                                groundDistance.in(Meters)
-                                                * Math.tan(
-                                                        TurretConstants.Pitch
-                                                        .ANGLE_CONSTANT.in(Radians)
-                                                )
-                                            ) - toTarget.getZ()
-                                        ) * (
-                                            2
-                                            / MetaConstants.Field.GRAVITY
-                                                .in(MetersPerSecondPerSecond)
+                                                (
+                                                    groundDistance.in(Meters)
+                                                    * Math.tan(
+                                                            TurretConstants.Pitch
+                                                            .ANGLE_CONSTANT.in(Radians)
+                                                    )
+                                                ) - toTarget.getZ()
+                                            ) * (
+                                                2
+                                                / MetaConstants.Field.GRAVITY
+                                                    .in(MetersPerSecondPerSecond)
+                                            )
                                         )
                                     )
+                                );
+                    
+                    LinearVelocity totalVelocity = (
+                            groundDistance
+                            .div(
+                                Math.cos(
+                                    TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)
                                 )
+                            ).div(
+                                timeOfFlight
                             )
-                        )
-                    );
-                LinearVelocity exitVelocityX = (
-                        totalVelocity
-                        .times(Math.cos(totalYaw.in(Radians)))
-                    ).plus(getLauncherPositionalVelocityX());
-                LinearVelocity exitVelocityY = (
-                        totalVelocity
-                        .times(Math.sin(totalYaw.in(Radians)))
-                    ).plus(getLauncherPositionalVelocityY());
+                        );
+                    LinearVelocity exitVelocityX = (
+                            totalVelocity
+                            .times(Math.cos(totalYaw.in(Radians)))
+                        ).plus(getLauncherPositionalVelocityX());
+                    LinearVelocity exitVelocityY = (
+                            totalVelocity
+                            .times(Math.sin(totalYaw.in(Radians)))
+                        ).plus(getLauncherPositionalVelocityY());
 
-                targetYaw = Radians.of(
-                    (
-                        (2 * Math.PI)
-                        + Math.atan2(
-                            exitVelocityY.in(MetersPerSecond),
-                            exitVelocityX.in(MetersPerSecond)
-                        )
-                    ) % (2 * Math.PI)
-                );
-                LinearVelocity targetExitVelocity = MetersPerSecond.of(
-                        Math.sqrt(
-                            Math.pow(exitVelocityX.in(MetersPerSecond), 2)
-                            + Math.pow(exitVelocityY.in(MetersPerSecond), 2)
+                    targetYaw = Radians.of(
+                        (
+                            (2 * Math.PI)
+                            + Math.atan2(
+                                exitVelocityY.in(MetersPerSecond),
+                                exitVelocityX.in(MetersPerSecond)
+                            )
+                        ) % (2 * Math.PI)
+                    );
+                    LinearVelocity targetExitVelocity = MetersPerSecond.of(
+                            Math.sqrt(
+                                Math.pow(exitVelocityX.in(MetersPerSecond), 2)
+                                + Math.pow(exitVelocityY.in(MetersPerSecond), 2)
+                            )
+                        );
+                    targetVelocity = calculateExitToLauncherVelocity(
+                            targetExitVelocity
+                        );
+                    TotalVelocityPublisher.set(
+                        new Pose3d(
+                            new Translation3d(
+                                totalVelocity.in(MetersPerSecond) 
+                                    * Math.cos(totalYaw.in(Radians))
+                                    * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
+                                totalVelocity.in(MetersPerSecond) 
+                                    * Math.sin(totalYaw.in(Radians))
+                                    * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
+                                totalVelocity.in(MetersPerSecond) 
+                                    * Math.sin(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians))
+                            ),
+                            new Rotation3d()
                         )
                     );
-                targetVelocity = calculateExitToLauncherVelocity(
-                        targetExitVelocity
+                    LauncherExitVelocityPublisher.set(
+                        new Pose3d(
+                            new Translation3d(
+                                targetExitVelocity.in(MetersPerSecond) 
+                                    * Math.cos(targetYaw.in(Radians))
+                                    * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
+                                targetExitVelocity.in(MetersPerSecond) 
+                                    * Math.sin(targetYaw.in(Radians))
+                                    * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
+                                targetExitVelocity.in(MetersPerSecond) 
+                                    * Math.sin(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians))
+                            ),
+                            new Rotation3d()
+                        )
                     );
-                TotalVelocityPublisher.set(
-                    new Pose3d(
-                        new Translation3d(
-                            totalVelocity.in(MetersPerSecond) 
-                                * Math.cos(totalYaw.in(Radians))
-                                * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
-                            totalVelocity.in(MetersPerSecond) 
-                                * Math.sin(totalYaw.in(Radians))
-                                * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
-                            totalVelocity.in(MetersPerSecond) 
-                                * Math.sin(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians))
-                        ),
-                        new Rotation3d()
-                    )
-                );
-                LauncherExitVelocityPublisher.set(
-                    new Pose3d(
-                        new Translation3d(
-                            targetExitVelocity.in(MetersPerSecond) 
-                                * Math.cos(targetYaw.in(Radians))
-                                * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
-                            targetExitVelocity.in(MetersPerSecond) 
-                                * Math.sin(targetYaw.in(Radians))
-                                * Math.cos(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians)),
-                            targetExitVelocity.in(MetersPerSecond) 
-                                * Math.sin(TurretConstants.Pitch.ANGLE_CONSTANT.in(Radians))
-                        ),
-                        new Rotation3d()
-                    )
-                );
+                }
+
+
+
+                atVelocity = (
+                        getLauncherVelocity()
+                        .minus(targetVelocity)
+                    ).abs(RotationsPerSecond)
+                    < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR
+                        .in(RotationsPerSecond);
+                atSolution = (
+                        getYaw()
+                        .minus(targetYaw)   
+                    ).abs(Degrees)
+                    < TurretConstants.Yaw.MAXIMUM_ANGLE_ERROR
+                        .in(Degrees);
+                // TODO: this
+                hasSolution = true; 
+
+                /** targetVelocity Clamped in Rot/s */
+                setVelocity = RotationsPerSecond.of(
+                        MathUtil.clamp(
+                            targetVelocity.in(RotationsPerSecond),
+                            TurretConstants.Launcher.MINIMUM_VELOCITY.in(RotationsPerSecond),
+                            TurretConstants.Launcher.MAXIMUM_VELOCITY.in(RotationsPerSecond)
+                        )
+                    );
+                setYaw = Rotations.of(
+                        MathUtil.clamp(
+                            targetYaw.in(Rotations),
+                            TurretConstants.Yaw.ANGLE_MIN.in(Rotations),
+                            TurretConstants.Yaw.ANGLE_MAX.in(Rotations)
+                        )
+                    );
+
+                // Calculate new position of the Robot in however 
+                // long it takes for the fuel to reach the hub.
+                toTarget = targetPosition
+                    .minus(getLauncherPosition())
+                    .getTranslation();
+
             }
-
-            Angle setYaw;
-            AngularVelocity setVelocity;
-
-            atVelocity = (
-                    getLauncherVelocity()
-                    .minus(targetVelocity)
-                ).abs(RotationsPerSecond)
-                < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR
-                    .in(RotationsPerSecond);
-            atSolution = (
-                    getYaw()
-                    .minus(targetYaw)   
-                ).abs(Degrees)
-                < TurretConstants.Yaw.MAXIMUM_ANGLE_ERROR
-                    .in(Degrees);
-            // TODO: this
-            hasSolution = true; 
-
-            /** targetVelocity Clamped in Rot/s */
-            setVelocity = RotationsPerSecond.of(
-                    MathUtil.clamp(
-                        targetVelocity.in(RotationsPerSecond),
-                        TurretConstants.Launcher.MINIMUM_VELOCITY.in(RotationsPerSecond),
-                        TurretConstants.Launcher.MAXIMUM_VELOCITY.in(RotationsPerSecond)
-                    )
-                );
-            setYaw = Rotations.of(
-                    MathUtil.clamp(
-                        targetYaw.in(Rotations),
-                        TurretConstants.Yaw.ANGLE_MIN.in(Rotations),
-                        TurretConstants.Yaw.ANGLE_MAX.in(Rotations)
-                    )
-                );
 
             m_LauncherPortMotor.setControl(
                 new VelocityTorqueCurrentFOC(setVelocity)
@@ -762,6 +792,35 @@ public class TurretSubsystem extends SubsystemBase {
         );
     }
 
+    public Pose3d getLauncherPositionAfterTime(Time time) {
+
+        double dx =
+            RobotContainer.swerveDriveSubsystem.getXVelocity().in(MetersPerSecond)
+            * time.in(Seconds);
+
+        double dy =
+            RobotContainer.swerveDriveSubsystem.getYVelocity().in(MetersPerSecond)
+            * time.in(Seconds);
+
+        return new Pose3d(
+            RobotContainer.swerveDriveSubsystem.getPose()
+        ).plus(
+            new Transform3d(
+                TurretConstants.Offsets.TRANSLATION.rotateBy(
+                    new Rotation3d(
+                        RobotContainer.swerveDriveSubsystem.getRotation())
+                ),
+                new Rotation3d()
+            )
+        ).plus(
+        new Transform3d(
+            dx
+            ,dy
+            ,0
+            ,new Rotation3d(0,0,0))
+        );
+    }
+
     public void setTargetVelocity(AngularVelocity target) {
         targetVelocity = target;
     }
@@ -802,4 +861,5 @@ public class TurretSubsystem extends SubsystemBase {
     public boolean hasSolution() {
         return hasSolution;
     }
+
 }
