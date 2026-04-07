@@ -266,8 +266,8 @@ public class TurretSubsystem extends SubsystemBase {
                     toTarget = targetPosition.getTranslation();
                     break;
             }
-            Angle setYaw;
-            AngularVelocity setVelocity;
+            Angle setYaw = getYaw();
+            AngularVelocity setVelocity = RadiansPerSecond.of(0);
             
             if (targetingMode != TargetingMode.MANUAL) {
                 /*
@@ -306,8 +306,7 @@ public class TurretSubsystem extends SubsystemBase {
                  *     target differnet to account for the movement of the robot during the fuel's flight.
                 */
 
-
-
+                // TODO: What is this for loop for, and could we remove it for readability
                 for(int i=0; i<1; i++) {
                     Distance groundDistance = Meters.of(
                             toTarget.toTranslation2d().getNorm()
