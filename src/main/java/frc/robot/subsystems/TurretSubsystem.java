@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -307,7 +308,7 @@ public class TurretSubsystem extends SubsystemBase {
                 */
 
                 // TODO: What is this for loop for, and could we remove it for readability
-                for(int i=0; i<1; i++) {
+                for(int i=0; i<4; i++) {
                     Distance groundDistance = Meters.of(
                             toTarget.toTranslation2d().getNorm()
                     );
@@ -339,6 +340,19 @@ public class TurretSubsystem extends SubsystemBase {
                                         )
                                     )
                                 );
+
+                                Translation2d robotVelocity = new Translation2d(
+                                    getLauncherPositionalVelocityX().in(MetersPerSecond),
+                                    getLauncherPositionalVelocityY().in(MetersPerSecond)
+                                );
+
+                                // shifts hub based on velocity
+                                Translation2d adjustedTarget = toTarget.toTranslation2d()
+                                    .minus(robotVelocity.times(timeOfFlight.in(Seconds)));
+                                // recomputes it
+                                targetYaw = Radians.of(
+                                    Math.atan2(adjustedTarget.getY(), adjustedTarget.getX())
+                                );                                                                                              
                     
                     LinearVelocity totalVelocity = (
                             groundDistance
