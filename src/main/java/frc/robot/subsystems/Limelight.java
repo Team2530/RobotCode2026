@@ -81,11 +81,6 @@ public class Limelight extends SubsystemBase {
                 pose.getRotation().getZ()
             )
         );
-    
-        LimelightHelpers.SetIMUAssistAlpha(
-            id, 
-            0.03
-        );
     }
 
     @Override
@@ -105,9 +100,12 @@ public class Limelight extends SubsystemBase {
                 .abs(DegreesPerSecond)
             > 2 
         ) {
-            RobotContainer.LLContainer.setIMUMode(4);
+            RobotContainer.LLContainer.setIMUMode(1);
+            LimelightHelpers.SetIMUAssistAlpha(id, 0.1);
+            
         } else {
             RobotContainer.LLContainer.setIMUMode(3);
+            LimelightHelpers.SetIMUAssistAlpha(id, 0.03);
         }
     }
 
