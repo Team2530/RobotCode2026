@@ -58,7 +58,11 @@ public class Robot extends TimedRobot {
   public Robot() {
 
 
-    DataLogManager.start();
+    DataLogManager.start(
+      "",
+      "",
+      0.1
+    );
     DriverStation.startDataLog(DataLogManager.getLog());
 
     // Pheonix 6 Signal Logging
