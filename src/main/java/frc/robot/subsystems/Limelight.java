@@ -100,8 +100,8 @@ public class Limelight extends SubsystemBase {
                 .abs(DegreesPerSecond)
             > 2 
         ) {
-            RobotContainer.LLContainer.setIMUMode(1);
-            LimelightHelpers.SetIMUAssistAlpha(id, 0.1);
+            RobotContainer.LLContainer.setIMUMode(4);
+            LimelightHelpers.SetIMUAssistAlpha(id, 0.01);
             
         } else {
             RobotContainer.LLContainer.setIMUMode(3);

@@ -247,7 +247,7 @@ public final class Constants {
             public static final Dimensionless TURTLE_DRIVE_MULT =
                 Percent.of(25);
             public static final Dimensionless ROCK_DRIVE_MULT =
-                Percent.of(10);
+                Percent.of(15);
             public static final Frequency MULTIPLIER_SLEW_RATE =
                 Percent
                 .of(25)
@@ -512,9 +512,9 @@ public final class Constants {
             }
 
             public static final class PID {
-                public static final double P = 80;
+                public static final double P = 90;
                 public static final double I = 0.40;
-                public static final double D = 0.1;
+                public static final double D = 0.12;
             }
 
             public static final class Feedforward {

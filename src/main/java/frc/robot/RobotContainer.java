@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MetaConstants;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.Constants.MetaConstants.Game.Timing.ShiftType;
 import frc.robot.commands.control.DriveCommand;
 import frc.robot.commands.control.IntakeCommand;
 import frc.robot.commands.control.ManualTurretCommand;
@@ -111,7 +112,7 @@ public class RobotContainer {
                 new Rotation3d(
                     Degrees.of(0),
                     Degrees.of(-14.30),
-                    Degrees.of(-38)
+                    Degrees.of(-52)
                 )
             )
         );
@@ -158,9 +159,8 @@ public class RobotContainer {
         new BooleanSupplier() {
             @Override
                 public boolean getAsBoolean() {
-                        return (
-                            operatorXbox.getHID().getRightTriggerAxis() > 0.2
-                        );
+                        return operatorXbox.getHID().getRightTriggerAxis() > 0.2
+                            || MetaConstants.Game.Timing.getCurrentShift() == ShiftType.AUTONOMOUS;
                     }
                 }
     );
