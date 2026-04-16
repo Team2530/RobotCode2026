@@ -154,7 +154,16 @@ public class RobotContainer {
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     public static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    public static final TurretSubsystem turretSubsystem = new TurretSubsystem();
+    public static final TurretSubsystem turretSubsystem = new TurretSubsystem(
+        new BooleanSupplier() {
+            @Override
+                public boolean getAsBoolean() {
+                        return (
+                            operatorXbox.getHID().getRightTriggerAxis() > 0.2
+                        );
+                    }
+                }
+    );
 
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.

@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -129,7 +131,10 @@ public class TurretSubsystem extends SubsystemBase {
     // debug
     private final SendableChooser<Boolean> forceEnableFiringChooser;
 
-    public TurretSubsystem() {
+    // actively shooting
+    private BooleanSupplier activeShooting;
+
+    public TurretSubsystem(BooleanSupplier Shooting) {
         // Initialize Motors and Encoders
         m_LauncherPortMotor = new TalonFX(
             TurretConstants.CANIDs.Launcher.PORT
@@ -140,6 +145,8 @@ public class TurretSubsystem extends SubsystemBase {
         m_YawMotor = new TalonFX(
             TurretConstants.CANIDs.YAW
         );
+
+        activeShooting = Shooting;
 
         // the output values are directly copied from the leader (`port`) and
         // replicated by the follower (`starboard`), thus we shouldn't have to
@@ -407,12 +414,17 @@ public class TurretSubsystem extends SubsystemBase {
 
             /** targetVelocity Clamped in Rot/s */
             setVelocity = RotationsPerSecond.of(
-                    MathUtil.clamp(
-                        targetVelocity.in(RotationsPerSecond),
-                        TurretConstants.Launcher.MINIMUM_VELOCITY.in(RotationsPerSecond),
-                        TurretConstants.Launcher.MAXIMUM_VELOCITY.in(RotationsPerSecond)
-                    )
-                );
+                MathUtil.clamp(
+                    targetVelocity.in(RotationsPerSecond),
+                    TurretConstants.Launcher.MINIMUM_VELOCITY.in(RotationsPerSecond),
+                    TurretConstants.Launcher.MAXIMUM_VELOCITY.in(RotationsPerSecond)
+                )
+            );
+
+
+
+                
+            
             setYaw = Rotations.of(
                     MathUtil.clamp(
                         targetYaw.in(Rotations),
@@ -421,10 +433,23 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 );
 
-            m_LauncherPortMotor.setControl(
-                new VelocityTorqueCurrentFOC(setVelocity)
-                    .withUpdateFreqHz(1000)
-            );
+            if(activeShooting.getAsBoolean()) {
+                m_LauncherPortMotor.setControl(
+                    new VelocityTorqueCurrentFOC(setVelocity)
+                        .withUpdateFreqHz(1000)
+                );
+                m_LauncherStarboardMotor.setControl(
+                    new Follower(
+                        TurretConstants.CANIDs.Launcher.PORT,
+                        MotorAlignmentValue.Opposed
+                    )
+                );
+                }
+            else {
+                m_LauncherPortMotor.stopMotor();
+                m_LauncherStarboardMotor.stopMotor();
+            }
+
 
             m_YawMotor.setControl(
                     new MotionMagicExpoTorqueCurrentFOC(
@@ -802,4 +827,5 @@ public class TurretSubsystem extends SubsystemBase {
     public boolean hasSolution() {
         return hasSolution;
     }
+
 }
