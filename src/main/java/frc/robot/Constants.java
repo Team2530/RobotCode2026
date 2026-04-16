@@ -109,6 +109,11 @@ public final class Constants {
                     );
 
                     if (
+                        DriverStation.getMatchTime() 
+                        > SHIFT_TIMINGS[SHIFT_TIMINGS.length - 1].in(Seconds)
+                    ) {
+                        return ShiftType.AUTONOMOUS;
+                    } else if (
                         TELEOP_LENGTH.minus(currentTime)
                         .lt(SHIFT_TIMINGS[0])
                     ) {
