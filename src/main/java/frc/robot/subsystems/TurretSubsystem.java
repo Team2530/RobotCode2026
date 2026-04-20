@@ -516,6 +516,10 @@ public class TurretSubsystem extends SubsystemBase {
             "Turret/Launcher/current",
             getLauncherCurrent()
         );
+        SmartDashboard.putBoolean(
+            "Turret/Launcher/spooling",
+            spoolingLauncher.get()
+        );
 
         // yaw
         SmartDashboard.putNumber(
