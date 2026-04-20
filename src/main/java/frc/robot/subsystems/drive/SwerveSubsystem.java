@@ -11,6 +11,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,6 +37,7 @@ import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.ChoreoConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.limelight.Reading;
+import static frc.robot.util.LimelightHelpers.PoseEstimate;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -391,7 +393,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
             if (
                 estimate.tagCount >= 2
-                && swerve.getAngularVelocity()
+                && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                     .lt(
                         RadiansPerSecond.of(Math.PI / 2)
                     )
@@ -431,6 +433,27 @@ public class SwerveSubsystem extends SubsystemBase {
     public void snapToVision() {
         ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
             .getMT1Readings();
+        
+        for (Reading reading : mt1Readings) {
+            PoseEstimate estimate = reading.getEstimate();
+            if (
+                estimate.tagCount > 0
+                && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                    .lt(
+                        RadiansPerSecond.of(Math.PI)
+                    )
+            ) {
+                swerveDrive.addVisionMeasurement(
+                    estimate.pose,
+                    estimate.timestampSeconds,
+                    VecBuilder.fill(
+                        0.2,
+                        0.2,
+                        0.1
+                    )
+                );
+            }
+        }
 
     }
     

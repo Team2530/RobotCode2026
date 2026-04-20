@@ -219,14 +219,7 @@ public class RobotContainer {
                 )
             );
 
-        RobotModeTriggers.disabled()
-            .onTrue(
-                new ParallelCommandGroup(
-                    new InstantCommand(() -> {
-                        LLContainer.setIMUMode(1);
-                    })
-                )
-            );
+        RobotModeTriggers.disabled();
     }
     
 
@@ -249,14 +242,14 @@ public class RobotContainer {
         driverXbox.start()
             .onTrue(
                 new InstantCommand(() -> {
-                    LLContainer.snapToVision(swerveDriveSubsystem);
+                    swerveDriveSubsystem.snapToVision();
                     normalDrive.resetHeading();
                 })
             );
         driverXbox.leftBumper()
             .onTrue(
                 new InstantCommand(() -> {
-                    LLContainer.snapToVision(swerveDriveSubsystem);
+                    swerveDriveSubsystem.snapToVision();
                 })
             );
 
@@ -333,7 +326,7 @@ public class RobotContainer {
             .onTrue(
                     new InstantCommand(
                         () -> {
-                            LLContainer.snapToVision(swerveDriveSubsystem);
+                            swerveDriveSubsystem.snapToVision();
                         }
                     )
             );
