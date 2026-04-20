@@ -54,8 +54,8 @@ import frc.robot.commands.util.MatchtimeStatusCommand;
 import frc.robot.commands.util.ShiftAlertingCommand;
 import frc.robot.commands.util.VoltageStatusCommand;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.Limelight.LimelightType;
+import frc.robot.subsystems.limelight.LimelightSubsystem;
+import frc.robot.subsystems.limelight.Limelight;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.manipulator.IndexerSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem;
@@ -79,64 +79,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  */
 @Logged(strategy = Logged.Strategy.OPT_IN)
 public class RobotContainer {
-    // These are initating the individual Limlight(s). The name should match the limelight internal names.
-    private static final Limelight LL_FL = new Limelight(
-            LimelightType.LL4, 
-            "limelight-fl", 
-            true, 
-            false,
-            new Pose3d(
-                new Translation3d(
-                    Meters.of(-0.31513),
-                    Meters.of(-0.25669),
-                    Meters.of(0.261315)
-                ),
-                new Rotation3d(
-                    Degrees.of(-1.6),
-                    Degrees.of(-14.8),
-                    Degrees.of(55)
-                )
-            )
-        );
-    private static final Limelight LL_FR = new Limelight(
-            LimelightType.LL4, 
-            "limelight-fr", 
-            true, 
-            false,
-            new Pose3d(
-                new Translation3d(
-                    Meters.of(-0.31729),
-                    Meters.of(0.268869),
-                    Meters.of(0.408635)
-                ),
-                new Rotation3d(
-                    Degrees.of(0),
-                    Degrees.of(-14.30),
-                    Degrees.of(-52)
-                )
-            )
-        );
-    private static final Limelight LL_BL = new Limelight(
-            LimelightType.LL4, 
-            "limelight-bl", 
-            true, 
-            false,
-            new Pose3d(
-                new Translation3d(
-                    Meters.of(-0.1919),
-                    Meters.of(-0.25003),
-                    Meters.of(0.351561)
-                ),
-                new Rotation3d(
-                    Degrees.of(3.4),
-                    Degrees.of(-13),
-                    Degrees.of(160.7)
-                )
-            )
-        );
 
-    //initalizing limelight container (Group)
-    public static final LimelightContainer LLContainer = new LimelightContainer(LL_BL, LL_FL, LL_FR); // remove the turret limelight, should not be used for odometry.
     // @Logged
     public static final CommandXboxController driverXbox = new CommandXboxController(MetaConstants.Controllers.DRIVER_PORT);
     // @Logged
@@ -164,6 +107,59 @@ public class RobotContainer {
                     }
                 }
     );
+    public static final LimelightSubsystem limelightSubsystem =
+        new LimelightSubsystem(
+            // These are initating the individual Limlight(s). The name should
+            // match the limelight internal names.
+            new Limelight(
+                "limelight-fl",
+                new Pose3d(
+                    new Translation3d(
+                        Meters.of(-0.31513),
+                        Meters.of(-0.25669),
+                        Meters.of(0.261315)
+                    ),
+                    new Rotation3d(
+                        Degrees.of(-1.6),
+                        Degrees.of(-14.8),
+                        Degrees.of(55)
+                    )
+                )
+            ),
+
+            new Limelight(
+                "limelight-fr",
+                new Pose3d(
+                    new Translation3d(
+                        Meters.of(-0.31729),
+                        Meters.of(0.268869),
+                        Meters.of(0.408635)
+                        ),
+                    new Rotation3d(
+                        Degrees.of(0),
+                        Degrees.of(-14.30),
+                        Degrees.of(-52)
+                        )
+                    )
+            ),
+
+            new Limelight(
+                "limelight-bl",
+                new Pose3d(
+                    new Translation3d(
+                        Meters.of(-0.1919),
+                        Meters.of(-0.25003),
+                        Meters.of(0.351561)
+                    ),
+                    new Rotation3d(
+                        Degrees.of(3.4),
+                        Degrees.of(-13),
+                        Degrees.of(160.7)
+                    )
+                )
+            )
+        );
+
 
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
