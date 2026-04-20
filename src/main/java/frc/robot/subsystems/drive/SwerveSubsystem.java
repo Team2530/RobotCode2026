@@ -1,6 +1,8 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
+
+import java.util.ArrayList;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -32,9 +34,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.ChoreoConstants;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.util.LimelightContainer;
+import frc.robot.subsystems.limelight.Reading;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -375,18 +376,43 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-     swerveDrive.updateOdometry(); 
-        if(Robot.isSimulation()) {
-            LimelightContainer.estimateSimOdometry();
-        } else {
-            RobotContainer.LLContainer.estimateMT2Odometry(this);
-            //RobotContainer.LLContainer.estimateMT1Odometry(this);
+        // this should be called every loop
+        // [see](https://yet-another-software-suite.github.io/YAGSL/javadocs/swervelib/SwerveDrive.html#updateOdometry())
+        swerveDrive.updateOdometry();
+
+        ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
+            .getMT1Readings();
+        ArrayList<Reading> mt2Readings = RobotContainer.limelightSubsystem
+            .getMT2Readings();
+
+        for (Reading reading : mt2Readings) {
+            PoseEstimate estimate = reading.getEstimate();
+            double[] stddevs = reading.getStddevs();
+
+            if (
+                estimate.tagCount >= 2
+                && swerve.getAngularVelocity()
+                    .lt(
+                        RadiansPerSecond.of(Math.PI / 2)
+                    )
+            ) {
+                swerveDrive.addVisionMeasurement(
+                    estimate.pose,
+                    estimate.timestampSeconds,
+                    VecBuilder.fill(
+                        stddevs[0],
+                        stddevs[1],
+                        stddevs[2]
+                    )
+                );
+            }
         }
+
         posePublisher.set(getPose());
 
         SmartDashboard.putNumber(
             "Swerve/Heading",
-            getHeading().getRotations() 
+            getHeading().getRotations()
         );
         SmartDashboard.putNumber(
             "Swerve/angularVelocity",
@@ -400,6 +426,12 @@ public class SwerveSubsystem extends SubsystemBase {
             "Swerve/velocity_y",
             getYVelocity().in(MetersPerSecond)
         );
+    }
+
+    public void snapToVision() {
+        ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
+            .getMT1Readings();
+
     }
     
 

@@ -19,53 +19,6 @@ import edu.wpi.first.units.measure.Angle;
  * It is created once inside RobotContainer, use it with import frc.robot.RobotContainer.LLContainer;
  */
 public class LimelightContainer {
-  static int SIMCOUNTER = 0;
-  static int RLCOUNTER = 0;
-  static int RLCountermt1 = 0;
-  private static ArrayList<Limelight> limelights = new ArrayList<Limelight>();
-
-  public LimelightContainer(Limelight... limelights) {
-    // This is were we add valid tag ids.
-    int[] validTagIDs = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48 }; 
-    // it is very likely that we will not use all of these, but just in case we do, they are here. Remove as needed. 
-    // Each tag id should be commented here to show what object it is in corralation to the field.
-
-    for (Limelight limelight : limelights) {
-      LimelightContainer.limelights.add(limelight);
-      LimelightHelpers.SetFiducialIDFiltersOverride(limelight.getID(), validTagIDs); // makes sure the helper only considers the specified valid tag IDs.
-    }
-  }
-
-  /** Enable or disable all limelights. */
-  public void enableLimelights(boolean enable) {
-    for (Limelight limelight : limelights) {
-      limelight.setEnabled(enable);
-    }
-  }
-
-  public void setIMUMode(int mode) {
-    for (Limelight limelight : limelights) {
-      limelight.setIMUMode(mode);
-    }
-  }
-
-  public static void estimateSimOdometry() {
-    for (Limelight limelight : limelights) {
-      boolean doRejectUpdate = false;
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
-      if (mt2 == null) { // in case not all limelights are connected
-        continue;
-      }
-      if (mt2.tagCount == 0) {
-        doRejectUpdate = true;
-      }
-      if (!doRejectUpdate) {
-        SmartDashboard.putString(limelight.getName() + " Pose: ", mt2.pose.toString() + SIMCOUNTER);
-        SIMCOUNTER++;
-      }
-    }
-  }
   /** 
    * For every limelight in the container, addVisionMesurement and get robot orientation from pigeon.
    */
@@ -83,6 +36,7 @@ public class LimelightContainer {
       );
       
       LimelightHelpers.PoseEstimate mt2Estimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getID());
+
 
       SmartDashboard.putNumber(
         "Odometry/mt2/" + limelight.getID() + "/lastConsidered",

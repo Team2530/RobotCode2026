@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MetaConstants;
 

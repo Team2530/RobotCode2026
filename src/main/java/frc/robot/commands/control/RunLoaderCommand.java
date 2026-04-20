@@ -2,7 +2,7 @@ package frc.robot.commands.control;
 
 import static edu.wpi.first.units.Units.*;
 
-import frc.robot.subsystems.LoaderSubsystem;
+import frc.robot.subsystems.manipulator.LoaderSubsystem;
 
 import java.util.function.BooleanSupplier;
 

@@ -2,8 +2,8 @@ package frc.robot.commands.control;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-import frc.robot.subsystems.IntakeSubsystem.IntakePreset;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakePreset;
+import frc.robot.subsystems.manipulator.IntakeSubsystem;
 
 public class IntakeCommand extends Command {
     
