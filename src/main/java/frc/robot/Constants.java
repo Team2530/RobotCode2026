@@ -581,7 +581,7 @@ public final class Constants {
   public static final class IndexerConstants {
       public static final boolean REVERSE = false;
       public static final int CAN_ID = 24;
-      public static final Dimensionless SPEED = Percent.of(80);
+      public static final Dimensionless SPEED = Percent.of(40);
 
     
       public static final class Fueling {
