@@ -516,7 +516,8 @@ public class RobotContainer {
                         IntakePreset.AGITATING
                     ),
                     new RunLoaderCommand(loaderSubsystem),
-                    new RunIndexerCommand(indexerSubsystem)
+                    new RunIndexerCommand(indexerSubsystem),
+                    new SpoolLauncherCommand()
                 )
             );
             put(
@@ -550,7 +551,8 @@ public class RobotContainer {
                         new WaitCommand(Seconds.of(9)),
                         new RunIndexerCommand(indexerSubsystem),
                         new RunLoaderCommand(loaderSubsystem),
-                        new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING)
+                        new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING),
+                        new SpoolLauncherCommand()
                     )
                 )
             );
@@ -560,7 +562,8 @@ public class RobotContainer {
                     () -> new ParallelCommandGroup(
                         new RunIndexerCommand(indexerSubsystem),
                         new RunLoaderCommand(loaderSubsystem),
-                        new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING)
+                        new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING),
+                        new SpoolLauncherCommand()
                     )
                 )
             );
