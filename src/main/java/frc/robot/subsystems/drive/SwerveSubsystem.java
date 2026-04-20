@@ -382,8 +382,8 @@ public class SwerveSubsystem extends SubsystemBase {
         // [see](https://yet-another-software-suite.github.io/YAGSL/javadocs/swervelib/SwerveDrive.html#updateOdometry())
         swerveDrive.updateOdometry();
 
-        ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
-            .getMT1Readings();
+        //ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
+         //   .getMT1Readings();
         ArrayList<Reading> mt2Readings = RobotContainer.limelightSubsystem
             .getMT2Readings();
 

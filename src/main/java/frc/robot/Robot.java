@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     Elastic.selectTab("Autonomous");
 
-    RobotContainer.LLContainer.setIMUMode(1);
+    RobotContainer.limelightSubsystem.setIMUModes(1);
     RobotController.setBrownoutVoltage(5); // "it will be fine....."
   }
 
@@ -177,7 +177,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    RobotContainer.LLContainer.snapToVision(RobotContainer.swerveDriveSubsystem);
+    RobotContainer.swerveDriveSubsystem.snapToVision();
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
