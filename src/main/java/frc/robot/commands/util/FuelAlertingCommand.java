@@ -3,7 +3,7 @@ package frc.robot.commands.util;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IndexerSubsystem.IndexerFuelState;
+import frc.robot.subsystems.manipulator.IndexerSubsystem.IndexerFuelState;
 
 import static frc.robot.RobotContainer.indexerSubsystem;
 
