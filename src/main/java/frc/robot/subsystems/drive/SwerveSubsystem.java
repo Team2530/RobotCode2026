@@ -387,6 +387,8 @@ public class SwerveSubsystem extends SubsystemBase {
         ArrayList<Reading> mt2Readings = RobotContainer.limelightSubsystem
             .getMT2Readings();
 
+        ArrayList<Reading> mt2Filtered = new ArrayList<>();
+        // regular mt2 vision measurements
         for (Reading reading : mt2Readings) {
             PoseEstimate estimate = reading.getEstimate();
             double[] stddevs = reading.getStddevs();
@@ -398,12 +400,49 @@ public class SwerveSubsystem extends SubsystemBase {
                         RadiansPerSecond.of(Math.PI / 2)
                     )
             ) {
+                mt2Filtered.add(reading);
+
                 swerveDrive.addVisionMeasurement(
                     estimate.pose,
                     estimate.timestampSeconds,
                     VecBuilder.fill(
                         stddevs[0],
                         stddevs[1],
+                        999999 // stddevs[2] 
+                    )
+                );
+            }
+        }
+
+        // average the readings to get dissonance
+        Translation2d averaged = new Translation2d();
+        for (Reading filtered : mt2Filtered) {
+            averaged = averaged.plus(
+                filtered.getEstimate()
+                    .pose
+                    .getTranslation()
+            );
+        }
+        averaged.div(mt2Filtered.size());
+
+        // try to correct dissonance
+        for (Reading reading : mt1Readings) {
+            PoseEstimate estimate = reading.getEstimate();
+            double[] stddevs = reading.getStddevs();
+
+            if (
+                estimate.tagCount >= 1
+                && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                    .lt(
+                        RadiansPerSecond.of(Math.PI)
+                    )
+            ) {
+                swerveDrive.addVisionMeasurement(
+                    estimate.pose,
+                    estimate.timestampSeconds,
+                    VecBuilder.fill(
+                        999999,
+                        999999,
                         stddevs[2]
                     )
                 );
