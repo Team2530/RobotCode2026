@@ -338,11 +338,11 @@ public class TurretSubsystem extends SubsystemBase {
                 LinearVelocity exitVelocityX = (
                         totalVelocity
                         .times(Math.cos(totalYaw.in(Radians)))
-                    ).plus(getLauncherPositionalVelocityX());
+                    ).minus(getLauncherPositionalVelocityX());
                 LinearVelocity exitVelocityY = (
                         totalVelocity
                         .times(Math.sin(totalYaw.in(Radians)))
-                    ).plus(getLauncherPositionalVelocityY());
+                    ).minus(getLauncherPositionalVelocityY());
 
                 targetYaw = Radians.of(
                     (
@@ -420,10 +420,6 @@ public class TurretSubsystem extends SubsystemBase {
                     TurretConstants.Launcher.MAXIMUM_VELOCITY.in(RotationsPerSecond)
                 )
             );
-
-
-
-                
             
             setYaw = Rotations.of(
                     MathUtil.clamp(
@@ -607,6 +603,9 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 )
             ).in(Meters)
+        )
+        .plus(
+            RobotContainer.swerveDriveSubsystem.getXVelocity()
         );
     }
 
@@ -631,6 +630,9 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 )
             ).in(Meters)
+        )
+        .plus(
+            RobotContainer.swerveDriveSubsystem.getYVelocity()
         );
     }
 

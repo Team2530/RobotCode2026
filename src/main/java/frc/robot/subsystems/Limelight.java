@@ -104,7 +104,7 @@ public class Limelight extends SubsystemBase {
             LimelightHelpers.SetIMUAssistAlpha(id, 0.01);
             
         } else {
-            RobotContainer.LLContainer.setIMUMode(3);
+            RobotContainer.LLContainer.setIMUMode(4);
             LimelightHelpers.SetIMUAssistAlpha(id, 0.03);
         }
     }

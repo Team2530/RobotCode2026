@@ -2,10 +2,12 @@ package frc.robot.util;
 
 import static edu.wpi.first.units.Units.*;
 import java.util.Arrays;
+import java.util.stream.DoubleStream;
 import java.util.ArrayList;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -134,7 +136,7 @@ public class LimelightContainer {
             VecBuilder.fill(
               stddevs[6],
               stddevs[7],
-              imuMode != 1
+              imuMode == 3
                 ? stddevs[11]
                 : 999999
             )
@@ -206,34 +208,65 @@ public class LimelightContainer {
   }
 
   public void snapToVision(SwerveSubsystem swerve) {
-    for (Limelight limelight : limelights) {
-      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getID());
-      if (mt1 != null && mt1.tagCount > 0 ) {
-        setIMUMode(1);
-        swerve.resetOdometry(mt1.pose);
-        SetRobotOrientation(
-         
-        Degrees.of(swerve.getHeading().getDegrees())
+      for (Limelight limelight : limelights) {
+      LimelightHelpers.PoseEstimate mt1Estimation = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getID());
+
+      // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      
+      SmartDashboard.putNumber(
+        "Odometry/mt1/" + limelight.getID() + "/lastConsidered",
+        Timer.getTimestamp()
+      );
+
+      boolean added;
+      if (mt1Estimation != null) {
+        double[] stddevs = NetworkTableInstance.getDefault().getTable(limelight.getID()).getEntry("stddevs").getDoubleArray(new double[6]);
+
+        if (stddevs.length < 12) {
+          continue;
+        }
+        SmartDashboard.putNumberArray(
+          "Odometry/mt1/" + limelight.getID() + "/stddevs", Arrays.copyOfRange(
+            stddevs, 0, 5
+            )
         );
 
-        break;
+      if (
+        limelight.isEnabled()
+        && mt1Estimation.tagCount > 0
+        && swerve.getAngularVelocity().lt(RadiansPerSecond.of(Math.PI * 2))
+      ){
+
+        swerve.addVisionMeasurement(
+            mt1Estimation.pose,
+            mt1Estimation.timestampSeconds,
+            VecBuilder.fill(
+              0.2,
+              0.2,
+              1
+            )
+        );
+        added = true;
+      } else {
+        added = false;
+      } 
+      } else {
+        added = false;
       }
-    
-    }
-    estimateMT1Odometry(swerve);
-    setIMUMode(1);
-    for (Limelight limelight : limelights) {
-      LimelightHelpers.SetRobotOrientation(
-        limelight.getID(), 
-        swerve.getHeading().getDegrees(),
-        0, 
-        0, 
-        0, 
-        0, 
-        0
+      SmartDashboard.putBoolean(
+        "Odometry/mt1/" + limelight.getID() + "/added",
+        added
       );
     }
-  }
+  
+    setIMUMode(1);
+    SetRobotOrientation(
+      Degrees.of(
+        swerve.getHeading().getDegrees()
+      )
+    );
+}
+  
 
   public void SetRobotOrientation(Angle yaw) {
     for (Limelight limelight: limelights) {
