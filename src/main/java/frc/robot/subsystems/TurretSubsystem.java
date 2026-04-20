@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -46,6 +44,7 @@ import frc.robot.Constants.TurretConstants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.MetaConstants;
 import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.Mutable;
 
 public class TurretSubsystem extends SubsystemBase {
     
@@ -132,9 +131,9 @@ public class TurretSubsystem extends SubsystemBase {
     private final SendableChooser<Boolean> forceEnableFiringChooser;
 
     // actively shooting
-    private BooleanSupplier activeShooting;
+    private final Mutable<Boolean> spoolingLauncher;
 
-    public TurretSubsystem(BooleanSupplier Shooting) {
+    public TurretSubsystem() {
         // Initialize Motors and Encoders
         m_LauncherPortMotor = new TalonFX(
             TurretConstants.CANIDs.Launcher.PORT
@@ -145,8 +144,6 @@ public class TurretSubsystem extends SubsystemBase {
         m_YawMotor = new TalonFX(
             TurretConstants.CANIDs.YAW
         );
-
-        activeShooting = Shooting;
 
         // the output values are directly copied from the leader (`port`) and
         // replicated by the follower (`starboard`), thus we shouldn't have to
@@ -249,6 +246,8 @@ public class TurretSubsystem extends SubsystemBase {
             "Force Enable Firing",
             forceEnableFiringChooser
         );
+
+        spoolingLauncher = new Mutable<Boolean>(false);
     }
 
     @Override
@@ -433,7 +432,7 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 );
 
-            if(activeShooting.getAsBoolean()) {
+            if(spoolingLauncher.get()) {
                 m_LauncherPortMotor.setControl(
                     new VelocityTorqueCurrentFOC(setVelocity)
                         .withUpdateFreqHz(1000)
@@ -826,6 +825,14 @@ public class TurretSubsystem extends SubsystemBase {
 
     public boolean hasSolution() {
         return hasSolution;
+    }
+
+    public void spoolLauncher() {
+        spoolingLauncher.set(true);
+    }
+
+    public void stopLauncher() {
+        spoolingLauncher.set(false);
     }
 
 }

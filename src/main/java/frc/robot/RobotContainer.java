@@ -48,6 +48,7 @@ import frc.robot.commands.control.IntakeCommand;
 import frc.robot.commands.control.ManualTurretCommand;
 import frc.robot.commands.control.RunIndexerCommand;
 import frc.robot.commands.control.RunLoaderCommand;
+import frc.robot.commands.control.SpoolLauncherCommand;
 import frc.robot.commands.util.FuelAlertingCommand;
 import frc.robot.commands.util.HubStatusCommand;
 import frc.robot.commands.util.MatchtimeStatusCommand;
@@ -155,15 +156,7 @@ public class RobotContainer {
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     public static final LoaderSubsystem loaderSubsystem = new LoaderSubsystem();
-    public static final TurretSubsystem turretSubsystem = new TurretSubsystem(
-        new BooleanSupplier() {
-            @Override
-                public boolean getAsBoolean() {
-                        return operatorXbox.getHID().getRightTriggerAxis() > 0.2
-                            || MetaConstants.Game.Timing.getCurrentShift() == ShiftType.AUTONOMOUS;
-                    }
-                }
-    );
+    public static final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
     /*
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -277,6 +270,11 @@ public class RobotContainer {
                         );
                     }
                 )
+            );
+
+        operatorXbox.rightTrigger(0.2)
+            .whileTrue(
+                new SpoolLauncherCommand()
             );
 
         operatorXbox.rightTrigger(0.3)
