@@ -382,11 +382,13 @@ public class SwerveSubsystem extends SubsystemBase {
         // [see](https://yet-another-software-suite.github.io/YAGSL/javadocs/swervelib/SwerveDrive.html#updateOdometry())
         swerveDrive.updateOdometry();
 
-        //ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
-         //   .getMT1Readings();
+        ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
+            .getMT1Readings();
         ArrayList<Reading> mt2Readings = RobotContainer.limelightSubsystem
             .getMT2Readings();
 
+        ArrayList<Reading> mt2Filtered = new ArrayList<>();
+        // regular mt2 vision measurements
         for (Reading reading : mt2Readings) {
             PoseEstimate estimate = reading.getEstimate();
             double[] stddevs = reading.getStddevs();
@@ -398,13 +400,57 @@ public class SwerveSubsystem extends SubsystemBase {
                         RadiansPerSecond.of(Math.PI / 2)
                     )
             ) {
+                mt2Filtered.add(reading);
+
                 swerveDrive.addVisionMeasurement(
                     estimate.pose,
                     estimate.timestampSeconds,
                     VecBuilder.fill(
                         stddevs[0],
                         stddevs[1],
-                        stddevs[2]
+                        999999 // stddevs[2] 
+                    )
+                );
+            }
+        }
+
+        // average the readings to get dissonance
+        Translation2d averaged = new Translation2d();
+        for (Reading filtered : mt2Filtered) {
+            averaged = averaged.plus(
+                filtered.getEstimate()
+                    .pose
+                    .getTranslation()
+            );
+        }
+        averaged.div(mt2Filtered.size());
+
+        double dissonance = averaged.getSquaredDistance(
+            mt2Filtered.get(0)
+                .getEstimate()
+                .pose
+                .getTranslation()
+        );
+
+        // try to correct dissonance
+        for (Reading reading : mt1Readings) {
+            PoseEstimate estimate = reading.getEstimate();
+            double[] stddevs = reading.getStddevs();
+
+            if (
+                estimate.tagCount >= 1
+                && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                    .lt(
+                        RadiansPerSecond.of(Math.PI)
+                    )
+            ) {
+                swerveDrive.addVisionMeasurement(
+                    estimate.pose,
+                    estimate.timestampSeconds,
+                    VecBuilder.fill(
+                        999999,
+                        999999,
+                        stddevs[2] / dissonance
                     )
                 );
             }
