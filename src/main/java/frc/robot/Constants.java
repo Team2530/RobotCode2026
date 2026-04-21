@@ -524,12 +524,12 @@ public final class Constants {
             public static final class Feedforward {
                 public static final double kS = 0.52;
                 public static final double kV = 0.35;
-                public static final double kA = 0.04;
+                public static final double kA = 0.042;
             }
             
             public static final class Magic {
-                public static final double kV = 0.05;
-                public static final double kA = 0.03;
+                public static final double kV = 0.045;
+                public static final double kA = 0.028;
             }
         }
 
