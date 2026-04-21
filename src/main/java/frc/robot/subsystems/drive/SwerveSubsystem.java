@@ -455,6 +455,8 @@ public class SwerveSubsystem extends SubsystemBase {
             }
         }
 
+        RobotContainer.limelightSubsystem.setIMUModes(1);
+        RobotContainer.limelightSubsystem.updatePositions();
     }
     
 
