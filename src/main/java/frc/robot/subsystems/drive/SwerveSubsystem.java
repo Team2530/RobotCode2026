@@ -390,28 +390,15 @@ public class SwerveSubsystem extends SubsystemBase {
         ArrayList<Reading> mt2Filtered = new ArrayList<>();
         // regular mt2 vision measurements
         for (Reading reading : mt2Readings) {
-            PoseEstimate estimate = reading.getEstimate();
-            double[] stddevs = reading.getStddevs();
-
             boolean added;
             if (
-                estimate.tagCount >= 2
+                reading.getEstimate().tagCount >= 2
                 && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                     .lt(
                         RadiansPerSecond.of(Math.PI / 2)
                     )
             ) {
                 mt2Filtered.add(reading);
-
-                swerveDrive.addVisionMeasurement(
-                    estimate.pose,
-                    estimate.timestampSeconds,
-                    VecBuilder.fill(
-                        0.7,
-                        0.7,
-                        999999 // stddevs[2] 
-                    )
-                );
 
                 added = true;
             } else {
@@ -465,6 +452,22 @@ public class SwerveSubsystem extends SubsystemBase {
                         )
                     );
                 }
+            }
+
+            for (Reading filtered: mt2Filtered) {
+                PoseEstimate estimate = filtered.getEstimate();
+                double[] stddevs = filtered.getStddevs();
+
+                swerveDrive.addVisionMeasurement(
+                    estimate.pose,
+                    estimate.timestampSeconds,
+                    VecBuilder.fill(
+                        stddevs[0],
+                        stddevs[1],
+                        999999 // stddevs[2] 
+                    )
+                );
+
             }
         }
 
