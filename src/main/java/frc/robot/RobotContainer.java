@@ -607,6 +607,7 @@ public class RobotContainer {
                     if (i == 0) {
                         routine.addCommands(
                             new InstantCommand(() -> {
+                                limelightSubsystem.setIMUModes(1);
                                 swerveDriveSubsystem.resetOdometry(
                                     AllianceFlipUtil.apply(
                                         path.getStartingHolonomicPose().get()
