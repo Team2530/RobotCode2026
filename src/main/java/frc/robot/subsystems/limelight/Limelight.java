@@ -106,12 +106,7 @@ public class Limelight extends SubsystemBase{
         double[] alldevs = NetworkTableInstance.getDefault()
             .getTable(getId())
             .getEntry("stddevs")
-            .getDoubleArray(new double[6]);
-        double[] stddevs = {
-                alldevs[0],
-                alldevs[1],
-                alldevs[5]
-            };
+            .getDoubleArray(new double[12]);
 
         int imuMode = NetworkTableInstance.getDefault()
             .getTable(getId())
@@ -121,8 +116,13 @@ public class Limelight extends SubsystemBase{
 
         if (
             estimate != null
-            || stddevs.length >= 12
+            && alldevs.length >= 12
         ) {
+            double[] stddevs = {
+                    alldevs[0],
+                    alldevs[1],
+                    alldevs[5]
+                };
             Reading reading = new Reading(
                     ReadingType.MT1,
                     estimate,
@@ -153,12 +153,7 @@ public class Limelight extends SubsystemBase{
         double[] alldevs = NetworkTableInstance.getDefault()
             .getTable(getId())
             .getEntry("stddevs")
-            .getDoubleArray(new double[6]);
-        double[] stddevs = {
-                alldevs[6],
-                alldevs[7],
-                alldevs[11]
-            };
+            .getDoubleArray(new double[12]);
 
         int imuMode = NetworkTableInstance.getDefault()
             .getTable(getId())
@@ -168,8 +163,13 @@ public class Limelight extends SubsystemBase{
 
         if (
             estimate != null
-            || stddevs.length >= 12
+            && alldevs.length >= 12
         ) {
+            double[] stddevs = {
+                    alldevs[6],
+                    alldevs[7],
+                    alldevs[11]
+                };
             Reading reading = new Reading(
                     ReadingType.MT2,
                     estimate,
