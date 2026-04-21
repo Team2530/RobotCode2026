@@ -423,11 +423,14 @@ public class SwerveSubsystem extends SubsystemBase {
             }
             averaged.div(mt2Filtered.size());
 
-            double dissonance = averaged.getSquaredDistance(
-                mt2Filtered.get(0)
-                    .getEstimate()
-                    .pose
-                    .getTranslation()
+            double dissonance = Math.max(
+                averaged.getSquaredDistance(
+                    mt2Filtered.get(0)
+                        .getEstimate()
+                        .pose
+                        .getTranslation()
+                ),
+                0.05
             );
 
             // try to correct dissonance
