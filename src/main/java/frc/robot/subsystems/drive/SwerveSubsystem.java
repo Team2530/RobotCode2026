@@ -425,6 +425,13 @@ public class SwerveSubsystem extends SubsystemBase {
         }
         averaged.div(mt2Filtered.size());
 
+        double dissonance = averaged.getSquaredDistance(
+            mt2Filtered.get(0)
+                .getEstimate()
+                .pose
+                .getTranslation()
+        );
+
         // try to correct dissonance
         for (Reading reading : mt1Readings) {
             PoseEstimate estimate = reading.getEstimate();
@@ -443,7 +450,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     VecBuilder.fill(
                         999999,
                         999999,
-                        stddevs[2]
+                        stddevs[2] / dissonance
                     )
                 );
             }
