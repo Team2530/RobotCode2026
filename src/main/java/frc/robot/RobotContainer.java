@@ -554,6 +554,13 @@ public class RobotContainer {
                     )
                 )
             );
+            put(
+                "xStance",
+                new InstantCommand(() -> {
+                    swerveDriveSubsystem.xStance();
+                })
+            );
+
         }};
         for (Entry<String, Command> pair : namedCommands.entrySet()) {
             NamedCommands.registerCommand(
