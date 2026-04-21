@@ -210,7 +210,12 @@ public class RobotContainer {
                 )
             );
 
-        RobotModeTriggers.disabled();
+        RobotModeTriggers.disabled()
+            .onTrue(
+                new InstantCommand(() -> {
+                    limelightSubsystem.setIMUModes(1);
+                })
+            );
     }
     
 
@@ -607,12 +612,13 @@ public class RobotContainer {
                     if (i == 0) {
                         routine.addCommands(
                             new InstantCommand(() -> {
-                                limelightSubsystem.setIMUModes(1);
                                 swerveDriveSubsystem.resetOdometry(
                                     AllianceFlipUtil.apply(
                                         path.getStartingHolonomicPose().get()
                                     )
                                 );
+                                limelightSubsystem.setIMUModes(1);
+                                limelightSubsystem.updatePositions();
                             })
                         );
                     }
