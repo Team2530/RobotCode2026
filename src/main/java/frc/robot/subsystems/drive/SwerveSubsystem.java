@@ -393,6 +393,7 @@ public class SwerveSubsystem extends SubsystemBase {
             PoseEstimate estimate = reading.getEstimate();
             double[] stddevs = reading.getStddevs();
 
+            boolean added;
             if (
                 estimate.tagCount >= 2
                 && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
@@ -406,53 +407,64 @@ public class SwerveSubsystem extends SubsystemBase {
                     estimate.pose,
                     estimate.timestampSeconds,
                     VecBuilder.fill(
-                        stddevs[0],
-                        stddevs[1],
+                        0.7,
+                        0.7,
                         999999 // stddevs[2] 
                     )
                 );
+
+                added = true;
+            } else {
+                added = false;
             }
+
+            SmartDashboard.putBoolean(
+                "Odometry/" + reading.getLimelightId() + "/added",
+                added
+            );
         }
 
-        // average the readings to get dissonance
-        Translation2d averaged = new Translation2d();
-        for (Reading filtered : mt2Filtered) {
-            averaged = averaged.plus(
-                filtered.getEstimate()
+        if (mt2Filtered.size() > 0) {
+            // average the readings to get dissonance
+            Translation2d averaged = new Translation2d();
+            for (Reading filtered : mt2Filtered) {
+                averaged = averaged.plus(
+                    filtered.getEstimate()
+                        .pose
+                        .getTranslation()
+                );
+            }
+            averaged.div(mt2Filtered.size());
+
+            double dissonance = averaged.getSquaredDistance(
+                mt2Filtered.get(0)
+                    .getEstimate()
                     .pose
                     .getTranslation()
             );
-        }
-        averaged.div(mt2Filtered.size());
 
-        double dissonance = averaged.getSquaredDistance(
-            mt2Filtered.get(0)
-                .getEstimate()
-                .pose
-                .getTranslation()
-        );
+            // try to correct dissonance
+            for (Reading reading : mt1Readings) {
+                PoseEstimate estimate = reading.getEstimate();
+                double[] stddevs = reading.getStddevs();
 
-        // try to correct dissonance
-        for (Reading reading : mt1Readings) {
-            PoseEstimate estimate = reading.getEstimate();
-            double[] stddevs = reading.getStddevs();
-
-            if (
-                estimate.tagCount >= 1
-                && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
-                    .lt(
-                        RadiansPerSecond.of(Math.PI)
-                    )
-            ) {
-                swerveDrive.addVisionMeasurement(
-                    estimate.pose,
-                    estimate.timestampSeconds,
-                    VecBuilder.fill(
-                        999999,
-                        999999,
-                        stddevs[2] / dissonance
-                    )
-                );
+                if (
+                    estimate.tagCount >= 1
+                    && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                        .lt(
+                            RadiansPerSecond.of(Math.PI)
+                        )
+                ) {
+                    swerveDrive.addVisionMeasurement(
+                        estimate.pose,
+                        estimate.timestampSeconds,
+                        VecBuilder.fill(
+                            999999,
+                            999999,
+                            stddevs[2] / dissonance
+                        )
+                    );
+                }
             }
         }
 
@@ -493,9 +505,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     estimate.pose,
                     estimate.timestampSeconds,
                     VecBuilder.fill(
-                        0.2,
-                        0.2,
-                        0.1
+                        0.3,
+                        0.3,
+                        0.4
                     )
                 );
             }
