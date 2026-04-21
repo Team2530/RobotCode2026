@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LimelightSubsystem extends SubsystemBase{
@@ -22,7 +23,9 @@ public class LimelightSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        if (
+        if (DriverStation.isDisabled()) {
+            setIMUModes(1);
+        } else if (
             RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .abs(DegreesPerSecond)
             > 2
