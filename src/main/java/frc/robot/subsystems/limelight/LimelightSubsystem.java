@@ -75,4 +75,10 @@ public class LimelightSubsystem extends SubsystemBase{
             limelight.setAlphaAssist(assist);
         }
     }
+
+    public void updatePositions() {
+        for (Limelight limelight : limelights) {
+            limelight.updatePosition();
+        }
+    }
 }
