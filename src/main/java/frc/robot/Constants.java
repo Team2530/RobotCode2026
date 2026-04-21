@@ -217,12 +217,12 @@ public final class Constants {
 
 
             public static final class Waving {
-                public static final Time PERIOD = Seconds.of(1.2);
+                public static final Time PERIOD = Seconds.of(1.4);
                 // an arbitrary value
                 //
                 // i think this is dependent on the gear ratio of the pivot, but
                 // i really don't know what units this is in
-                public static final double HEIGHT = 4;
+                public static final double HEIGHT = 3;
 
                 public static final class PID {
                     public static final double P = 0.25;
