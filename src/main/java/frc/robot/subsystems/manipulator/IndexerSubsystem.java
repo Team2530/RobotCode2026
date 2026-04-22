@@ -64,7 +64,10 @@ public class IndexerSubsystem extends SubsystemBase {
     public void periodic() {
         Dimensionless setSpeed;
 
-        if (RobotContainer.turretSubsystem.allowFiring()) {
+        if (
+            RobotContainer.turretSubsystem.allowFiring()
+            || targetSpeed.lt(Percent.of(0))
+        ) {
             setSpeed = targetSpeed;
 
             fuelState = fuelDebouncer.calculate(
