@@ -576,7 +576,18 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
+        RobotContainer.limelightSubsystem.setIMUModes(1);
         swerveDrive.resetOdometry(pose);
+        addVisionMeasurement(
+            pose, 
+            Timer.getTimestamp(), 
+            VecBuilder.fill(
+                0,
+                0,
+                0
+            ) 
+        );
+        RobotContainer.limelightSubsystem.updatePositions();
     }
 
     public void resetOdometry() {

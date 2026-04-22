@@ -625,8 +625,6 @@ public class RobotContainer {
                                         path.getStartingHolonomicPose().get()
                                     )
                                 );
-                                limelightSubsystem.setIMUModes(1);
-                                limelightSubsystem.updatePositions();
                             })
                         );
                     }
