@@ -793,7 +793,7 @@
  },
  "events":[
    {"name":"Start Intake", "from":{"target":8, "targetTimestamp":12.69636, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
-   {"name":"Start Intake", "from":{"target":1, "targetTimestamp":0.8095, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
+   {"name":"Start Intake", "from":{"target":0, "targetTimestamp":0.8095, "offset":{"exp":"0.2 s", "val":0.2}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
    {"name":"Raise Shoot", "from":{"target":5, "targetTimestamp":5.88167, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":{"type":"race", "data":{"commands":[
        {"type":"named", "data":{"name":"Raise Shoot"}},
        {"type":"wait", "data":{"waitTime":{"exp":"6 s", "val":6.0}}}]}}},
