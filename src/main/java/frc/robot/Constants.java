@@ -203,7 +203,7 @@ public final class Constants {
                 // output applied when the pivot is moving between stowed
                 // / deployed
                 public static final Dimensionless DEPLOY_OUTPUT =
-                    Percent.of(20);
+                    Percent.of(25);
 
                 public static final Current CURRENT_LIMIT = Amps.of(30);
                 public static final Time DEBOUNCE_TIME = Seconds.of(0.15);
