@@ -513,7 +513,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     VecBuilder.fill(
                         0.3,
                         0.3,
-                        0.4
+                        0.3
                     )
                 );
             }
