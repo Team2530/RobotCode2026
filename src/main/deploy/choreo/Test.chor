@@ -5,6 +5,20 @@
  "variables":{
   "expressions":{},
   "poses":{
+   "DoubleRightT":{
+    "x":{
+     "exp":"3.53 m",
+     "val":3.53
+    },
+    "y":{
+     "exp":"0.76 m",
+     "val":0.76
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
    "LeftTrenchShoot":{
     "x":{
      "exp":"3.75 m",
