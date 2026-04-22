@@ -758,8 +758,8 @@
   "splits":[0,237]
  },
  "events":[
-   {"name":"Start Intake", "from":{"target":8, "targetTimestamp":11.84928, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
-   {"name":"Start Intake", "from":{"target":1, "targetTimestamp":0.80994, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
+   {"name":"Start Intake", "from":{"target":7, "targetTimestamp":11.84928, "offset":{"exp":"0.2 s", "val":0.2}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
+   {"name":"Start Intake", "from":{"target":0, "targetTimestamp":0.80994, "offset":{"exp":"-0.1 s", "val":-0.1}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
    {"name":"Raise Shoot", "from":{"target":5, "targetTimestamp":5.87989, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":{"type":"race", "data":{"commands":[
        {"type":"named", "data":{"name":"Raise Shoot"}},
        {"type":"wait", "data":{"waitTime":{"exp":"6 s", "val":6.0}}}]}}},

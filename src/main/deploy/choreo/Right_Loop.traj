@@ -586,7 +586,7 @@
  },
  "events":[
    {"name":"Start Intake", "from":{"target":8, "targetTimestamp":7.21901, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
-   {"name":"Start Intake", "from":{"target":1, "targetTimestamp":0.6955, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
+   {"name":"Start Intake", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.2 s", "val":0.2}}, "event":{"type":"named", "data":{"name":"Start Intake"}}},
    {"name":"Raise Shoot", "from":{"target":13, "targetTimestamp":12.45954, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":{"type":"named", "data":{"name":"Raise Shoot"}}},
    {"name":"Aim", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
        {"type":"named", "data":{"name":"Hub"}},
