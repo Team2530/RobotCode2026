@@ -243,10 +243,18 @@ public class RobotContainer {
                 })
             );
         driverXbox.leftBumper()
-            .onTrue(
-                new InstantCommand(() -> {
-                    swerveDriveSubsystem.snapToVision();
-                })
+            .whileTrue(
+                new Command() {
+                    @Override
+                    public void execute() {
+                        swerveDriveSubsystem.snapToVision();
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return false;
+                    }
+                }
             );
 
         operatorXbox.leftTrigger(0.1)
