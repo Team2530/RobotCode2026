@@ -345,7 +345,7 @@
  "events":[
    {"name":"Shoot", "from":{"target":5, "targetTimestamp":5.97719, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":{"type":"named", "data":{"name":"Raise Shoot"}}},
    {"name":"Shoot", "from":{"target":9, "targetTimestamp":11.66919, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":{"type":"named", "data":{"name":"Raise Shoot"}}},
-   {"name":"Start Intake", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.5 s", "val":0.5}}, "event":{"type":"parallel", "data":{"commands":[
+   {"name":"Start Intake", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.2 s", "val":0.2}}, "event":{"type":"parallel", "data":{"commands":[
        {"type":"named", "data":{"name":"Start Intake"}}]}}},
    {"name":"Aim hub", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
        {"type":"named", "data":{"name":"Hub"}},
