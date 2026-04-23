@@ -144,7 +144,7 @@ public class RobotContainer {
                         Meters.of(0.351561)
                     ),
                     new Rotation3d(
-                        Degrees.of(3.4),
+                        Degrees.of(3),
                         Degrees.of(-13),
                         Degrees.of(160.7)
                     )
