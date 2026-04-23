@@ -238,4 +238,11 @@ public class Limelight extends SubsystemBase{
                 assist
             );
     }
+
+    public void setPipeline(int index) {
+        LimelightHelpers.setPipelineIndex(
+            getId(),
+            index
+        );
+    }
 }

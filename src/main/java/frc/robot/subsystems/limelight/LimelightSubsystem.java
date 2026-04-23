@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LimelightSubsystem extends SubsystemBase{
@@ -36,6 +38,18 @@ public class LimelightSubsystem extends SubsystemBase{
         } else {
             setIMUModes(4);
             setAlphaAssists(0.03);
+        }
+
+        Time pipelinePeriod = Milliseconds.of(250);
+        if (
+            (
+                Timer.getTimestamp() 
+                % pipelinePeriod.times(2).in(Seconds)
+            ) > pipelinePeriod.in(Seconds)
+        ) {
+            setPipelines(0);
+        } else {
+            setPipelines(1);
         }
     }
 
@@ -82,6 +96,12 @@ public class LimelightSubsystem extends SubsystemBase{
     public void updatePositions() {
         for (Limelight limelight : limelights) {
             limelight.updatePosition();
+        }
+    }
+
+    public void setPipelines(int index) {
+        for (Limelight limelight : limelights) {
+            limelight.setPipeline(index);
         }
     }
 }
