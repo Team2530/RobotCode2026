@@ -596,7 +596,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public LinearVelocity getLauncherPositionalVelocityX() {
         return MetersPerSecond.of(
-            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .in(RadiansPerSecond)
             * (
                 (
@@ -623,7 +623,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public LinearVelocity getLauncherPositionalVelocityY() {
         return MetersPerSecond.of(
-            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .in(RadiansPerSecond)
             * (
                 (
