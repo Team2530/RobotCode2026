@@ -132,6 +132,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // actively shooting
     private final Mutable<Boolean> spoolingLauncher;
+    private final Debouncer spoolingDebouncer;
 
     public TurretSubsystem() {
         // Initialize Motors and Encoders
@@ -248,6 +249,10 @@ public class TurretSubsystem extends SubsystemBase {
         );
 
         spoolingLauncher = new Mutable<Boolean>(false);
+        spoolingDebouncer = new Debouncer(
+                TurretConstants.Launcher.CLEARING_TIME.in(Seconds),
+                DebounceType.kFalling
+            );
     }
 
     @Override
@@ -428,7 +433,11 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 );
 
-            if(spoolingLauncher.get()) {
+            if(
+                spoolingDebouncer.calculate(
+                    spoolingLauncher.get()
+                )
+            ) {
                 m_LauncherPortMotor.setControl(
                     new VelocityTorqueCurrentFOC(setVelocity)
                         .withUpdateFreqHz(1000)

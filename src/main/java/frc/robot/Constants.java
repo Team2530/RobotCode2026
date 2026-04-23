@@ -453,6 +453,8 @@ public final class Constants {
             public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
                 RotationsPerSecond.of(2.5);
 
+	    public static final Time CLEARING_TIME = Seconds.of(0.3);
+
             public static final class PID {
                 public static final double P = 13.5;
                 public static final double I = 0.12;
