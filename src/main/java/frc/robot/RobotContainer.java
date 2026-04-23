@@ -548,7 +548,7 @@ public class RobotContainer {
                 "Raise Shoot",
                 flagpole.raiseFlaggedCommand(
                     () -> new ParallelRaceGroup(
-                        new WaitCommand(Seconds.of(9)),
+                        new WaitCommand(Seconds.of(5)),
                         new RunIndexerCommand(indexerSubsystem),
                         new RunLoaderCommand(loaderSubsystem),
                         new IntakeCommand(intakeSubsystem, IntakePreset.AGITATING),
