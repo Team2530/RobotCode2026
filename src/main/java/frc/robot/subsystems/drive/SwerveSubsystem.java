@@ -430,7 +430,7 @@ public class SwerveSubsystem extends SubsystemBase {
                         .pose
                         .getTranslation()
                 ),
-                0.05
+                0.005
             );
 
             // try to correct dissonance
@@ -457,6 +457,11 @@ public class SwerveSubsystem extends SubsystemBase {
                 }
             }
 
+            double translationDissonanceMaximum = 0.2;
+            double translationDissonance = Math.min(
+                dissonance,
+                translationDissonanceMaximum
+            ) / translationDissonanceMaximum;
             for (Reading filtered: mt2Filtered) {
                 PoseEstimate estimate = filtered.getEstimate();
                 double[] stddevs = filtered.getStddevs();
@@ -465,8 +470,8 @@ public class SwerveSubsystem extends SubsystemBase {
                     estimate.pose,
                     estimate.timestampSeconds,
                     VecBuilder.fill(
-                        stddevs[0],
-                        stddevs[1],
+                        stddevs[0] * translationDissonance,
+                        stddevs[1] * translationDissonance,
                         999999 // stddevs[2] 
                     )
                 );
