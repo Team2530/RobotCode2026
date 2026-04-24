@@ -457,7 +457,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 }
             }
 
-            double translationDissonanceMaximum = 0.2;
+            double translationDissonanceMaximum = 0.075;
             double translationDissonance = Math.min(
                 dissonance,
                 translationDissonanceMaximum
@@ -470,8 +470,8 @@ public class SwerveSubsystem extends SubsystemBase {
                     estimate.pose,
                     estimate.timestampSeconds,
                     VecBuilder.fill(
-                        stddevs[0] * translationDissonance,
-                        stddevs[1] * translationDissonance,
+                        stddevs[0] / translationDissonance,
+                        stddevs[1] / translationDissonance,
                         999999 // stddevs[2] 
                     )
                 );
