@@ -573,7 +573,12 @@ public class RobotContainer {
                     swerveDriveSubsystem.xStance();
                 })
             );
-
+            put(
+                "Raise Wait",
+                flagpole.raiseFlaggedCommand(
+                    () -> new WaitCommand(Seconds.of(4))
+                )        
+            );
         }};
         for (Entry<String, Command> pair : namedCommands.entrySet()) {
             NamedCommands.registerCommand(
