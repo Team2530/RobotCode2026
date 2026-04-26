@@ -3,8 +3,58 @@
  "version":2,
  "type":"Swerve",
  "variables":{
-  "expressions":{},
+  "expressions":{
+   "All":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"2.5 m / s",
+     "val":2.5
+    }
+   },
+   "Bump":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"2 m / s",
+     "val":2.0
+    }
+   },
+   "IntakeSpeed1":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"1 m / s",
+     "val":1.0
+    }
+   },
+   "OTF":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"0.7 m / s",
+     "val":0.7
+    }
+   },
+   "Start":{
+    "dimension":"LinAcc",
+    "var":{
+     "exp":"1.5 m / s ^ 2",
+     "val":1.5
+    }
+   }
+  },
   "poses":{
+   "DoubleRightT":{
+    "x":{
+     "exp":"3.53 m",
+     "val":3.53
+    },
+    "y":{
+     "exp":"0.76 m",
+     "val":0.76
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
    "LeftTrenchShoot":{
     "x":{
      "exp":"3.75 m",

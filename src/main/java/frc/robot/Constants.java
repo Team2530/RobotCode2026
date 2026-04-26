@@ -109,6 +109,11 @@ public final class Constants {
                     );
 
                     if (
+                        DriverStation.getMatchTime() 
+                        > SHIFT_TIMINGS[SHIFT_TIMINGS.length - 1].in(Seconds)
+                    ) {
+                        return ShiftType.AUTONOMOUS;
+                    } else if (
                         TELEOP_LENGTH.minus(currentTime)
                         .lt(SHIFT_TIMINGS[0])
                     ) {
@@ -198,7 +203,7 @@ public final class Constants {
                 // output applied when the pivot is moving between stowed
                 // / deployed
                 public static final Dimensionless DEPLOY_OUTPUT =
-                    Percent.of(20);
+                    Percent.of(25);
 
                 public static final Current CURRENT_LIMIT = Amps.of(30);
                 public static final Time DEBOUNCE_TIME = Seconds.of(0.15);
@@ -212,12 +217,12 @@ public final class Constants {
 
 
             public static final class Waving {
-                public static final Time PERIOD = Seconds.of(1.2);
+                public static final Time PERIOD = Seconds.of(1.4);
                 // an arbitrary value
                 //
                 // i think this is dependent on the gear ratio of the pivot, but
                 // i really don't know what units this is in
-                public static final double HEIGHT = 4;
+                public static final double HEIGHT = 3;
 
                 public static final class PID {
                     public static final double P = 0.25;
@@ -247,7 +252,7 @@ public final class Constants {
             public static final Dimensionless TURTLE_DRIVE_MULT =
                 Percent.of(25);
             public static final Dimensionless ROCK_DRIVE_MULT =
-                Percent.of(10);
+                Percent.of(15);
             public static final Frequency MULTIPLIER_SLEW_RATE =
                 Percent
                 .of(25)
@@ -295,8 +300,8 @@ public final class Constants {
             public static final double WHEEL_FRICTION_COEFFICIENT = 2.255;
 
             public static final Voltage OPTIMAL_VOLTAGE = Volts.of(12);
-            public static final Current DRIVE_CURRENT_LIMIT = Amps.of(50);
-            public static final Current STEER_CURRENT_LIMIT = Amps.of(50);
+            public static final Current DRIVE_CURRENT_LIMIT = Amps.of(120);
+            public static final Current STEER_CURRENT_LIMIT = Amps.of(120);
 
             // the minimum number of seconds it takes the motor to go from 0 to
             // full throttle
@@ -415,13 +420,6 @@ public final class Constants {
 
 
     public static final class LimelightConstants {
-        public static final double kPositionStdDevX = 0.1;
-        public static final double kPositionStdDevY = 0.1;
-        public static final double kPositionStdDevTheta = 10;
-        public static final double kVisionStdDevY = 5;
-        public static final double kVisionStdDevX = 5;
-        public static final double kVisionStdDevTheta = 500;
-
         private static final AprilTagFieldLayout TAG_LAYOUT =
             AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
@@ -432,6 +430,12 @@ public final class Constants {
                         put(i, TAG_LAYOUT.getTagPose(i + 1).get().toPose2d());
                 }
             }};
+
+        public static final int[] VALID_TAGS = {
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
+                35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48
+            };
     }
 
     public static final class TurretConstants {
@@ -448,6 +452,8 @@ public final class Constants {
 
             public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
                 RotationsPerSecond.of(2.5);
+
+	    public static final Time CLEARING_TIME = Seconds.of(0.3);
 
             public static final class PID {
                 public static final double P = 13.5;
@@ -467,11 +473,17 @@ public final class Constants {
                 // public static final double C = 3.14192;
                 // public static final double D = 2.439991;
 
-                // Untested but should be more accurate.
+                // // Untested but should be more accurate.
+                // public static final double A = 0.0220843;
+                // public static final double B = -0.820693;;
+                // public static final double C = 18.03142;
+                // public static final double D = -46.76686;  
+
+    
                 public static final double A = 0.0220843;
-                public static final double B = -0.820693;;
-                public static final double C = 18.03142;
-                public static final double D = -46.76686;  
+                public static final double B = -0.910693;;
+                public static final double C = 20.55142;
+                public static final double D = -50.46686;  
             }
         }
 
@@ -506,20 +518,20 @@ public final class Constants {
             }
 
             public static final class PID {
-                public static final double P = 80;
+                public static final double P = 90;
                 public static final double I = 0.40;
-                public static final double D = 0.1;
+                public static final double D = 0.12;
             }
 
             public static final class Feedforward {
                 public static final double kS = 0.52;
                 public static final double kV = 0.35;
-                public static final double kA = 0.04;
+                public static final double kA = 0.042;
             }
             
             public static final class Magic {
-                public static final double kV = 0.05;
-                public static final double kA = 0.03;
+                public static final double kV = 0.045;
+                public static final double kA = 0.028;
             }
         }
 
@@ -570,7 +582,7 @@ public final class Constants {
   public static final class IndexerConstants {
       public static final boolean REVERSE = false;
       public static final int CAN_ID = 24;
-      public static final Dimensionless SPEED = Percent.of(80);
+      public static final Dimensionless SPEED = Percent.of(60);
 
     
       public static final class Fueling {

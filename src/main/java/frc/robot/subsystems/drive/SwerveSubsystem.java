@@ -1,6 +1,8 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
+
+import java.util.ArrayList;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -9,6 +11,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,9 +35,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.ChoreoConstants;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.util.LimelightContainer;
+import frc.robot.subsystems.limelight.Reading;
+import static frc.robot.util.LimelightHelpers.PoseEstimate;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.encoders.CANCoderSwerve;
@@ -375,18 +378,112 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-     swerveDrive.updateOdometry(); 
-        if(Robot.isSimulation()) {
-            LimelightContainer.estimateSimOdometry();
-        } else {
-            RobotContainer.LLContainer.estimateMT2Odometry(this);
-            //RobotContainer.LLContainer.estimateMT1Odometry(this);
+        // this should be called every loop
+        // [see](https://yet-another-software-suite.github.io/YAGSL/javadocs/swervelib/SwerveDrive.html#updateOdometry())
+        swerveDrive.updateOdometry();
+
+        ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
+            .getMT1Readings();
+        ArrayList<Reading> mt2Readings = RobotContainer.limelightSubsystem
+            .getMT2Readings();
+
+        ArrayList<Reading> mt2Filtered = new ArrayList<>();
+        // regular mt2 vision measurements
+        for (Reading reading : mt2Readings) {
+            boolean added;
+            if (
+                reading.getEstimate().tagCount >= 2
+                && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                    .lt(
+                        RadiansPerSecond.of(Math.PI / 2)
+                    )
+            ) {
+                mt2Filtered.add(reading);
+
+                added = true;
+            } else {
+                added = false;
+            }
+
+            SmartDashboard.putBoolean(
+                "Odometry/" + reading.getLimelightId() + "/added",
+                added
+            );
         }
+
+        if (mt2Filtered.size() > 0) {
+            // average the readings to get dissonance
+            Translation2d averaged = new Translation2d();
+            for (Reading filtered : mt2Filtered) {
+                averaged = averaged.plus(
+                    filtered.getEstimate()
+                        .pose
+                        .getTranslation()
+                );
+            }
+            averaged.div(mt2Filtered.size());
+
+            double dissonance = Math.max(
+                averaged.getSquaredDistance(
+                    mt2Filtered.get(0)
+                        .getEstimate()
+                        .pose
+                        .getTranslation()
+                ),
+                0.005
+            );
+
+            // try to correct dissonance
+            for (Reading reading : mt1Readings) {
+                PoseEstimate estimate = reading.getEstimate();
+                double[] stddevs = reading.getStddevs();
+
+                if (
+                    estimate.tagCount >= 1
+                    && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                        .lt(
+                            RadiansPerSecond.of(Math.PI)
+                        )
+                ) {
+                    swerveDrive.addVisionMeasurement(
+                        estimate.pose,
+                        estimate.timestampSeconds,
+                        VecBuilder.fill(
+                            999999,
+                            999999,
+                            stddevs[2] / dissonance
+                        )
+                    );
+                }
+            }
+
+            double translationDissonanceMaximum = 0.075;
+            double translationDissonance = Math.min(
+                dissonance,
+                translationDissonanceMaximum
+            ) / translationDissonanceMaximum;
+            for (Reading filtered: mt2Filtered) {
+                PoseEstimate estimate = filtered.getEstimate();
+                double[] stddevs = filtered.getStddevs();
+
+                swerveDrive.addVisionMeasurement(
+                    estimate.pose,
+                    estimate.timestampSeconds,
+                    VecBuilder.fill(
+                        stddevs[0] / translationDissonance,
+                        stddevs[1] / translationDissonance,
+                        999999 // stddevs[2] 
+                    )
+                );
+
+            }
+        }
+
         posePublisher.set(getPose());
 
         SmartDashboard.putNumber(
             "Swerve/Heading",
-            getHeading().getRotations() 
+            getHeading().getRotations()
         );
         SmartDashboard.putNumber(
             "Swerve/angularVelocity",
@@ -400,6 +497,35 @@ public class SwerveSubsystem extends SubsystemBase {
             "Swerve/velocity_y",
             getYVelocity().in(MetersPerSecond)
         );
+    }
+
+    public void snapToVision() {
+        ArrayList<Reading> mt1Readings = RobotContainer.limelightSubsystem
+            .getMT1Readings();
+        
+        for (Reading reading : mt1Readings) {
+            PoseEstimate estimate = reading.getEstimate();
+            if (
+                estimate.tagCount > 0
+                && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+                    .lt(
+                        RadiansPerSecond.of(Math.PI)
+                    )
+            ) {
+                swerveDrive.addVisionMeasurement(
+                    estimate.pose,
+                    estimate.timestampSeconds,
+                    VecBuilder.fill(
+                        0.3,
+                        0.3,
+                        0.3
+                    )
+                );
+            }
+        }
+
+        RobotContainer.limelightSubsystem.setIMUModes(1);
+        RobotContainer.limelightSubsystem.updatePositions();
     }
     
 
@@ -455,7 +581,18 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
+        RobotContainer.limelightSubsystem.setIMUModes(1);
         swerveDrive.resetOdometry(pose);
+        addVisionMeasurement(
+            pose, 
+            Timer.getTimestamp(), 
+            VecBuilder.fill(
+                0,
+                0,
+                0
+            ) 
+        );
+        RobotContainer.limelightSubsystem.updatePositions();
     }
 
     public void resetOdometry() {

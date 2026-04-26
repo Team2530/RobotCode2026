@@ -1,8 +1,6 @@
 package frc.robot.commands.control;
 
-import frc.robot.subsystems.IndexerSubsystem;
-
-import java.util.function.BooleanSupplier;
+import frc.robot.subsystems.manipulator.IndexerSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
 

@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.manipulator;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -44,6 +44,7 @@ import frc.robot.Constants.TurretConstants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.MetaConstants;
 import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.Mutable;
 
 public class TurretSubsystem extends SubsystemBase {
     
@@ -128,6 +129,10 @@ public class TurretSubsystem extends SubsystemBase {
     
     // debug
     private final SendableChooser<Boolean> forceEnableFiringChooser;
+
+    // actively shooting
+    private final Mutable<Boolean> spoolingLauncher;
+    private final Debouncer spoolingDebouncer;
 
     public TurretSubsystem() {
         // Initialize Motors and Encoders
@@ -242,6 +247,12 @@ public class TurretSubsystem extends SubsystemBase {
             "Force Enable Firing",
             forceEnableFiringChooser
         );
+
+        spoolingLauncher = new Mutable<Boolean>(false);
+        spoolingDebouncer = new Debouncer(
+                TurretConstants.Launcher.CLEARING_TIME.in(Seconds),
+                DebounceType.kFalling
+            );
     }
 
     @Override
@@ -331,11 +342,11 @@ public class TurretSubsystem extends SubsystemBase {
                 LinearVelocity exitVelocityX = (
                         totalVelocity
                         .times(Math.cos(totalYaw.in(Radians)))
-                    ).plus(getLauncherPositionalVelocityX());
+                    ).minus(getLauncherPositionalVelocityX());
                 LinearVelocity exitVelocityY = (
                         totalVelocity
                         .times(Math.sin(totalYaw.in(Radians)))
-                    ).plus(getLauncherPositionalVelocityY());
+                    ).minus(getLauncherPositionalVelocityY());
 
                 targetYaw = Radians.of(
                     (
@@ -407,12 +418,13 @@ public class TurretSubsystem extends SubsystemBase {
 
             /** targetVelocity Clamped in Rot/s */
             setVelocity = RotationsPerSecond.of(
-                    MathUtil.clamp(
-                        targetVelocity.in(RotationsPerSecond),
-                        TurretConstants.Launcher.MINIMUM_VELOCITY.in(RotationsPerSecond),
-                        TurretConstants.Launcher.MAXIMUM_VELOCITY.in(RotationsPerSecond)
-                    )
-                );
+                MathUtil.clamp(
+                    targetVelocity.in(RotationsPerSecond),
+                    TurretConstants.Launcher.MINIMUM_VELOCITY.in(RotationsPerSecond),
+                    TurretConstants.Launcher.MAXIMUM_VELOCITY.in(RotationsPerSecond)
+                )
+            );
+            
             setYaw = Rotations.of(
                     MathUtil.clamp(
                         targetYaw.in(Rotations),
@@ -421,10 +433,27 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 );
 
-            m_LauncherPortMotor.setControl(
-                new VelocityTorqueCurrentFOC(setVelocity)
-                    .withUpdateFreqHz(1000)
-            );
+            if(
+                spoolingDebouncer.calculate(
+                    spoolingLauncher.get()
+                )
+            ) {
+                m_LauncherPortMotor.setControl(
+                    new VelocityTorqueCurrentFOC(setVelocity)
+                        .withUpdateFreqHz(1000)
+                );
+                m_LauncherStarboardMotor.setControl(
+                    new Follower(
+                        TurretConstants.CANIDs.Launcher.PORT,
+                        MotorAlignmentValue.Opposed
+                    )
+                );
+                }
+            else {
+                m_LauncherPortMotor.stopMotor();
+                m_LauncherStarboardMotor.stopMotor();
+            }
+
 
             m_YawMotor.setControl(
                     new MotionMagicExpoTorqueCurrentFOC(
@@ -491,6 +520,10 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putNumber(
             "Turret/Launcher/current",
             getLauncherCurrent()
+        );
+        SmartDashboard.putBoolean(
+            "Turret/Launcher/spooling",
+            spoolingLauncher.get()
         );
 
         // yaw
@@ -563,7 +596,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public LinearVelocity getLauncherPositionalVelocityX() {
         return MetersPerSecond.of(
-            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .in(RadiansPerSecond)
             * (
                 (
@@ -582,12 +615,15 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 )
             ).in(Meters)
+        )
+        .plus(
+            RobotContainer.swerveDriveSubsystem.getXVelocity()
         );
     }
 
     public LinearVelocity getLauncherPositionalVelocityY() {
         return MetersPerSecond.of(
-            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .in(RadiansPerSecond)
             * (
                 (
@@ -606,6 +642,9 @@ public class TurretSubsystem extends SubsystemBase {
                     )
                 )
             ).in(Meters)
+        )
+        .plus(
+            RobotContainer.swerveDriveSubsystem.getYVelocity()
         );
     }
 
@@ -802,4 +841,13 @@ public class TurretSubsystem extends SubsystemBase {
     public boolean hasSolution() {
         return hasSolution;
     }
+
+    public void spoolLauncher() {
+        spoolingLauncher.set(true);
+    }
+
+    public void stopLauncher() {
+        spoolingLauncher.set(false);
+    }
+
 }
