@@ -35,8 +35,8 @@ public class IntakeSubsystem extends SubsystemBase {
     public enum IntakePreset {
         STOWED(true, RotationsPerSecond.of(0)),
         OUT(false, RotationsPerSecond.of(0)),
-        INTAKING(false, RotationsPerSecond.of(34)),
-        AGITATING(false, RotationsPerSecond.of(40)),
+        INTAKING(false, RotationsPerSecond.of(32.5)),
+        AGITATING(false, RotationsPerSecond.of(60)),
         SPITTING(false, IntakeConstants.Feeder.MAXIMUM_VELOCITY.times(-1)),
         CUSTOM(false, RotationsPerSecond.of(Double.MAX_VALUE));
 
