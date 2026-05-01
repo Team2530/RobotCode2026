@@ -451,12 +451,14 @@ public final class Constants {
                 RotationsPerSecond.of(15);
 
             public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
-                RotationsPerSecond.of(2.5);
+                RotationsPerSecond.of(5);
 
-	    public static final Time CLEARING_TIME = Seconds.of(0.3);
+            public static final Dimensionless VELOCITY_IMPART = Percent.of(90);
+            
+            public static final Time CLEARING_TIME = Seconds.of(1);
 
             public static final class PID {
-                public static final double P = 13.5;
+                public static final double P = 15;
                 public static final double I = 0.12;
                 public static final double D = 0.04;
             }
@@ -480,10 +482,10 @@ public final class Constants {
                 // public static final double D = -46.76686;  
 
     
-                public static final double A = 0.0220843;
-                public static final double B = -0.910693;;
-                public static final double C = 20.55142;
-                public static final double D = -50.46686;  
+                public static final double A = 0.02240843;
+                public static final double B = -0.98693;;
+                public static final double C = 23.95142;
+                public static final double D = -73.46686;  
             }
         }
 
