@@ -457,7 +457,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 }
             }
 
-            double translationDissonanceMaximum = 0.075;
+            double translationDissonanceMaximum = 0.08;
             double translationDissonance = Math.min(
                 dissonance,
                 translationDissonanceMaximum
