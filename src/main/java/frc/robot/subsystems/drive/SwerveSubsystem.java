@@ -430,7 +430,12 @@ public class SwerveSubsystem extends SubsystemBase {
                         .pose
                         .getTranslation()
                 ),
-                0.005
+                0.016
+            );
+
+            SmartDashboard.putNumber(
+                "Odometry/dissonance",
+                dissonance
             );
 
             // try to correct dissonance
