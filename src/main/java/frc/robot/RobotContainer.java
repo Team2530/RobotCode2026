@@ -332,12 +332,19 @@ public class RobotContainer {
                 turretSubsystem.zeroYawCommand()
             );
         operatorXbox.rightStick()
-            .onTrue(
-                    new InstantCommand(
-                        () -> {
+            .whileTrue(
+                    new Command() {
+                        @Override
+                        public void execute() {
+                            
                             swerveDriveSubsystem.snapToVision();
+                        }                        
+
+                        @Override
+                        public boolean isFinished() {
+                            return false;
                         }
-                    )
+                    }
             );
 
         operatorXbox.back()
