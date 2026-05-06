@@ -60,6 +60,7 @@ import frc.robot.subsystems.limelight.Limelight;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.manipulator.IndexerSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem;
+import frc.robot.subsystems.manipulator.LighttrapSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakePreset;
 import frc.robot.subsystems.manipulator.LoaderSubsystem;
 import frc.robot.subsystems.manipulator.TurretSubsystem;
@@ -94,6 +95,8 @@ public class RobotContainer {
     // LimeLightSubsystem();
     @Logged
     public static final DriveCommand normalDrive = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
+
+    public static final LighttrapSubsystem lighttrapSubsystem = new LighttrapSubsystem();
 
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public static final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
