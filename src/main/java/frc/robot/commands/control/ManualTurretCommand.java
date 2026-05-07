@@ -107,6 +107,8 @@ public class ManualTurretCommand extends Command {
             || operatorXbox.getAButton()
             || operatorXbox.getBButton()
             || operatorXbox.getRightBumperButtonPressed()
+            || operatorXbox.getPOV() == 90
+            || operatorXbox.getPOV() == 270
         );
     }
 

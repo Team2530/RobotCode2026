@@ -73,6 +73,22 @@ public class TurretSubsystem extends SubsystemBase {
                 new Rotation3d()
             )
         ),
+        SHUTTLE_MIDDLE_LEFT(
+            new Pose3d(
+                Inches.of(325.1),
+                Inches.of(238.4),
+                Inches.of(0),
+                new Rotation3d()
+            )
+        ),
+        SHUTTLE_MIDDLE_RIGHT(
+            new Pose3d(
+                Inches.of(325.1),
+                Inches.of(79.3),
+                Inches.of(0),
+                new Rotation3d()
+            )
+        ),
         CUSTOM(
             new Pose3d(
                 Inches.of(Double.MAX_VALUE),
@@ -607,7 +623,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public LinearVelocity getLauncherPositionalVelocityX() {
         return MetersPerSecond.of(
-            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .in(RadiansPerSecond)
             * (
                 (
@@ -627,14 +643,14 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             ).in(Meters)
         )
-        .plus(
+        .minus(
             RobotContainer.swerveDriveSubsystem.getXVelocity()
         );
     }
 
     public LinearVelocity getLauncherPositionalVelocityY() {
         return MetersPerSecond.of(
-            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .in(RadiansPerSecond)
             * (
                 (
@@ -654,7 +670,7 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             ).in(Meters)
         )
-        .plus(
+        .minus(
             RobotContainer.swerveDriveSubsystem.getYVelocity()
         );
     }

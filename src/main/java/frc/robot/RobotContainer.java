@@ -374,35 +374,6 @@ public class RobotContainer {
         
         operatorXbox.y().onTrue(turretCommand);
 
-        // SHUTTLE
-        operatorXbox.a()
-            .onTrue(
-                new InstantCommand( 
-                    () -> {
-                        turretSubsystem.setManualControl(
-                            Degrees.of(0), 
-                            RotationsPerSecond.of(45)
-                        );
-                        //turretSubsystem.setTarget(TurretTargets.HUB);
-                    }
-                )
-            );
-
-        // DEPOT
-        operatorXbox.povDown()
-            //.onTrue(turretCommand);
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                        turretSubsystem.setManualControl(
-                            Degrees.of(62), 
-                            RotationsPerSecond.of(37.5)
-                        );
-                    }
-                )
-            );
-
-
         // KILL
         driverXbox.x()
             .onTrue(
@@ -413,17 +384,16 @@ public class RobotContainer {
                 )
             );
 
-        // LEFT TRENCH  
+        // LEFT MIDDLE SHUTTLE 
         operatorXbox.povLeft()
             .onTrue(
-                new InstantCommand(
-                    () -> {
-                        turretSubsystem.setManualControl(
-                            Degrees.of(295), 
-                            RotationsPerSecond.of(36)
-                        );
-                    }
-                )
+                    new InstantCommand(
+                        () ->{
+                            turretSubsystem.setTarget(
+                                TurretTargets.SHUTTLE_MIDDLE_LEFT
+                            );
+                        }
+                    )
             );
 
         // RIGHT TRENCH
@@ -431,15 +401,12 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                        turretSubsystem.setManualControl(
-                            Degrees.of(69),
-                            RotationsPerSecond.of(35)
+                        turretSubsystem.setTarget(
+                            TurretTargets.SHUTTLE_MIDDLE_RIGHT
                         );
                     }
                 )
             );
-
-        
     }
 
 
