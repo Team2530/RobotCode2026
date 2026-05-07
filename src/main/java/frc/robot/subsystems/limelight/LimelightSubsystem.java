@@ -33,14 +33,14 @@ public class LimelightSubsystem extends SubsystemBase{
             > 2
         ) {
             setIMUModes(4);
-            setAlphaAssists(0.01);
+            setAlphaAssists(0.025);
             
         } else {
             setIMUModes(4);
-            setAlphaAssists(0.03);
+            setAlphaAssists(0.035);
         }
 
-        Time pipelinePeriod = Milliseconds.of(250);
+        Time pipelinePeriod = Milliseconds.of(100);
         if (
             (
                 Timer.getTimestamp() 

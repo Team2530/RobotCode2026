@@ -393,10 +393,10 @@ public class SwerveSubsystem extends SubsystemBase {
             boolean added;
             if (
                 reading.getEstimate().tagCount >= 2
-                && RobotContainer.swerveDriveSubsystem.getAngularVelocity()
-                    .lt(
-                        RadiansPerSecond.of(Math.PI / 2)
-                    )
+                && RobotContainer.swerveDriveSubsystem
+                        .getAngularVelocity()
+                        .abs(RadiansPerSecond)
+                    < (2 * Math.PI)
             ) {
                 mt2Filtered.add(reading);
 
@@ -430,7 +430,12 @@ public class SwerveSubsystem extends SubsystemBase {
                         .pose
                         .getTranslation()
                 ),
-                0.005
+                0.024
+            );
+
+            SmartDashboard.putNumber(
+                "Odometry/dissonance",
+                dissonance
             );
 
             // try to correct dissonance
@@ -457,11 +462,10 @@ public class SwerveSubsystem extends SubsystemBase {
                 }
             }
 
-            double translationDissonanceMaximum = 0.075;
-            double translationDissonance = Math.min(
-                dissonance,
-                translationDissonanceMaximum
-            ) / translationDissonanceMaximum;
+            double translationDissonance = Math.pow(
+                    dissonance / 0.04,
+                    3
+                );
             for (Reading filtered: mt2Filtered) {
                 PoseEstimate estimate = filtered.getEstimate();
                 double[] stddevs = filtered.getStddevs();
@@ -470,8 +474,8 @@ public class SwerveSubsystem extends SubsystemBase {
                     estimate.pose,
                     estimate.timestampSeconds,
                     VecBuilder.fill(
-                        stddevs[0] / translationDissonance,
-                        stddevs[1] / translationDissonance,
+                        stddevs[0] * translationDissonance,
+                        stddevs[1] * translationDissonance,
                         999999 // stddevs[2] 
                     )
                 );
