@@ -217,7 +217,7 @@ public final class Constants {
 
 
             public static final class Waving {
-                public static final Time PERIOD = Seconds.of(1.4);
+                public static final Time PERIOD = Seconds.of(1.2);
                 // an arbitrary value
                 //
                 // i think this is dependent on the gear ratio of the pivot, but
@@ -451,12 +451,14 @@ public final class Constants {
                 RotationsPerSecond.of(15);
 
             public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
-                RotationsPerSecond.of(2.5);
+                RotationsPerSecond.of(10);
 
-	    public static final Time CLEARING_TIME = Seconds.of(0.3);
+            public static final Dimensionless VELOCITY_IMPART = Percent.of(90);
+            
+            public static final Time CLEARING_TIME = Seconds.of(1);
 
             public static final class PID {
-                public static final double P = 13.5;
+                public static final double P = 15;
                 public static final double I = 0.12;
                 public static final double D = 0.04;
             }
@@ -480,10 +482,10 @@ public final class Constants {
                 // public static final double D = -46.76686;  
 
     
-                public static final double A = 0.0220843;
-                public static final double B = -0.910693;;
-                public static final double C = 20.55142;
-                public static final double D = -50.46686;  
+                public static final double A = 0.02240843;
+                public static final double B = -0.98693;;
+                public static final double C = 23.95142;
+                public static final double D = -72.46686;  
             }
         }
 
@@ -582,7 +584,7 @@ public final class Constants {
   public static final class IndexerConstants {
       public static final boolean REVERSE = false;
       public static final int CAN_ID = 24;
-      public static final Dimensionless SPEED = Percent.of(60);
+      public static final Dimensionless SPEED = Percent.of(80);
 
     
       public static final class Fueling {

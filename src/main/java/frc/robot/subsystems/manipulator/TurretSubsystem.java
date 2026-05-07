@@ -73,6 +73,22 @@ public class TurretSubsystem extends SubsystemBase {
                 new Rotation3d()
             )
         ),
+        SHUTTLE_MIDDLE_LEFT(
+            new Pose3d(
+                Inches.of(325.1),
+                Inches.of(238.4),
+                Inches.of(0),
+                new Rotation3d()
+            )
+        ),
+        SHUTTLE_MIDDLE_RIGHT(
+            new Pose3d(
+                Inches.of(325.1),
+                Inches.of(79.3),
+                Inches.of(0),
+                new Rotation3d()
+            )
+        ),
         CUSTOM(
             new Pose3d(
                 Inches.of(Double.MAX_VALUE),
@@ -342,11 +358,17 @@ public class TurretSubsystem extends SubsystemBase {
                 LinearVelocity exitVelocityX = (
                         totalVelocity
                         .times(Math.cos(totalYaw.in(Radians)))
-                    ).minus(getLauncherPositionalVelocityX());
+                    ).minus(
+                        getLauncherPositionalVelocityX()
+                            .times(TurretConstants.Launcher.VELOCITY_IMPART)
+                    );
                 LinearVelocity exitVelocityY = (
                         totalVelocity
                         .times(Math.sin(totalYaw.in(Radians)))
-                    ).minus(getLauncherPositionalVelocityY());
+                    ).minus(
+                        getLauncherPositionalVelocityY()
+                            .times(TurretConstants.Launcher.VELOCITY_IMPART)
+                    );
 
                 targetYaw = Radians.of(
                     (
@@ -366,6 +388,11 @@ public class TurretSubsystem extends SubsystemBase {
                 targetVelocity = calculateExitToLauncherVelocity(
                         targetExitVelocity
                     );
+
+                SmartDashboard.putNumber(
+                    "Turret/Launcher/total_exit_velocity", 
+                    targetExitVelocity.magnitude()
+                );
                 TotalVelocityPublisher.set(
                     new Pose3d(
                         new Translation3d(
@@ -596,7 +623,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public LinearVelocity getLauncherPositionalVelocityX() {
         return MetersPerSecond.of(
-            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .in(RadiansPerSecond)
             * (
                 (
@@ -616,14 +643,14 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             ).in(Meters)
         )
-        .plus(
+        .minus(
             RobotContainer.swerveDriveSubsystem.getXVelocity()
         );
     }
 
     public LinearVelocity getLauncherPositionalVelocityY() {
         return MetersPerSecond.of(
-            -RobotContainer.swerveDriveSubsystem.getAngularVelocity()
+            RobotContainer.swerveDriveSubsystem.getAngularVelocity()
                 .in(RadiansPerSecond)
             * (
                 (
@@ -643,7 +670,7 @@ public class TurretSubsystem extends SubsystemBase {
                 )
             ).in(Meters)
         )
-        .plus(
+        .minus(
             RobotContainer.swerveDriveSubsystem.getYVelocity()
         );
     }
