@@ -451,7 +451,7 @@ public final class Constants {
                 RotationsPerSecond.of(15);
 
             public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
-                RotationsPerSecond.of(5);
+                RotationsPerSecond.of(10);
 
             public static final Dimensionless VELOCITY_IMPART = Percent.of(90);
             
@@ -485,7 +485,7 @@ public final class Constants {
                 public static final double A = 0.02240843;
                 public static final double B = -0.98693;;
                 public static final double C = 23.95142;
-                public static final double D = -73.46686;  
+                public static final double D = -72.46686;  
             }
         }
 
