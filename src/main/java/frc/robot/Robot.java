@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
   @Logged
   double loopTime = 0.02;
   @Logged
-  double commandSchedulerTime = 0.02;
+  double commandSchedulerTime = 1/800;
 
   DoublePublisher loopPub = NetworkTableInstance.getDefault()
       .getDoubleTopic("loopTime").publish();

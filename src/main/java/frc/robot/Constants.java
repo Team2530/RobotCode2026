@@ -464,8 +464,8 @@ public final class Constants {
             }
 
             public static final class Feedforward {
-                public static final double kS = 8.5;
-                public static final double kV = 0.2;
+                public static final double kS = 9.5;
+                public static final double kV = 0.3;
             }
 
             public static final class VelocityRegression {

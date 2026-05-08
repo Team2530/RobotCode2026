@@ -4,14 +4,15 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 import edu.wpi.first.hal.DIOJNI;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LighttrapSubsystem extends SubsystemBase {
     
-    private final int startTrapPin = 0;
-    private final int endTrapPin = 1;
+    private final DigitalInput startTrap = new DigitalInput(3);
+    private final DigitalInput endTrap = new DigitalInput(2);
 
     private boolean previouslyStartTrapped = true;
     private boolean previouslyEndTrapped = true;
@@ -23,7 +24,7 @@ public class LighttrapSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (
-            DIOJNI.getDIO(startTrapPin)
+            !startTrap.get()
             && !previouslyStartTrapped
         ) {
             previouslyStartTrapped = true;
@@ -40,31 +41,51 @@ public class LighttrapSubsystem extends SubsystemBase {
         }
 
         if (
-            DIOJNI.getDIO(endTrapPin)
+            !endTrap.get()
             && !previouslyEndTrapped
         ) {
             double time = Timer.getTimestamp();
             previouslyEndTrapped = true;
-            SmartDashboard.putNumber(
-                "Lighttrap/lastDifference",
-                Timer.getTimestamp() - timestamps.remove()
-            );
+
+
+            if (timestamps.size() > 0) {
+
+                double PreviousTime = timestamps.remove();
+
+                SmartDashboard.putNumber(
+                    "Lighttrap/lastDifference",
+                    Timer.getTimestamp() - PreviousTime
+                );
+
+                SmartDashboard.putNumber(
+                    "Lighttrap/PreviousTime",
+                    PreviousTime
+                );
+            }
             SmartDashboard.putNumber(
                 "Lighttrap/lastExit",
                 time
             );
+
         } else {
             previouslyEndTrapped = false;
         }
 
+        SmartDashboard.putNumber(
+            "Lighttrap/queue_size",
+            timestamps.size()
+        );
+        
+
         SmartDashboard.putBoolean(
-            "Lightrap/start_trapped",
-            DIOJNI.getDIO(startTrapPin)
+            "Lighttrap/start_trapped",
+            startTrap.get()
         );
         SmartDashboard.putBoolean(
-            "Lightrap/end_trapped",
-            DIOJNI.getDIO(endTrapPin)
+            "Lighttrap/end_trapped",
+            endTrap.get()
         );
+
     }
 
 }

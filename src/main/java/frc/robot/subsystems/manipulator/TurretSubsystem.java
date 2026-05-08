@@ -145,6 +145,8 @@ public class TurretSubsystem extends SubsystemBase {
     
     // debug
     private final SendableChooser<Boolean> forceEnableFiringChooser;
+    private final SendableChooser<Boolean> forceEnableManipulators;
+
 
     // actively shooting
     private final Mutable<Boolean> spoolingLauncher;
@@ -256,12 +258,26 @@ public class TurretSubsystem extends SubsystemBase {
             false
         );
         forceEnableFiringChooser.addOption(
-            "Force Enabled",
+            "Firing Force Enabled",
             true
         );
         SmartDashboard.putData(
             "Force Enable Firing",
             forceEnableFiringChooser
+        );
+
+        forceEnableManipulators = new SendableChooser<>();
+        forceEnableManipulators.setDefaultOption(
+            "Non-Turret Manipulators Disabled", 
+            false
+        );
+        forceEnableManipulators.addOption(
+            "All Manipulators Enabled",
+             true
+        );
+        SmartDashboard.putData(
+            "Force Enable Manipulators",
+            forceEnableManipulators
         );
 
         spoolingLauncher = new Mutable<Boolean>(false);
@@ -590,6 +606,14 @@ public class TurretSubsystem extends SubsystemBase {
             "Turret/hasSolution",
             hasSolution()
         );
+
+        if(forceEnableFiringChooser.getSelected()==true){
+            yawIsZeroed = true;
+        }
+        else{
+            yawIsZeroed = false;
+        }
+
     }
     
     public Angle getYaw() {
@@ -846,7 +870,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
     
     public boolean isAtVelocity() {
-        return atVelocity && yawIsZeroed;
+        return atVelocity && yawIsZeroed && forceEnableManipulators.getSelected();
     }
 
     public void stop() {
@@ -854,10 +878,18 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public boolean allowFiring() {
-        return (
-            isAtVelocity()
-            && atSolution()
-        ) || forceEnableFiringChooser.getSelected();
+        if(forceEnableManipulators.getSelected()==true){
+            return (
+                isAtVelocity()
+                && atSolution()
+            );
+        }
+        else{
+            return(
+                false
+            );
+        }
+
     }
 
     public boolean atSolution() {
