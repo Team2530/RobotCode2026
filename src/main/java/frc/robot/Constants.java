@@ -448,7 +448,7 @@ public final class Constants {
             public static final AngularVelocity MAXIMUM_VELOCITY =
                 RotationsPerSecond.of(100);
             public static final AngularVelocity MINIMUM_VELOCITY =
-                RotationsPerSecond.of(15);
+                RotationsPerSecond.of(45);
 
             public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
                 RotationsPerSecond.of(10);
@@ -458,14 +458,14 @@ public final class Constants {
             public static final Time CLEARING_TIME = Seconds.of(1);
 
             public static final class PID {
-                public static final double P = 15;
-                public static final double I = 0.12;
-                public static final double D = 0.04;
+                public static final double P = 10;
+                public static final double I = 0.13;
+                public static final double D = 0.02;
             }
 
             public static final class Feedforward {
-                public static final double kS = 9.5;
-                public static final double kV = 0.3;
+                public static final double kS = 6;
+                public static final double kV = 0.9; 
             }
 
             public static final class VelocityRegression {
