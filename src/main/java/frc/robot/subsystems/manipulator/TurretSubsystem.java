@@ -437,8 +437,13 @@ public class TurretSubsystem extends SubsystemBase {
                     getLauncherVelocity()
                     .minus(targetVelocity)
                 ).abs(RotationsPerSecond)
-                < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR
-                    .in(RotationsPerSecond);
+                < (
+                    targetVelocity.gt(TurretConstants.Launcher.FULL_SEND_LINE)
+                        ?  TurretConstants.Launcher.MAXIMUM_ROUGH_VELOCITY_ERROR
+                            .in(RotationsPerSecond)
+                        :  TurretConstants.Launcher.MAXIMUM_FINE_VELOCITY_ERROR
+                            .in(RotationsPerSecond)
+                );
             atSolution = (
                     getYaw()
                     .minus(targetYaw)   
