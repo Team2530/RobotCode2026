@@ -35,6 +35,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
@@ -187,6 +188,10 @@ public class TurretSubsystem extends SubsystemBase {
                             .withKV(
                                 TurretConstants.Launcher.Feedforward.kV
                             )
+                    ).withCurrentLimits(
+                        new CurrentLimitsConfigs()
+                            .withStatorCurrentLimit(200)
+                            .withSupplyCurrentLimit(90)
                     )
             );
         // WARNING: this might need to be set in periodic?
