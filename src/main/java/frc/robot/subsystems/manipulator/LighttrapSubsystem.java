@@ -88,4 +88,9 @@ public class LighttrapSubsystem extends SubsystemBase {
 
     }
 
+    public void clearQueue() {
+        timestamps.clear();
+    }
+
+
 }

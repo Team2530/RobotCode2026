@@ -453,9 +453,9 @@ public final class Constants {
             public static final AngularVelocity MAXIMUM_FINE_VELOCITY_ERROR = 
                 RotationsPerSecond.of(5);
             public static final AngularVelocity MAXIMUM_ROUGH_VELOCITY_ERROR = 
-                RotationsPerSecond.of(15);
+                RotationsPerSecond.of(14);
             public static final AngularVelocity FULL_SEND_LINE = 
-                RotationsPerSecond.of(60);
+                RotationsPerSecond.of(67.5);
 
             public static final Dimensionless VELOCITY_IMPART = Percent.of(90);
             

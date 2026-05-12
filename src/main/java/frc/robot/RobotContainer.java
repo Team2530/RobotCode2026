@@ -410,6 +410,16 @@ public class RobotContainer {
                     }
                 )
             );
+
+        driverXbox.a()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                        lighttrapSubsystem.clearQueue();
+                    }
+                )
+            );
+
     }
 
 
