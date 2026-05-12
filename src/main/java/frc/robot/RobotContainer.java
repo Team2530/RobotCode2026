@@ -280,7 +280,7 @@ public class RobotContainer {
                 new SpoolLauncherCommand()
             );
 
-        operatorXbox.rightTrigger(0.3)
+        operatorXbox.rightTrigger(0.7)
             .whileTrue(
                 new ParallelCommandGroup(
                     new RunLoaderCommand(loaderSubsystem),
@@ -288,7 +288,7 @@ public class RobotContainer {
                 )
             );
 
-        operatorXbox.rightTrigger(0.3)
+        operatorXbox.rightTrigger(0.7)
             .and(
                 new BooleanSupplier() {
                     @Override
