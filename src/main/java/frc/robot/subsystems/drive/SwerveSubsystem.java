@@ -154,7 +154,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
                     drive = new DriveConversionFactorsJson() {{
                         gearRatio = DriveConstants.Modules.Gearing.Drive
-                            .RIDICULUS;
+                            .LIGHT;
                         diameter = DriveConstants.Modules.WHEEL_DIAMETER
                             .in(Inches);
                         calculate();
@@ -353,11 +353,11 @@ public class SwerveSubsystem extends SubsystemBase {
         // register gearshifter with smartdashboard
         gearChooser = new SendableChooser<>();
 
-        gearChooser.addOption(
+        gearChooser.setDefaultOption(
             SwerveGearing.LIGHT.toString(),
             SwerveGearing.LIGHT
         );
-        gearChooser.setDefaultOption(
+        gearChooser.addOption(
             SwerveGearing.RIDICULUS.toString(),
             SwerveGearing.RIDICULUS
         );
