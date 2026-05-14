@@ -457,6 +457,13 @@ public class SwerveSubsystem extends SubsystemBase {
                         .lt(
                             RadiansPerSecond.of(Math.PI)
                         )
+                    && (
+                        0 < reading.getEstimate().pose.getX() 
+                        && reading.getEstimate().pose.getX() < MetaConstants.Field.LENGTH.in(Meters)
+                    ) && (
+                        0 < reading.getEstimate().pose.getY() 
+                        && reading.getEstimate().pose.getY() < MetaConstants.Field.WIDTH.in(Meters)
+                    )
                 ) {
                     swerveDrive.addVisionMeasurement(
                         estimate.pose,
@@ -523,6 +530,13 @@ public class SwerveSubsystem extends SubsystemBase {
                     .lt(
                         RadiansPerSecond.of(Math.PI)
                     )
+                && (
+                    0 < reading.getEstimate().pose.getX() 
+                    && reading.getEstimate().pose.getX() < MetaConstants.Field.LENGTH.in(Meters)
+                ) && (
+                    0 < reading.getEstimate().pose.getY() 
+                    && reading.getEstimate().pose.getY() < MetaConstants.Field.WIDTH.in(Meters)
+                )
             ) {
                 swerveDrive.addVisionMeasurement(
                     estimate.pose,
