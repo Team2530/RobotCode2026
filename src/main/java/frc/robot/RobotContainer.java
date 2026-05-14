@@ -214,6 +214,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(() -> {
                     limelightSubsystem.setIMUModes(1);
+                    limelightSubsystem.captureRewind();
                 })
             );
     }

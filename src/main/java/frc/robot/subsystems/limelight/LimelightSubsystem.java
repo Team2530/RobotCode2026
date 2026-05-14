@@ -3,6 +3,8 @@ package frc.robot.subsystems.limelight;
 import static edu.wpi.first.units.Units.*;
 
 import frc.robot.RobotContainer;
+import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightHelpers.RewindStats;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +23,8 @@ public class LimelightSubsystem extends SubsystemBase{
        this.limelights = new ArrayList<>(
                Arrays.asList(limelights)
            );
+
+       setRewinds(true);
     }
 
     @Override
@@ -102,6 +106,31 @@ public class LimelightSubsystem extends SubsystemBase{
     public void setPipelines(int index) {
         for (Limelight limelight : limelights) {
             limelight.setPipeline(index);
+        }
+    }
+
+    public void setRewinds(boolean value) {
+        for (Limelight limelight : limelights) {
+            LimelightHelpers.setRewindEnabled(
+                limelight.getId(),
+                value
+            );
+        }
+    }
+
+    public void captureRewinds() {
+        for (Limelight limelight : limelights) {
+            RewindStats stats = LimelightHelpers.getLatestResults(
+                    limelight.getId()
+                ).rewindStats;
+
+            LimelightHelpers.triggerRewindCapture(
+                    limelight.getId(),
+                    Math.min(
+                        stats.storedSeconds,
+                        165
+                    )
+            );
         }
     }
 }
