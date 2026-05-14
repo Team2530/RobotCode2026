@@ -488,7 +488,7 @@ public final class Constants {
     
                 public static final double A = 0.02240843;
                 public static final double B = -0.98693;;
-                public static final double C = 23.95142;
+                public static final double C = 24.05142;
                 public static final double D = -72.46686;  
             }
         }

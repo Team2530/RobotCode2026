@@ -519,6 +519,10 @@ public class RobotContainer {
                 new IntakeCommand(intakeSubsystem)
             );
             put(
+                "IntakeOut", 
+                new IntakeCommand(intakeSubsystem, IntakePreset.OUT)
+            );
+            put(
                 "Raise Shoot",
                 flagpole.raiseFlaggedCommand(
                     () -> new ParallelRaceGroup(
