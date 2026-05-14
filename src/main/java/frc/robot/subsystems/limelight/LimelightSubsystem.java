@@ -87,13 +87,19 @@ public class LimelightSubsystem extends SubsystemBase{
 
     public void setIMUModes(int mode) {
         for (Limelight limelight : limelights) {
-            limelight.setIMUMode(mode);
+            LimelightHelpers.SetIMUMode(
+                    limelight.getId(), 
+                    mode
+            );
         }
     }
 
     public void setAlphaAssists(double assist) {
         for (Limelight limelight : limelights) {
-            limelight.setAlphaAssist(assist);
+            LimelightHelpers.SetIMUAssistAlpha(
+                    limelight.getId(),
+                    assist
+            );
         }
     }
 
@@ -105,7 +111,10 @@ public class LimelightSubsystem extends SubsystemBase{
 
     public void setPipelines(int index) {
         for (Limelight limelight : limelights) {
-            limelight.setPipeline(index);
+            LimelightHelpers.setPipelineIndex(
+                    limelight.getId(),
+                    index
+            );
         }
     }
 

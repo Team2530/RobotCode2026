@@ -224,25 +224,4 @@ public class Limelight extends SubsystemBase{
     public Pose3d getPose() {
         return cameraPoseSupplier.get();
     }
-
-    public void setIMUMode(int mode) {
-        LimelightHelpers.SetIMUMode(
-                getId(),
-                mode
-            );
-    }
-
-    public void setAlphaAssist(double assist) {
-        LimelightHelpers.SetIMUAssistAlpha(
-                getId(),
-                assist
-            );
-    }
-
-    public void setPipeline(int index) {
-        LimelightHelpers.setPipelineIndex(
-            getId(),
-            index
-        );
-    }
 }

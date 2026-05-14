@@ -189,11 +189,6 @@ public class RobotContainer {
 
                     new HubStatusCommand(),
 
-                    new InstantCommand(() -> {
-                        intakeSubsystem.setPreset(IntakePreset.OUT);
-                        //LLContainer.setIMUMode(4);
-                    }),
-
                     new FuelAlertingCommand(operatorXbox.getHID())
                 )
             );
@@ -202,11 +197,7 @@ public class RobotContainer {
             .onTrue(
                 new ParallelCommandGroup(
                     new MatchtimeStatusCommand(),
-                    new VoltageStatusCommand(),
-                
-                    new InstantCommand(() -> {
-                        //LLContainer.setIMUMode(4);
-                    })
+                    new VoltageStatusCommand()
                 )
             );
 
@@ -214,7 +205,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(() -> {
                     limelightSubsystem.setIMUModes(1);
-                    limelightSubsystem.captureRewind();
+                    limelightSubsystem.captureRewinds();
                 })
             );
     }
