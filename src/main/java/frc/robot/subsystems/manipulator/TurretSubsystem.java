@@ -189,7 +189,7 @@ public class TurretSubsystem extends SubsystemBase {
                     ).withCurrentLimits(
                         new CurrentLimitsConfigs()
                             .withStatorCurrentLimit(200)
-                            .withSupplyCurrentLimit(90)
+                            .withSupplyCurrentLimit(65)
                     )
             );
         // WARNING: this might need to be set in periodic?
