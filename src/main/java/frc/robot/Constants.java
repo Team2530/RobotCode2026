@@ -300,7 +300,7 @@ public final class Constants {
             public static final double WHEEL_FRICTION_COEFFICIENT = 2.255;
 
             public static final Voltage OPTIMAL_VOLTAGE = Volts.of(12);
-            // BOTH STATOR AND SUPPLY
+            // STATOR LIMIT IF A NEO, SUPPLY LIMIT IF A KRAKEN
             public static final Current DRIVE_CURRENT_LIMIT = Amps.of(65);
             public static final Current STEER_CURRENT_LIMIT = Amps.of(65);
 
