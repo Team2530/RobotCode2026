@@ -203,10 +203,24 @@ public class RobotContainer {
 
         RobotModeTriggers.disabled()
             .onTrue(
-                new InstantCommand(() -> {
-                    limelightSubsystem.setIMUModes(1);
-                    limelightSubsystem.captureRewinds();
-                })
+                new Command() {
+                    @Override
+                    public void execute() {
+                        limelightSubsystem.setIMUModes(1);
+                        limelightSubsystem.captureRewinds();
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean runsWhenDisabled() {
+                        return true;
+                    }
+
+                }
             );
     }
     
