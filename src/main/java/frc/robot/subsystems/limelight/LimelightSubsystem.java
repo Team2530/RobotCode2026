@@ -129,16 +129,9 @@ public class LimelightSubsystem extends SubsystemBase{
 
     public void captureRewinds() {
         for (Limelight limelight : limelights) {
-            RewindStats stats = LimelightHelpers.getLatestResults(
-                    limelight.getId()
-                ).rewindStats;
-
             LimelightHelpers.triggerRewindCapture(
                     limelight.getId(),
-                    Math.min(
-                        stats.storedSeconds,
-                        165
-                    )
+                    165
             );
         }
     }
