@@ -300,8 +300,9 @@ public final class Constants {
             public static final double WHEEL_FRICTION_COEFFICIENT = 2.255;
 
             public static final Voltage OPTIMAL_VOLTAGE = Volts.of(12);
-            public static final Current DRIVE_CURRENT_LIMIT = Amps.of(120);
-            public static final Current STEER_CURRENT_LIMIT = Amps.of(120);
+            // BOTH STATOR AND SUPPLY
+            public static final Current DRIVE_CURRENT_LIMIT = Amps.of(65);
+            public static final Current STEER_CURRENT_LIMIT = Amps.of(65);
 
             // the minimum number of seconds it takes the motor to go from 0 to
             // full throttle
