@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.MetaConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.ChoreoConstants;
 import frc.robot.RobotContainer;
@@ -393,10 +394,17 @@ public class SwerveSubsystem extends SubsystemBase {
             boolean added;
             if (
                 reading.getEstimate().tagCount >= 2
-                && RobotContainer.swerveDriveSubsystem
+                && (RobotContainer.swerveDriveSubsystem
                         .getAngularVelocity()
                         .abs(RadiansPerSecond)
                     < (2 * Math.PI)
+                ) && (
+                    0 < reading.getEstimate().pose.getX() 
+                    && reading.getEstimate().pose.getX() < MetaConstants.Field.LENGTH.in(Meters)
+                ) && (
+                    0 < reading.getEstimate().pose.getY() 
+                    && reading.getEstimate().pose.getY() < MetaConstants.Field.WIDTH.in(Meters)
+                ) 
             ) {
                 mt2Filtered.add(reading);
 
@@ -449,6 +457,13 @@ public class SwerveSubsystem extends SubsystemBase {
                         .lt(
                             RadiansPerSecond.of(Math.PI)
                         )
+                    && (
+                        0 < reading.getEstimate().pose.getX() 
+                        && reading.getEstimate().pose.getX() < MetaConstants.Field.LENGTH.in(Meters)
+                    ) && (
+                        0 < reading.getEstimate().pose.getY() 
+                        && reading.getEstimate().pose.getY() < MetaConstants.Field.WIDTH.in(Meters)
+                    )
                 ) {
                     swerveDrive.addVisionMeasurement(
                         estimate.pose,
@@ -515,6 +530,13 @@ public class SwerveSubsystem extends SubsystemBase {
                     .lt(
                         RadiansPerSecond.of(Math.PI)
                     )
+                && (
+                    0 < reading.getEstimate().pose.getX() 
+                    && reading.getEstimate().pose.getX() < MetaConstants.Field.LENGTH.in(Meters)
+                ) && (
+                    0 < reading.getEstimate().pose.getY() 
+                    && reading.getEstimate().pose.getY() < MetaConstants.Field.WIDTH.in(Meters)
+                )
             ) {
                 swerveDrive.addVisionMeasurement(
                     estimate.pose,

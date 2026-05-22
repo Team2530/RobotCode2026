@@ -189,11 +189,6 @@ public class RobotContainer {
 
                     new HubStatusCommand(),
 
-                    new InstantCommand(() -> {
-                        intakeSubsystem.setPreset(IntakePreset.OUT);
-                        //LLContainer.setIMUMode(4);
-                    }),
-
                     new FuelAlertingCommand(operatorXbox.getHID())
                 )
             );
@@ -202,19 +197,30 @@ public class RobotContainer {
             .onTrue(
                 new ParallelCommandGroup(
                     new MatchtimeStatusCommand(),
-                    new VoltageStatusCommand(),
-                
-                    new InstantCommand(() -> {
-                        //LLContainer.setIMUMode(4);
-                    })
+                    new VoltageStatusCommand()
                 )
             );
 
         RobotModeTriggers.disabled()
             .onTrue(
-                new InstantCommand(() -> {
-                    limelightSubsystem.setIMUModes(1);
-                })
+                new Command() {
+                    @Override
+                    public void execute() {
+                        limelightSubsystem.setIMUModes(1);
+                        limelightSubsystem.captureRewinds();
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean runsWhenDisabled() {
+                        return true;
+                    }
+
+                }
             );
     }
     
@@ -517,6 +523,10 @@ public class RobotContainer {
             put(
                 "Intake",
                 new IntakeCommand(intakeSubsystem)
+            );
+            put(
+                "IntakeOut", 
+                new IntakeCommand(intakeSubsystem, IntakePreset.OUT)
             );
             put(
                 "Raise Shoot",

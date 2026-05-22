@@ -300,8 +300,9 @@ public final class Constants {
             public static final double WHEEL_FRICTION_COEFFICIENT = 2.255;
 
             public static final Voltage OPTIMAL_VOLTAGE = Volts.of(12);
-            public static final Current DRIVE_CURRENT_LIMIT = Amps.of(120);
-            public static final Current STEER_CURRENT_LIMIT = Amps.of(120);
+            // STATOR LIMIT IF A NEO, SUPPLY LIMIT IF A KRAKEN
+            public static final Current DRIVE_CURRENT_LIMIT = Amps.of(65);
+            public static final Current STEER_CURRENT_LIMIT = Amps.of(65);
 
             // the minimum number of seconds it takes the motor to go from 0 to
             // full throttle
@@ -450,8 +451,12 @@ public final class Constants {
             public static final AngularVelocity MINIMUM_VELOCITY =
                 RotationsPerSecond.of(15);
 
-            public static final AngularVelocity MAXIMUM_VELOCITY_ERROR = 
-                RotationsPerSecond.of(10);
+            public static final AngularVelocity MAXIMUM_FINE_VELOCITY_ERROR = 
+                RotationsPerSecond.of(5);
+            public static final AngularVelocity MAXIMUM_ROUGH_VELOCITY_ERROR = 
+                RotationsPerSecond.of(14);
+            public static final AngularVelocity FULL_SEND_LINE = 
+                RotationsPerSecond.of(67.5);
 
             public static final Dimensionless VELOCITY_IMPART = Percent.of(90);
             
@@ -484,7 +489,7 @@ public final class Constants {
     
                 public static final double A = 0.02240843;
                 public static final double B = -0.98693;;
-                public static final double C = 23.95142;
+                public static final double C = 24.05142;
                 public static final double D = -72.46686;  
             }
         }

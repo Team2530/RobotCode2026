@@ -35,6 +35,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
@@ -185,6 +186,10 @@ public class TurretSubsystem extends SubsystemBase {
                             .withKV(
                                 TurretConstants.Launcher.Feedforward.kV
                             )
+                    ).withCurrentLimits(
+                        new CurrentLimitsConfigs()
+                            .withStatorCurrentLimit(200)
+                            .withSupplyCurrentLimit(65)
                     )
             );
         // WARNING: this might need to be set in periodic?
@@ -432,8 +437,13 @@ public class TurretSubsystem extends SubsystemBase {
                     getLauncherVelocity()
                     .minus(targetVelocity)
                 ).abs(RotationsPerSecond)
-                < TurretConstants.Launcher.MAXIMUM_VELOCITY_ERROR
-                    .in(RotationsPerSecond);
+                < (
+                    targetVelocity.gt(TurretConstants.Launcher.FULL_SEND_LINE)
+                        ?  TurretConstants.Launcher.MAXIMUM_ROUGH_VELOCITY_ERROR
+                            .in(RotationsPerSecond)
+                        :  TurretConstants.Launcher.MAXIMUM_FINE_VELOCITY_ERROR
+                            .in(RotationsPerSecond)
+                );
             atSolution = (
                     getYaw()
                     .minus(targetYaw)   
